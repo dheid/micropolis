@@ -29,7 +29,7 @@
 
 <target name="copy-resources" depends="init-builddir">
 <copy todir="${builddir}">
-	<fileset dir="resources"
+	<fileset dir="src/main/resources"
 		excludes="**/*.xcf **/Thumbs.db"
 		/>
 </copy>
@@ -113,7 +113,7 @@
 <target name="dist" depends="build">
 <zip destfile="${zipfile}">
 	<fileset dir="." includes="${distfile}, ${ant.project.name}.ico, README, COPYING" />
-	<zipfileset dir="resources" includes="micropolism.png" fullpath="${ant.project.name}-icon.png"/>
+	<zipfileset dir="src/main/resources" includes="micropolism.png" fullpath="${ant.project.name}-icon.png"/>
 </zip>
 </target>
 
