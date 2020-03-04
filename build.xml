@@ -17,14 +17,10 @@
 <property name="zipfile" value="${ant.project.name}-${package-version}.zip" />
 
 <path id="build-classpath">
-  <fileset dir="extlib">
-    <include name="*.jar" />
-  </fileset>
 </path>
 
 <target name="init-builddir">
 <mkdir dir="${builddir}" />
-<mkdir dir="extlib" />
 </target>
 
 <target name="copy-resources" depends="init-builddir">
