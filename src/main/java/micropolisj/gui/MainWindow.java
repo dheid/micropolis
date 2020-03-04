@@ -62,7 +62,7 @@ public class MainWindow extends JFrame
 		appIcon = new ImageIcon(MainWindow.class.getResource("/micropolism.png"));
 	}
 
-	static ResourceBundle strings = ResourceBundle.getBundle("micropolisj.GuiStrings");
+	static ResourceBundle strings = ResourceBundle.getBundle("strings.GuiStrings");
 	static final String PRODUCT_NAME = strings.getString("PRODUCT");
 
 	public MainWindow()

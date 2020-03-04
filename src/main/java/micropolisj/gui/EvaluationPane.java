@@ -36,7 +36,7 @@ public class EvaluationPane extends JPanel
 	JLabel scoreLbl;
 	JLabel scoreDeltaLbl;
 
-	static ResourceBundle cstrings = ResourceBundle.getBundle("micropolisj.CityStrings");
+	static ResourceBundle cstrings = ResourceBundle.getBundle("strings.CityStrings");
 	static ResourceBundle gstrings = MainWindow.strings;
 
 	public EvaluationPane(Micropolis _engine)

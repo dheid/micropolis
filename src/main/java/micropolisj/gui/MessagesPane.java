@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 
 public class MessagesPane extends JTextPane
 {
-	static ResourceBundle cityMessageStrings = ResourceBundle.getBundle("micropolisj.CityMessages");
+	static ResourceBundle cityMessageStrings = ResourceBundle.getBundle("strings.CityMessages");
 
 	public MessagesPane()
 	{

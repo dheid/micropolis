@@ -31,8 +31,8 @@ public class NotificationPane extends JPanel
 	static final Dimension VIEWPORT_SIZE = new Dimension(160, 160);
 	static final Color QUERY_COLOR = new Color(255, 165, 0);
 	static final ResourceBundle strings = MainWindow.strings;
-	static final ResourceBundle mstrings = ResourceBundle.getBundle("micropolisj.CityMessages");
-	static final ResourceBundle s_strings = ResourceBundle.getBundle("micropolisj.StatusMessages");
+	static final ResourceBundle mstrings = ResourceBundle.getBundle("strings.CityMessages");
+	static final ResourceBundle s_strings = ResourceBundle.getBundle("strings.StatusMessages");
 
 	public NotificationPane(Micropolis engine)
 	{

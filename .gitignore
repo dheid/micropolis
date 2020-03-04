@@ -1,6 +1,2 @@
+.gradle
 build
-*.jar
-*.zip
-docs/api
-src/main/resources/graphics/generated
-.*.swp
