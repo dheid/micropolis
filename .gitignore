@@ -1,5 +1,6 @@
 build
 *.jar
+*.zip
 docs/api
 graphics/generated
 .*.swp
