@@ -9,30 +9,41 @@
 package micropolisj.gui;
 
 import micropolisj.engine.SpriteKind;
+import micropolisj.engine.TileSpec;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static micropolisj.engine.TileConstants.LOMASK;
+import static micropolisj.engine.TileSpec.generateTileNames;
 
 public class TileImages
 {
-	final int TILE_WIDTH;
-	final int TILE_HEIGHT;
-	Image[] images;
+
+	private static final int STD_SIZE = 16;
+
+	final int tileWidth;
+	final int tileHeight;
+	BufferedImage[] images;
 	Map<SpriteKind, Map<Integer, Image>> spriteImages;
 
 	private TileImages(int size)
 	{
-		this.TILE_WIDTH = size;
-		this.TILE_HEIGHT = size;
+		this.tileWidth = size;
+		this.tileHeight = size;
 
-		this.images = loadTileImages("/" + size + "x" + size + "/tiles.png", size);
+		this.images = loadTileImages(size);
 		loadSpriteImages();
 	}
 
@@ -46,33 +57,95 @@ public class TileImages
 		return savedInstances.get(size);
 	}
 
-	public Image getTileImage(int cell)
+	public BufferedImage getTileImage(int cell)
 	{
 		int tile = (cell & LOMASK) % images.length;
 		return images[tile];
 	}
 
-	private Image[] loadTileImages(String resourceName, int srcSize)
+	private BufferedImage[] loadTileImages(int srcSize)
 	{
-		URL iconUrl = TileImages.class.getResource(resourceName);
-		Image refImage = new ImageIcon(iconUrl).getImage();
+
+		InputStream recipeFile = TileImages.class.getResourceAsStream("/graphics/tiles.rc");
+
+		Properties recipe = new Properties();
+		try {
+			recipe.load(new InputStreamReader(recipeFile, StandardCharsets.UTF_8));
+		} catch (IOException e) {
+			throw new UncheckedIOException("Could not load tiles recipe file tiles.rc", e);
+		}
+
+		String[] tileNames = generateTileNames(recipe);
+		int ntiles = tileNames.length;
+		BufferedImage[] images = new BufferedImage[ntiles];
 
 		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice dev = env.getDefaultScreenDevice();
 		GraphicsConfiguration conf = dev.getDefaultConfiguration();
 
-		Image[] images = new Image[refImage.getHeight(null) / srcSize];
-		for (int i = 0; i < images.length; i++) {
-			BufferedImage bi = conf.createCompatibleImage(TILE_WIDTH, TILE_HEIGHT, Transparency.OPAQUE);
+		for (int tileNumber = 0; tileNumber < ntiles; tileNumber++) {
+
+			BufferedImage bi = conf.createCompatibleImage(tileWidth, tileHeight, Transparency.OPAQUE);
 			Graphics2D gr = bi.createGraphics();
-			gr.drawImage(refImage, 0, 0, TILE_WIDTH, TILE_HEIGHT,
-					0, i * srcSize,
-					0 + srcSize, i * srcSize + srcSize,
+
+			String tileName = tileNames[tileNumber];
+			String rawSpec = recipe.getProperty(tileName);
+			assert rawSpec != null;
+
+			TileSpec tileSpec = TileSpec.parse(tileNumber, tileName, rawSpec, recipe);
+			FrameSpec ref = parseFrameSpec(tileSpec);
+			if (ref == null) {
+				// tile is defined, but it has no images
+				continue;
+			}
+
+			SourceImage sourceImg = ref.image;
+			gr.drawImage(sourceImg.image, 0, 0, tileWidth, tileHeight,
+					ref.offsetX * sourceImg.basisSize / STD_SIZE,
+					ref.offsetY * sourceImg.basisSize / STD_SIZE,
+					(ref.offsetX + STD_SIZE) * sourceImg.basisSize / STD_SIZE,
+					(ref.offsetY + STD_SIZE) * sourceImg.basisSize / STD_SIZE,
 					null);
 
-			images[i] = bi;
+			images[tileNumber] = bi;
 		}
 		return images;
+	}
+
+	private static FrameSpec parseFrameSpec(TileSpec spec)
+	{
+		FrameSpec result = null;
+
+		for (String layerStr : spec.getImages()) {
+
+			FrameSpec rv = new FrameSpec();
+			rv.background = result;
+			result = rv;
+
+			String[] parts = layerStr.split("@", 2);
+			rv.image = loadImage(parts[0]);
+
+			if (parts.length >= 2) {
+				String offsetInfo = parts[1];
+				parts = offsetInfo.split(",");
+				if (parts.length >= 1) {
+					rv.offsetX = Integer.parseInt(parts[0]);
+				}
+				if (parts.length >= 2) {
+					rv.offsetY = Integer.parseInt(parts[1]);
+				}
+			}//endif something given after '@' in image specifier
+
+		}//end foreach layer in image specification
+
+		return result;
+	}
+
+	private static SourceImage loadImage(String fileName)
+	{
+		URL pngFile = TileImages.class.getResource("/graphics/" + fileName + ".png");
+		ImageIcon ii = new ImageIcon(pngFile);
+		return new SourceImage(ii.getImage(), STD_SIZE);
 	}
 
 	public Image getSpriteImage(SpriteKind kind, int frameNumber)
@@ -100,7 +173,7 @@ public class TileImages
 		String resourceName = "/obj" + kind.objectId + "-" + frameNo;
 
 		// first, try to load specific size image
-		URL iconUrl = TileImages.class.getResource(resourceName + "_" + TILE_WIDTH + "x" + TILE_HEIGHT + ".png");
+		URL iconUrl = TileImages.class.getResource(resourceName + "_" + tileWidth + "x" + tileHeight + ".png");
 		if (iconUrl != null) {
 			return new ImageIcon(iconUrl).getImage();
 		}
@@ -109,14 +182,14 @@ public class TileImages
 		if (iconUrl == null)
 			return null;
 
-		if (TILE_WIDTH == 16 && TILE_HEIGHT == 16) {
+		if (tileWidth == 16 && tileHeight == 16) {
 			return new ImageIcon(iconUrl).getImage();
 		}
 
 		// scale the image ourselves
 		ImageIcon ii = new ImageIcon(iconUrl);
-		int destWidth = ii.getIconWidth() * TILE_WIDTH / 16;
-		int destHeight = ii.getIconHeight() * TILE_HEIGHT / 16;
+		int destWidth = ii.getIconWidth() * tileWidth / 16;
+		int destHeight = ii.getIconHeight() * tileHeight / 16;
 
 		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice dev = env.getDefaultScreenDevice();

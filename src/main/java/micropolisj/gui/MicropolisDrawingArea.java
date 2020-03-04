@@ -119,8 +119,8 @@ public class MicropolisDrawingArea extends JComponent
 	public void selectTileSize(int newTileSize)
 	{
 		tileImages = TileImages.getInstance(newTileSize);
-		TILE_WIDTH = tileImages.TILE_WIDTH;
-		TILE_HEIGHT = tileImages.TILE_HEIGHT;
+		TILE_WIDTH = tileImages.tileWidth;
+		TILE_HEIGHT = tileImages.tileHeight;
 		revalidate();
 	}
 

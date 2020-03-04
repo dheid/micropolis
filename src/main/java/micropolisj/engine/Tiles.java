@@ -42,7 +42,7 @@ public class Tiles
 		Properties tilesRc = new Properties();
 		tilesRc.load(
 				new InputStreamReader(
-						Tiles.class.getResourceAsStream("/tiles.rc"),
+						Tiles.class.getResourceAsStream("/graphics/tiles.rc"),
 						UTF8
 				)
 		);

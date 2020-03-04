@@ -20,7 +20,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 import java.util.ArrayList;
 
 import static micropolisj.engine.TileConstants.*;
@@ -28,6 +27,7 @@ import static micropolisj.engine.TileConstants.*;
 public class OverlayMapView extends JComponent
 		implements Scrollable, MapListener
 {
+	TileImages tileImages;
 	Micropolis engine;
 	ArrayList<ConnectedView> views = new ArrayList<ConnectedView>();
 	MapState mapState = MapState.ALL;
@@ -54,6 +54,9 @@ public class OverlayMapView extends JComponent
 		addMouseMotionListener(mouse);
 
 		setEngine(_engine);
+
+		tileImages = TileImages.getInstance(TILE_WIDTH);
+
 	}
 
 	public Micropolis getEngine()
@@ -102,23 +105,9 @@ public class OverlayMapView extends JComponent
 		repaint();
 	}
 
-	static BufferedImage tileArrayImage = loadImage("/sm/tiles.png");
 	static final int TILE_WIDTH = 3;
 	static final int TILE_HEIGHT = 3;
 	static final int TILE_OFFSET_Y = 3;
-
-	static BufferedImage loadImage(String resourceName)
-	{
-		URL iconUrl = MicropolisDrawingArea.class.getResource(resourceName);
-		Image refImage = new ImageIcon(iconUrl).getImage();
-
-		BufferedImage bi = new BufferedImage(refImage.getWidth(null), refImage.getHeight(null),
-				BufferedImage.TYPE_INT_RGB);
-		Graphics2D gr = bi.createGraphics();
-		gr.drawImage(refImage, 0, 0, null);
-
-		return bi;
-	}
 
 	static final Color VAL_LOW = new Color(0xbfbfbf);
 	static final Color VAL_MEDIUM = new Color(0xffff00);
@@ -411,11 +400,12 @@ public class OverlayMapView extends JComponent
 	void paintTile(BufferedImage img, int x, int y, int tile)
 	{
 		assert tile >= 0;
+		BufferedImage tileImage = tileImages.getTileImage(tile);
 
 		for (int yy = 0; yy < TILE_HEIGHT; yy++) {
 			for (int xx = 0; xx < TILE_WIDTH; xx++) {
 				img.setRGB(x * TILE_WIDTH + xx, y * TILE_HEIGHT + yy,
-						tileArrayImage.getRGB(xx, tile * TILE_OFFSET_Y + yy));
+						tileImage.getRGB(xx, yy));
 			}
 		}
 	}
