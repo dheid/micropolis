@@ -20,7 +20,7 @@ class RoadLikeTool extends ToolStroke
 	@Override
 	protected void applyArea(ToolEffectIfc eff)
 	{
-		for (;;) {
+		for (; ; ) {
 			if (!applyForward(eff)) {
 				break;
 			}
@@ -37,7 +37,7 @@ class RoadLikeTool extends ToolStroke
 		CityRect b = getBounds();
 		for (int i = b.height - 1; i >= 0; i--) {
 			for (int j = b.width - 1; j >= 0; j--) {
-				TranslatedToolEffect tte = new TranslatedToolEffect(eff, b.x+j, b.y+i);
+				TranslatedToolEffect tte = new TranslatedToolEffect(eff, b.x + j, b.y + i);
 				anyChange = anyChange || applySingle(tte);
 			}
 		}
@@ -51,7 +51,7 @@ class RoadLikeTool extends ToolStroke
 		CityRect b = getBounds();
 		for (int i = 0; i < b.height; i++) {
 			for (int j = 0; j < b.width; j++) {
-				TranslatedToolEffect tte = new TranslatedToolEffect(eff, b.x+j, b.y+i);
+				TranslatedToolEffect tte = new TranslatedToolEffect(eff, b.x + j, b.y + i);
 				anyChange = anyChange || applySingle(tte);
 			}
 		}
@@ -67,41 +67,39 @@ class RoadLikeTool extends ToolStroke
 		assert tool.getWidth() == 1;
 		assert tool.getHeight() == 1;
 
-		if (Math.abs(xdest-xpos) >= Math.abs(ydest-ypos)) {
+		if (Math.abs(xdest - xpos) >= Math.abs(ydest - ypos)) {
 			// horizontal line
 			CityRect r = new CityRect();
 			r.x = Math.min(xpos, xdest);
-			r.width = Math.abs(xdest-xpos) + 1;
+			r.width = Math.abs(xdest - xpos) + 1;
 			r.y = ypos;
 			r.height = 1;
 			return r;
-		}
-		else {
+		} else {
 			// vertical line
 			CityRect r = new CityRect();
 			r.x = xpos;
 			r.width = 1;
 			r.y = Math.min(ypos, ydest);
-			r.height = Math.abs(ydest-ypos) + 1;
+			r.height = Math.abs(ydest - ypos) + 1;
 			return r;
 		}
 	}
 
 	boolean applySingle(ToolEffectIfc eff)
 	{
-		switch (tool)
-		{
-		case RAIL:
-			return applyRailTool(eff);
+		switch (tool) {
+			case RAIL:
+				return applyRailTool(eff);
 
-		case ROADS:
-			return applyRoadTool(eff);
+			case ROADS:
+				return applyRoadTool(eff);
 
-		case WIRE:
-			return applyWireTool(eff);
+			case WIRE:
+				return applyWireTool(eff);
 
-		default:
-			throw new Error("Unexpected tool: " + tool);
+			default:
+				throw new Error("Unexpected tool: " + tool);
 		}
 	}
 
@@ -110,8 +108,7 @@ class RoadLikeTool extends ToolStroke
 		if (layRail(eff)) {
 			fixZone(eff);
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -121,8 +118,7 @@ class RoadLikeTool extends ToolStroke
 		if (layRoad(eff)) {
 			fixZone(eff);
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -132,8 +128,7 @@ class RoadLikeTool extends ToolStroke
 		if (layWire(eff)) {
 			fixZone(eff);
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -148,21 +143,19 @@ class RoadLikeTool extends ToolStroke
 		char tile = (char) eff.getTile(0, 0);
 		tile = neutralizeRoad(tile);
 
-		switch (tile)
-		{
-		case RIVER:		// rail on water
-		case REDGE:
-		case CHANNEL:
+		switch (tile) {
+			case RIVER:        // rail on water
+			case REDGE:
+			case CHANNEL:
 
-			cost = TUNNEL_COST;
+				cost = TUNNEL_COST;
 
-			// check east
+				// check east
 			{
 				char eTile = neutralizeRoad(eff.getTile(1, 0));
 				if (eTile == RAILHPOWERV ||
-					eTile == HRAIL ||
-					(eTile >= LHRAIL && eTile <= HRAILROAD))
-				{
+						eTile == HRAIL ||
+						(eTile >= LHRAIL && eTile <= HRAILROAD)) {
 					eff.setTile(0, 0, HRAIL);
 					break;
 				}
@@ -172,9 +165,8 @@ class RoadLikeTool extends ToolStroke
 			{
 				char wTile = neutralizeRoad(eff.getTile(-1, 0));
 				if (wTile == RAILHPOWERV ||
-					wTile == HRAIL ||
-					(wTile > VRAIL && wTile < VRAILROAD))
-				{
+						wTile == HRAIL ||
+						(wTile > VRAIL && wTile < VRAILROAD)) {
 					eff.setTile(0, 0, HRAIL);
 					break;
 				}
@@ -184,9 +176,8 @@ class RoadLikeTool extends ToolStroke
 			{
 				char sTile = neutralizeRoad(eff.getTile(0, 1));
 				if (sTile == RAILVPOWERH ||
-					sTile == VRAILROAD ||
-					(sTile > HRAIL && sTile < HRAILROAD))
-				{
+						sTile == VRAILROAD ||
+						(sTile > HRAIL && sTile < HRAILROAD)) {
 					eff.setTile(0, 0, VRAIL);
 					break;
 				}
@@ -196,9 +187,8 @@ class RoadLikeTool extends ToolStroke
 			{
 				char nTile = neutralizeRoad(eff.getTile(0, -1));
 				if (nTile == RAILVPOWERH ||
-					nTile == VRAILROAD ||
-					(nTile > HRAIL && nTile < HRAILROAD))
-				{
+						nTile == VRAILROAD ||
+						(nTile > HRAIL && nTile < HRAILROAD)) {
 					eff.setTile(0, 0, VRAIL);
 					break;
 				}
@@ -207,36 +197,35 @@ class RoadLikeTool extends ToolStroke
 			// cannot do road here
 			return false;
 
-		case LHPOWER: // rail on power
-			eff.setTile(0, 0, RAILVPOWERH);
-			break;
+			case LHPOWER: // rail on power
+				eff.setTile(0, 0, RAILVPOWERH);
+				break;
 
-		case LVPOWER: // rail on power
-			eff.setTile(0, 0, RAILHPOWERV);
-			break;
+			case LVPOWER: // rail on power
+				eff.setTile(0, 0, RAILHPOWERV);
+				break;
 
-		case TileConstants.ROADS:	// rail on road (case 1)
-			eff.setTile(0, 0, VRAILROAD);
-			break;
+			case TileConstants.ROADS:    // rail on road (case 1)
+				eff.setTile(0, 0, VRAILROAD);
+				break;
 
-		case ROADS2:	// rail on road (case 2)
-			eff.setTile(0, 0, HRAILROAD);
-			break;
+			case ROADS2:    // rail on road (case 2)
+				eff.setTile(0, 0, HRAILROAD);
+				break;
 
-		default:
-			if (tile != DIRT) {
-				if (city.autoBulldoze && canAutoBulldozeRRW(tile)) {
-					cost += 1; //autodoze cost
+			default:
+				if (tile != DIRT) {
+					if (city.autoBulldoze && canAutoBulldozeRRW(tile)) {
+						cost += 1; //autodoze cost
+					} else {
+						// cannot do rail here
+						return false;
+					}
 				}
-				else {
-					// cannot do rail here
-					return false;
-				}
-			}
 
-		  	//rail on dirt
-			eff.setTile(0, 0, LHRAIL);
-			break;
+				//rail on dirt
+				eff.setTile(0, 0, LHRAIL);
+				break;
 		}
 
 		eff.spend(cost);
@@ -251,21 +240,19 @@ class RoadLikeTool extends ToolStroke
 		int cost = ROAD_COST;
 
 		char tile = (char) eff.getTile(0, 0);
-		switch (tile)
-		{
-		case RIVER:		// road on water
-		case REDGE:
-		case CHANNEL:	// check how to build bridges, if possible.
+		switch (tile) {
+			case RIVER:        // road on water
+			case REDGE:
+			case CHANNEL:    // check how to build bridges, if possible.
 
-			cost = BRIDGE_COST;
+				cost = BRIDGE_COST;
 
-			// check east
+				// check east
 			{
 				char eTile = neutralizeRoad(eff.getTile(1, 0));
 				if (eTile == VRAILROAD ||
-					eTile == HBRIDGE ||
-					(eTile >= TileConstants.ROADS && eTile <= HROADPOWER))
-				{
+						eTile == HBRIDGE ||
+						(eTile >= TileConstants.ROADS && eTile <= HROADPOWER)) {
 					eff.setTile(0, 0, HBRIDGE);
 					break;
 				}
@@ -275,9 +262,8 @@ class RoadLikeTool extends ToolStroke
 			{
 				char wTile = neutralizeRoad(eff.getTile(-1, 0));
 				if (wTile == VRAILROAD ||
-					wTile == HBRIDGE ||
-					(wTile >= TileConstants.ROADS && wTile <= INTERSECTION))
-				{
+						wTile == HBRIDGE ||
+						(wTile >= TileConstants.ROADS && wTile <= INTERSECTION)) {
 					eff.setTile(0, 0, HBRIDGE);
 					break;
 				}
@@ -287,9 +273,8 @@ class RoadLikeTool extends ToolStroke
 			{
 				char sTile = neutralizeRoad(eff.getTile(0, 1));
 				if (sTile == HRAILROAD ||
-					sTile == VROADPOWER ||
-					(sTile >= VBRIDGE && sTile <= INTERSECTION))
-				{
+						sTile == VROADPOWER ||
+						(sTile >= VBRIDGE && sTile <= INTERSECTION)) {
 					eff.setTile(0, 0, VBRIDGE);
 					break;
 				}
@@ -299,9 +284,8 @@ class RoadLikeTool extends ToolStroke
 			{
 				char nTile = neutralizeRoad(eff.getTile(0, -1));
 				if (nTile == HRAILROAD ||
-					nTile == VROADPOWER ||
-					(nTile >= VBRIDGE && nTile <= INTERSECTION))
-				{
+						nTile == VROADPOWER ||
+						(nTile >= VBRIDGE && nTile <= INTERSECTION)) {
 					eff.setTile(0, 0, VBRIDGE);
 					break;
 				}
@@ -310,39 +294,38 @@ class RoadLikeTool extends ToolStroke
 			// cannot do road here
 			return false;
 
-		case LHPOWER: //road on power
-			eff.setTile(0, 0, VROADPOWER);
-			break;
+			case LHPOWER: //road on power
+				eff.setTile(0, 0, VROADPOWER);
+				break;
 
-		case LVPOWER: //road on power #2
-			eff.setTile(0, 0, HROADPOWER);
-			break;
+			case LVPOWER: //road on power #2
+				eff.setTile(0, 0, HROADPOWER);
+				break;
 
-		case LHRAIL: //road on rail
-			eff.setTile(0, 0, HRAILROAD);
-			break;
+			case LHRAIL: //road on rail
+				eff.setTile(0, 0, HRAILROAD);
+				break;
 
-		case LVRAIL: //road on rail #2
-			eff.setTile(0, 0, VRAILROAD);
-			break;
+			case LVRAIL: //road on rail #2
+				eff.setTile(0, 0, VRAILROAD);
+				break;
 
-		default:
-			if (tile != DIRT) {
-				if (city.autoBulldoze && canAutoBulldozeRRW(tile)) {
-					cost += 1; //autodoze cost
+			default:
+				if (tile != DIRT) {
+					if (city.autoBulldoze && canAutoBulldozeRRW(tile)) {
+						cost += 1; //autodoze cost
+					} else {
+						// cannot do road here
+						return false;
+					}
 				}
-				else {
-					// cannot do road here
-					return false;
-				}
-			}
 
-			// road on dirt;
-			// just build a plain road, fixZone will fix it.
-			eff.setTile(0, 0, TileConstants.ROADS);
-			break;
+				// road on dirt;
+				// just build a plain road, fixZone will fix it.
+				eff.setTile(0, 0, TileConstants.ROADS);
+				break;
 		}
-	
+
 		eff.spend(cost);
 		return true;
 	}
@@ -357,24 +340,22 @@ class RoadLikeTool extends ToolStroke
 		char tile = (char) eff.getTile(0, 0);
 		tile = neutralizeRoad(tile);
 
-		switch (tile)
-		{
-		case RIVER:		// wire on water
-		case REDGE:
-		case CHANNEL:
+		switch (tile) {
+			case RIVER:        // wire on water
+			case REDGE:
+			case CHANNEL:
 
-			cost = UNDERWATER_WIRE_COST;
+				cost = UNDERWATER_WIRE_COST;
 
-			// check east
+				// check east
 			{
 				int tmp = eff.getTile(1, 0);
 				char tmpn = neutralizeRoad(tmp);
 
 				if (isConductive(tmp) &&
-					tmpn != HROADPOWER &&
-					tmpn != RAILHPOWERV &&
-					tmpn != HPOWER)
-				{
+						tmpn != HROADPOWER &&
+						tmpn != RAILHPOWERV &&
+						tmpn != HPOWER) {
 					eff.setTile(0, 0, VPOWER);
 					break;
 				}
@@ -386,10 +367,9 @@ class RoadLikeTool extends ToolStroke
 				char tmpn = neutralizeRoad(tmp);
 
 				if (isConductive(tmp) &&
-					tmpn != HROADPOWER &&
-					tmpn != RAILHPOWERV &&
-					tmpn != HPOWER)
-				{
+						tmpn != HROADPOWER &&
+						tmpn != RAILHPOWERV &&
+						tmpn != HPOWER) {
 					eff.setTile(0, 0, VPOWER);
 					break;
 				}
@@ -401,10 +381,9 @@ class RoadLikeTool extends ToolStroke
 				char tmpn = neutralizeRoad(tmp);
 
 				if (isConductive(tmp) &&
-					tmpn != VROADPOWER &&
-					tmpn != RAILVPOWERH &&
-					tmpn != VPOWER)
-				{
+						tmpn != VROADPOWER &&
+						tmpn != RAILVPOWERH &&
+						tmpn != VPOWER) {
 					eff.setTile(0, 0, HPOWER);
 					break;
 				}
@@ -416,10 +395,9 @@ class RoadLikeTool extends ToolStroke
 				char tmpn = neutralizeRoad(tmp);
 
 				if (isConductive(tmp) &&
-					tmpn != VROADPOWER &&
-					tmpn != RAILVPOWERH &&
-					tmpn != VPOWER)
-				{
+						tmpn != VROADPOWER &&
+						tmpn != RAILVPOWERH &&
+						tmpn != VPOWER) {
 					eff.setTile(0, 0, HPOWER);
 					break;
 				}
@@ -428,36 +406,35 @@ class RoadLikeTool extends ToolStroke
 			// cannot do wire here
 			return false;
 
-		case TileConstants.ROADS: // wire on E/W road
-			eff.setTile(0, 0, HROADPOWER);
-			break;
+			case TileConstants.ROADS: // wire on E/W road
+				eff.setTile(0, 0, HROADPOWER);
+				break;
 
-		case ROADS2: // wire on N/S road
-			eff.setTile(0, 0, VROADPOWER);
-			break;
+			case ROADS2: // wire on N/S road
+				eff.setTile(0, 0, VROADPOWER);
+				break;
 
-		case LHRAIL:	// wire on E/W railroad tracks
-			eff.setTile(0, 0, RAILHPOWERV);
-			break;
+			case LHRAIL:    // wire on E/W railroad tracks
+				eff.setTile(0, 0, RAILHPOWERV);
+				break;
 
-		case LVRAIL:	// wire on N/S railroad tracks
-			eff.setTile(0, 0, RAILVPOWERH);
-			break;
+			case LVRAIL:    // wire on N/S railroad tracks
+				eff.setTile(0, 0, RAILVPOWERH);
+				break;
 
-		default:
-			if (tile != DIRT) {
-				if (city.autoBulldoze && canAutoBulldozeRRW(tile)) {
-					cost += 1; //autodoze cost
+			default:
+				if (tile != DIRT) {
+					if (city.autoBulldoze && canAutoBulldozeRRW(tile)) {
+						cost += 1; //autodoze cost
+					} else {
+						//cannot do wire here
+						return false;
+					}
 				}
-				else {
-					//cannot do wire here
-					return false;
-				}
-			}
 
-			//wire on dirt
-			eff.setTile(0, 0, LHPOWER);
-			break;
+				//wire on dirt
+				eff.setTile(0, 0, LHPOWER);
+				break;
 		}
 
 		eff.spend(cost);

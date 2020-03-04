@@ -18,12 +18,12 @@ import static micropolisj.engine.TileConstants.*;
  */
 public class ShipSprite extends Sprite
 {
-	static int [] BDx = {  0,  0,  1,  1,  1,  0, -1, -1, -1 };
-	static int [] BDy = {  0, -1, -1,  0,  1,  1,  1,  0, -1 };
-	static int [] BPx = {  0,  0,  2,  2,  2,  0, -2, -2, -2 };
-	static int [] BPy = {  0, -2, -2,  0,  2,  2,  2,  0, -2 };
-	static int [] BtClrTab = { RIVER, CHANNEL, POWERBASE, POWERBASE+1,
-			RAILBASE, RAILBASE+1, BRWH, BRWV };
+	static int[] BDx = {0, 0, 1, 1, 1, 0, -1, -1, -1};
+	static int[] BDy = {0, -1, -1, 0, 1, 1, 1, 0, -1};
+	static int[] BPx = {0, 0, 2, 2, 2, 0, -2, -2, -2};
+	static int[] BPy = {0, -2, -2, 0, 2, 2, 2, 0, -2};
+	static int[] BtClrTab = {RIVER, CHANNEL, POWERBASE, POWERBASE + 1,
+			RAILBASE, RAILBASE + 1, BRWH, BRWV};
 
 	int newDir;
 	int count;
@@ -57,7 +57,7 @@ public class ShipSprite extends Sprite
 		this.soundCount--;
 		if (this.soundCount <= 0) {
 			if (city.PRNG.nextInt(4) == 0) {
-				city.makeSound(x/16,y/16,Sound.HONKHONK_LOW);
+				city.makeSound(x / 16, y / 16, Sound.HONKHONK_LOW);
 			}
 			this.soundCount = 200;
 		}
@@ -75,30 +75,30 @@ public class ShipSprite extends Sprite
 				int z = (pem % 8) + 1;
 				if (z == this.dir)
 					continue;
-	
+
 				int xpos = this.x / 16 + BDx[z];
 				int ypos = this.y / 16 + BDy[z];
-	
+
 				if (city.testBounds(xpos, ypos)) {
 					t = city.getTile(xpos, ypos);
 					if ((t == CHANNEL) || (t == BRWH) || (t == BRWV) ||
-						tryOther(t, this.dir, z))
-					{
+							tryOther(t, this.dir, z)) {
 						this.newDir = z;
 						this.frame = turnTo(this.frame, this.newDir);
 						this.dir = z + 4;
-						if (this.dir > 8) { this.dir -= 8; }
+						if (this.dir > 8) {
+							this.dir -= 8;
+						}
 						break;
 					}
 				}
 			}
-	
+
 			if (pem == (tem + 8)) {
 				this.dir = 10;
-				this.newDir = city.PRNG.nextInt(8)+1;
+				this.newDir = city.PRNG.nextInt(8) + 1;
 			}
-		}
-		else {
+		} else {
 			int z = this.frame;
 			if (z == this.newDir) {
 				this.x += BPx[z];
@@ -119,8 +119,8 @@ public class ShipSprite extends Sprite
 		}
 		if (!found) {
 			if (!city.noDisasters) {
-			explodeSprite();
-			destroyTile(x/16, y/16);
+				explodeSprite();
+				destroyTile(x / 16, y / 16);
 			}
 		}
 	}
@@ -131,8 +131,8 @@ public class ShipSprite extends Sprite
 		if (z > 8) z -= 8;
 		if (newDir != z) return false;
 
-		return (tile == POWERBASE || tile == POWERBASE+1 ||
-			tile == RAILBASE || tile == RAILBASE+1);
+		return (tile == POWERBASE || tile == POWERBASE + 1 ||
+				tile == RAILBASE || tile == RAILBASE + 1);
 	}
 
 	boolean spriteInBounds()

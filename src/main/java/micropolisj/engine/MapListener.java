@@ -14,15 +14,23 @@ package micropolisj.engine;
  */
 public interface MapListener
 {
-	/** Called whenever data for a specific overlay has changed. */
+	/**
+	 * Called whenever data for a specific overlay has changed.
+	 */
 	void mapOverlayDataChanged(MapState overlayDataType);
 
-	/** Called when a sprite moves. */
+	/**
+	 * Called when a sprite moves.
+	 */
 	void spriteMoved(Sprite sprite);
 
-	/** Called when a map tile changes, including for animations. */
+	/**
+	 * Called when a map tile changes, including for animations.
+	 */
 	void tileChanged(int xpos, int ypos);
 
-	/** Called when the entire map should be reread and rendered. */
+	/**
+	 * Called when the entire map should be reread and rendered.
+	 */
 	void wholeMapChanged();
 }

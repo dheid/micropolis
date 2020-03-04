@@ -15,16 +15,28 @@ package micropolisj.engine;
  */
 public class ZoneStatus
 {
-	/** Number from 0 to 27, identifying the type of building. */
+	/**
+	 * Number from 0 to 27, identifying the type of building.
+	 */
 	public int building;
-	/** Number from 1 to 4, 1=Low, 2=Medium, 3=High, 4=Very High. */
+	/**
+	 * Number from 1 to 4, 1=Low, 2=Medium, 3=High, 4=Very High.
+	 */
 	public int popDensity;
-	/** Number from 5 to 8, 5=Slum, 6=Lower Class, etc. */
+	/**
+	 * Number from 5 to 8, 5=Slum, 6=Lower Class, etc.
+	 */
 	public int landValue;
-	/** Number from 9 to 12, 9=Safe, 10=Light, 11=Moderate, etc. */
+	/**
+	 * Number from 9 to 12, 9=Safe, 10=Light, 11=Moderate, etc.
+	 */
 	public int crimeLevel;
-	/** Number from 13 to 16, 13=None, 14=Moderate, 15=Heavy, etc. */
+	/**
+	 * Number from 13 to 16, 13=None, 14=Moderate, 15=Heavy, etc.
+	 */
 	public int pollution;
-	/** Number from 17 to 20, 17=Declining, 18=Stable, etc. */
+	/**
+	 * Number from 17 to 20, 17=Declining, 18=Stable, etc.
+	 */
 	public int growthRate;
 }

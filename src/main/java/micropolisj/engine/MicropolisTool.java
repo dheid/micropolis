@@ -8,8 +8,6 @@
 
 package micropolisj.engine;
 
-import static micropolisj.engine.TileConstants.*;
-
 /**
  * Enumerates the various tools that can be applied to the map by the user.
  * Call the tool's apply() method to actually use the tool on the map.
@@ -55,25 +53,25 @@ public enum MicropolisTool
 	public ToolStroke beginStroke(Micropolis engine, int xpos, int ypos)
 	{
 		switch (this) {
-		case BULLDOZER:
-			return new Bulldozer(engine, xpos, ypos);
+			case BULLDOZER:
+				return new Bulldozer(engine, xpos, ypos);
 
-		case WIRE:
-		case ROADS:
-		case RAIL:
-			return new RoadLikeTool(engine, this, xpos, ypos);
+			case WIRE:
+			case ROADS:
+			case RAIL:
+				return new RoadLikeTool(engine, this, xpos, ypos);
 
-		case FIRE:
-		case POLICE:
-		case STADIUM:
-		case SEAPORT:
-		case POWERPLANT:
-		case NUCLEAR:
-		case AIRPORT:
-			return new BuildingTool(engine, this, xpos, ypos);
+			case FIRE:
+			case POLICE:
+			case STADIUM:
+			case SEAPORT:
+			case POWERPLANT:
+			case NUCLEAR:
+			case AIRPORT:
+				return new BuildingTool(engine, this, xpos, ypos);
 
-		default:
-			return new ToolStroke(engine, this, xpos, ypos);
+			default:
+				return new ToolStroke(engine, this, xpos, ypos);
 		}
 	}
 

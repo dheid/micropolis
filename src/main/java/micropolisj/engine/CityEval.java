@@ -26,38 +26,60 @@ public class CityEval
 		assert PRNG != null;
 	}
 
-	/** Percentage of population "approving" the mayor. Derived from cityScore. */
+	/**
+	 * Percentage of population "approving" the mayor. Derived from cityScore.
+	 */
 	public int cityYes;
 
-	/** Percentage of population "disapproving" the mayor. Derived from cityScore. */
+	/**
+	 * Percentage of population "disapproving" the mayor. Derived from cityScore.
+	 */
 	public int cityNo;
 
-	/** City assessment value. */
+	/**
+	 * City assessment value.
+	 */
 	public int cityAssValue;
 
-	/** Player's score, 0-1000. */
+	/**
+	 * Player's score, 0-1000.
+	 */
 	public int cityScore;
 
-	/** Change in cityScore since last evaluation. */
+	/**
+	 * Change in cityScore since last evaluation.
+	 */
 	public int deltaCityScore;
 
-	/** City population as of current evaluation. */
+	/**
+	 * City population as of current evaluation.
+	 */
 	public int cityPop;
 
-	/** Change in cityPopulation since last evaluation. */
+	/**
+	 * Change in cityPopulation since last evaluation.
+	 */
 	public int deltaCityPop;
 
-	/** Classification of city size. 0==village, 1==town, etc. */
+	/**
+	 * Classification of city size. 0==village, 1==town, etc.
+	 */
 	public int cityClass; // 0..5
 
-	/** City's top 4 (or fewer) problems as reported by citizens. */
-	public CityProblem [] problemOrder = new CityProblem[0];
+	/**
+	 * City's top 4 (or fewer) problems as reported by citizens.
+	 */
+	public CityProblem[] problemOrder = new CityProblem[0];
 
-	/** Number of votes given for the various problems identified by problemOrder[]. */
-	public EnumMap<CityProblem,Integer> problemVotes = new EnumMap<CityProblem,Integer>(CityProblem.class);
+	/**
+	 * Number of votes given for the various problems identified by problemOrder[].
+	 */
+	public EnumMap<CityProblem, Integer> problemVotes = new EnumMap<CityProblem, Integer>(CityProblem.class);
 
-	/** Score for various problems. */
-	public EnumMap<CityProblem,Integer> problemTable = new EnumMap<CityProblem,Integer>(CityProblem.class);
+	/**
+	 * Score for various problems.
+	 */
+	public EnumMap<CityProblem, Integer> problemTable = new EnumMap<CityProblem, Integer>(CityProblem.class);
 
 	/**
 	 * Perform an evaluation.
@@ -76,7 +98,9 @@ public class CityEval
 		engine.fireEvaluationChanged();
 	}
 
-	/** Evaluate an empty city. */
+	/**
+	 * Evaluate an empty city.
+	 */
 	void evalInit()
 	{
 		cityYes = 0;
@@ -112,12 +136,12 @@ public class CityEval
 		deltaCityPop = cityPop - oldCityPop;
 
 		cityClass =
-			cityPop > 500000 ? 5 :    //megalopolis
-			cityPop > 100000 ? 4 :    //metropolis
-			cityPop > 50000 ? 3 :     //capital
-			cityPop > 10000 ? 2 :     //city
-			cityPop > 2000 ? 1 :      //town
-			0;                  //village
+				cityPop > 500000 ? 5 :    //megalopolis
+						cityPop > 100000 ? 4 :    //metropolis
+								cityPop > 50000 ? 3 :     //capital
+										cityPop > 10000 ? 2 :     //city
+												cityPop > 2000 ? 1 :      //town
+														0;                  //village
 	}
 
 	void doProblems()
@@ -125,7 +149,7 @@ public class CityEval
 		problemTable.clear();
 		problemTable.put(CityProblem.CRIME, engine.crimeAverage);
 		problemTable.put(CityProblem.POLLUTION, engine.pollutionAverage);
-		problemTable.put(CityProblem.HOUSING, (int)Math.round(engine.landValueAverage * 0.7));
+		problemTable.put(CityProblem.HOUSING, (int) Math.round(engine.landValueAverage * 0.7));
 		problemTable.put(CityProblem.TAXES, engine.cityTax * 10);
 		problemTable.put(CityProblem.TRAFFIC, averageTrf());
 		problemTable.put(CityProblem.UNEMPLOYMENT, getUnemployment());
@@ -133,11 +157,14 @@ public class CityEval
 
 		problemVotes = voteProblems(problemTable);
 
-		CityProblem [] probOrder = CityProblem.values();
-		Arrays.sort(probOrder, new Comparator<CityProblem>() {
-			public int compare(CityProblem a, CityProblem b) {
+		CityProblem[] probOrder = CityProblem.values();
+		Arrays.sort(probOrder, new Comparator<CityProblem>()
+		{
+			public int compare(CityProblem a, CityProblem b)
+			{
 				return -(problemVotes.get(a).compareTo(problemVotes.get(b)));
-			}});
+			}
+		});
 
 		int c = 0;
 		while (c < probOrder.length &&
@@ -151,22 +178,22 @@ public class CityEval
 		}
 	}
 
-	EnumMap<CityProblem,Integer> voteProblems(Map<CityProblem,Integer> probTab)
+	EnumMap<CityProblem, Integer> voteProblems(Map<CityProblem, Integer> probTab)
 	{
-		CityProblem [] pp = CityProblem.values();
-		int [] votes = new int[pp.length];
+		CityProblem[] pp = CityProblem.values();
+		int[] votes = new int[pp.length];
 
 		int countVotes = 0;
 		for (int i = 0; i < 600; i++) {
-			if (PRNG.nextInt(301) < probTab.get(pp[i%pp.length])) {
-				votes[i%pp.length]++;
+			if (PRNG.nextInt(301) < probTab.get(pp[i % pp.length])) {
+				votes[i % pp.length]++;
 				countVotes++;
 				if (countVotes >= 100)
 					break;
 			}
 		}
 
-		EnumMap<CityProblem,Integer> rv = new EnumMap<CityProblem,Integer>(CityProblem.class);
+		EnumMap<CityProblem, Integer> rv = new EnumMap<CityProblem, Integer>(CityProblem.class);
 		for (int i = 0; i < pp.length; i++) {
 			rv.put(pp[i], votes[i]);
 		}
@@ -188,7 +215,7 @@ public class CityEval
 			}
 		}
 
-		engine.trafficAverage = (int)Math.round(((double)total / (double)count) * 2.4);
+		engine.trafficAverage = (int) Math.round(((double) total / (double) count) * 2.4);
 		return engine.trafficAverage;
 	}
 
@@ -198,8 +225,8 @@ public class CityEval
 		if (b == 0)
 			return 0;
 
-		double r = (double)engine.resPop / (double)b;
-		b = (int)Math.floor((r-1.0)*255);
+		double r = (double) engine.resPop / (double) b;
+		b = (int) Math.floor((r - 1.0) * 255);
 		if (b > 255) {
 			b = 255;
 		}
@@ -231,40 +258,55 @@ public class CityEval
 
 		double z = clamp((256 - x) * 4, 0, 1000);
 
-		if (engine.resCap) { z = 0.85 * z; }
-		if (engine.comCap) { z = 0.85 * z; }
-		if (engine.indCap) { z = 0.85 * z; }
-		if (engine.roadEffect < 32) { z -= (32 - engine.roadEffect); }
-		if (engine.policeEffect < 1000) { z *= (0.9 + (engine.policeEffect / 10000.1)); }
-		if (engine.fireEffect < 1000) { z *= (0.9 + (engine.fireEffect / 10000.1)); }
-		if (engine.resValve < -1000) { z *= 0.85; }
-		if (engine.comValve < -1000) { z *= 0.85; }
-		if (engine.indValve < -1000) { z *= 0.85; }
+		if (engine.resCap) {
+			z = 0.85 * z;
+		}
+		if (engine.comCap) {
+			z = 0.85 * z;
+		}
+		if (engine.indCap) {
+			z = 0.85 * z;
+		}
+		if (engine.roadEffect < 32) {
+			z -= (32 - engine.roadEffect);
+		}
+		if (engine.policeEffect < 1000) {
+			z *= (0.9 + (engine.policeEffect / 10000.1));
+		}
+		if (engine.fireEffect < 1000) {
+			z *= (0.9 + (engine.fireEffect / 10000.1));
+		}
+		if (engine.resValve < -1000) {
+			z *= 0.85;
+		}
+		if (engine.comValve < -1000) {
+			z *= 0.85;
+		}
+		if (engine.indValve < -1000) {
+			z *= 0.85;
+		}
 
 		double SM = 1.0;
 		if (cityPop == 0 && deltaCityPop == 0) {
 			SM = 1.0;
-		}
-		else if (deltaCityPop == cityPop) {
+		} else if (deltaCityPop == cityPop) {
 			SM = 1.0;
-		}
-		else if (deltaCityPop > 0) {
-			SM = (double)deltaCityPop / (double)cityPop + 1.0;
-		}
-		else if (deltaCityPop < 0) {
-			SM = 0.95 + ((double)deltaCityPop / (double)(cityPop-deltaCityPop));
+		} else if (deltaCityPop > 0) {
+			SM = (double) deltaCityPop / (double) cityPop + 1.0;
+		} else if (deltaCityPop < 0) {
+			SM = 0.95 + ((double) deltaCityPop / (double) (cityPop - deltaCityPop));
 		}
 		z *= SM;
 		z -= getFire();
 		z -= engine.cityTax;
 
 		int TM = engine.unpoweredZoneCount + engine.poweredZoneCount;
-		SM = TM != 0 ? ((double)engine.poweredZoneCount / (double)TM) : 1.0;
+		SM = TM != 0 ? ((double) engine.poweredZoneCount / (double) TM) : 1.0;
 		z *= SM;
 
 		z = clamp(z, 0, 1000);
 
-		cityScore = (int)Math.round((cityScore + z) / 2.0);
+		cityScore = (int) Math.round((cityScore + z) / 2.0);
 		deltaCityScore = cityScore - oldCityScore;
 	}
 

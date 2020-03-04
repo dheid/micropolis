@@ -21,8 +21,8 @@ public class AirplaneSprite extends Sprite
 
 	// Note: frames 1-8 used for regular movement
 	//    9-11 used for Taking off
-	static int [] CDx = { 0,  0,  6,  8,  6,  0, -6, -8, -6,  8,  8,  8 };
-	static int [] CDy = { 0, -8, -6,  0,  6,  8,  6,  0, -6,  0,  0,  0 };
+	static int[] CDx = {0, 0, 6, 8, 6, 0, -6, -8, -6, 8, 8, 8};
+	static int[] CDy = {0, -8, -6, 0, 6, 8, 6, 0, -6, 0, 0, 0};
 
 	public AirplaneSprite(Micropolis engine, int xpos, int ypos)
 	{
@@ -35,12 +35,11 @@ public class AirplaneSprite extends Sprite
 		this.offy = -24;
 
 		this.destY = this.y;
-		if (xpos > engine.getWidth()-20) {
+		if (xpos > engine.getWidth() - 20) {
 			// not enough room to east of airport for taking off
 			this.destX = x - 200;
 			this.frame = 7;
-		}
-		else {
+		} else {
 			this.destX = x + 200;
 			this.frame = 11;
 		}
@@ -54,17 +53,18 @@ public class AirplaneSprite extends Sprite
 		if (city.acycle % 5 == 0) {
 			if (z > 8) { //plane is still taking off
 				z--;
-				if (z < 9) { z = 3; }
+				if (z < 9) {
+					z = 3;
+				}
 				this.frame = z;
-			}
-			else { // go to destination
+			} else { // go to destination
 				int d = getDir(x, y, destX, destY);
 				z = turnTo(z, d);
 				this.frame = z;
 			}
 		}
 
-		if (getDis(x, y, destX, destY) < 50) {		// at destination
+		if (getDis(x, y, destX, destY) < 50) {        // at destination
 			//FIXME- original code allows destination to be off-the-map
 			destX = city.PRNG.nextInt(city.getWidth()) * 16 + 8;
 			destY = city.PRNG.nextInt(city.getHeight()) * 16 + 8;
@@ -75,9 +75,8 @@ public class AirplaneSprite extends Sprite
 
 			for (Sprite s : city.allSprites()) {
 				if (s != this &&
-					(s.kind == SpriteKind.AIR || s.kind == SpriteKind.COP) &&
-					checkSpriteCollision(s))
-				{
+						(s.kind == SpriteKind.AIR || s.kind == SpriteKind.COP) &&
+						checkSpriteCollision(s)) {
 					s.explodeSprite();
 					explode = true;
 				}

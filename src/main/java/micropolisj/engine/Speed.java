@@ -16,17 +16,21 @@ package micropolisj.engine;
  */
 public enum Speed
 {
-	PAUSED    ( 999,  0),
-	SLOW      ( 625,  1),   //one sim step every 1250 ms
-	NORMAL    ( 125,  1),   //one sim step every 250 ms
-	FAST      (  25,  1),   //one sim step every 50 ms
-	SUPER_FAST(  25,  5);   //one sim step every 10 ms
+	PAUSED(999, 0),
+	SLOW(625, 1),   //one sim step every 1250 ms
+	NORMAL(125, 1),   //one sim step every 250 ms
+	FAST(25, 1),   //one sim step every 50 ms
+	SUPER_FAST(25, 5);   //one sim step every 10 ms
 
-	/** The animation speed, expressed as an interval in milliseconds. */
+	/**
+	 * The animation speed, expressed as an interval in milliseconds.
+	 */
 	public final int animationDelay;
 
-	/** For faster speeds, how many simulation steps should occur for every
-	 * update to the screen. */
+	/**
+	 * For faster speeds, how many simulation steps should occur for every
+	 * update to the screen.
+	 */
 	public final int simStepsPerUpdate;
 
 	private Speed(int delay, int simSteps)

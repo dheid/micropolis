@@ -8,22 +8,26 @@
 
 package micropolisj.util;
 
+import javax.swing.table.AbstractTableModel;
 import java.io.*;
-import java.util.*;
-import javax.swing.table.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Properties;
 
 class StringsModel extends AbstractTableModel
 {
-	StringInfo [] strings;
+	StringInfo[] strings;
 	ArrayList<MyLocaleInfo> locales = new ArrayList<MyLocaleInfo>();
 
 	static class MyLocaleInfo
 	{
 		String code;
-		HashMap<String,Properties> propsMap = new HashMap<String,Properties>();
+		HashMap<String, Properties> propsMap = new HashMap<String, Properties>();
 		boolean dirty;
 
-		MyLocaleInfo(String code) {
+		MyLocaleInfo(String code)
+		{
 			this.code = code;
 		}
 	}
@@ -40,21 +44,21 @@ class StringsModel extends AbstractTableModel
 		}
 	}
 
-	static final String [] FILES = {
-		"CityMessages",
-		"CityStrings",
-		"GuiStrings",
-		"StatusMessages"
-		};
+	static final String[] FILES = {
+			"CityMessages",
+			"CityStrings",
+			"GuiStrings",
+			"StatusMessages"
+	};
 
 	File workingDirectory;
 
 	StringsModel() throws IOException
 	{
 		workingDirectory = new File(
-			new File(System.getProperty("user.home")),
-			"micropolis-translations"
-			);
+				new File(System.getProperty("user.home")),
+				"micropolis-translations"
+		);
 
 		ArrayList<StringInfo> ss = new ArrayList<StringInfo>();
 		for (String f : FILES) {
@@ -64,15 +68,14 @@ class StringsModel extends AbstractTableModel
 	}
 
 	static void loadStrings(String file, ArrayList<StringInfo> ss)
-		throws IOException
+			throws IOException
 	{
 		Properties p = new Properties();
-		p.load(StringsModel.class.getResourceAsStream("/micropolisj/"+file+".properties"));
-		String [] propNames = p.keySet().toArray(new String[0]);
+		p.load(StringsModel.class.getResourceAsStream("/micropolisj/" + file + ".properties"));
+		String[] propNames = p.keySet().toArray(new String[0]);
 		Arrays.sort(propNames);
 
-		for (String propName : propNames)
-		{
+		for (String propName : propNames) {
 			StringInfo si = new StringInfo(file, propName);
 			ss.add(si);
 		}
@@ -85,7 +88,7 @@ class StringsModel extends AbstractTableModel
 			return si.id;
 		}
 
-		MyLocaleInfo l = locales.get(col-1);
+		MyLocaleInfo l = locales.get(col - 1);
 		Properties p = l.propsMap.get(si.file);
 		return p.getProperty(si.id);
 	}
@@ -113,9 +116,8 @@ class StringsModel extends AbstractTableModel
 	{
 		if (col == 0) {
 			return "String";
-		}
-		else {
-			MyLocaleInfo l = locales.get(col-1);
+		} else {
+			MyLocaleInfo l = locales.get(col - 1);
 			return l.code != null ? l.code : "C";
 		}
 	}
@@ -125,9 +127,8 @@ class StringsModel extends AbstractTableModel
 	{
 		if (col == 0) {
 			return false;
-		}
-		else {
-			MyLocaleInfo l = locales.get(col-1);
+		} else {
+			MyLocaleInfo l = locales.get(col - 1);
 			return l.code != null;
 		}
 	}
@@ -140,9 +141,9 @@ class StringsModel extends AbstractTableModel
 			return;
 		}
 
-		MyLocaleInfo l = locales.get(col-1);
+		MyLocaleInfo l = locales.get(col - 1);
 		Properties p = l.propsMap.get(si.file);
-		p.setProperty(si.id, (String)aValue);
+		p.setProperty(si.id, (String) aValue);
 		l.dirty = true;
 	}
 
@@ -153,21 +154,20 @@ class StringsModel extends AbstractTableModel
 	{
 		File d = new File(workingDirectory, "micropolisj");
 		return new File(d,
-			file
-			+(localeCode != null ? "_"+localeCode : "")
-			+".properties");
+				file
+						+ (localeCode != null ? "_" + localeCode : "")
+						+ ".properties");
 	}
 
 	void addLocale(String localeCode)
-		throws IOException
+			throws IOException
 	{
 		MyLocaleInfo li = new MyLocaleInfo(localeCode);
-		for (String file : FILES)
-		{
+		for (String file : FILES) {
 			Properties p = new Properties();
 			{
 				// load strings from our jar file
-				String s = "/micropolisj/"+file+(localeCode != null ? "_"+localeCode : "") + ".properties";
+				String s = "/micropolisj/" + file + (localeCode != null ? "_" + localeCode : "") + ".properties";
 				InputStream in = getClass().getResourceAsStream(s);
 				if (in != null) {
 					p.load(in);
@@ -184,9 +184,9 @@ class StringsModel extends AbstractTableModel
 		fireTableStructureChanged();
 	}
 
-	String [] getAllLocaleCodes()
+	String[] getAllLocaleCodes()
 	{
-		String [] rv = new String[locales.size()];
+		String[] rv = new String[locales.size()];
 		for (int i = 0; i < rv.length; i++) {
 			rv[i] = locales.get(i).code;
 		}
@@ -198,7 +198,7 @@ class StringsModel extends AbstractTableModel
 		assert localeCode != null;
 
 		boolean found = false;
-		for (int i = locales.size()-1; i >= 0; i--) {
+		for (int i = locales.size() - 1; i >= 0; i--) {
 			String loc = locales.get(i).code;
 			if (localeCode.equals(loc)) {
 				locales.remove(i);
@@ -211,7 +211,7 @@ class StringsModel extends AbstractTableModel
 	}
 
 	void makeDirectories(File f)
-		throws IOException
+			throws IOException
 	{
 		File d = f.getParentFile();
 		if (d != null) {
@@ -220,14 +220,12 @@ class StringsModel extends AbstractTableModel
 	}
 
 	void save()
-		throws IOException
+			throws IOException
 	{
-		for (MyLocaleInfo l : locales)
-		{
+		for (MyLocaleInfo l : locales) {
 			if (!l.dirty) continue;
 
-			for (String file : FILES)
-			{
+			for (String file : FILES) {
 				Properties p = l.propsMap.get(file);
 				File f = getPFile(file, l.code);
 				makeDirectories(f);

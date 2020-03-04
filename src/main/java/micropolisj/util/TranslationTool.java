@@ -8,12 +8,15 @@
 
 package micropolisj.util;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
 import javax.swing.*;
-import javax.swing.table.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.Locale;
 
 public class TranslationTool extends JFrame
 {
@@ -29,13 +32,12 @@ public class TranslationTool extends JFrame
 		setTitle("MicropolisJ Translation Tool");
 
 		try {
-		stringsModel = new StringsModel();
-		stringsModel.addLocale(null);
+			stringsModel = new StringsModel();
+			stringsModel.addLocale(null);
 
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			JOptionPane.showMessageDialog(this,
-				e, "Error", JOptionPane.ERROR_MESSAGE);
+					e, "Error", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		}
 
@@ -49,31 +51,43 @@ public class TranslationTool extends JFrame
 
 		JButton btn;
 		btn = new JButton("Add Locale...");
-		btn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+		btn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				onAddLocaleClicked();
-			}});
+			}
+		});
 		buttonPane.add(btn);
 
 		removeBtn = new JButton("Remove Locale");
-		removeBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+		removeBtn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				onRemoveLocaleClicked();
-			}});
+			}
+		});
 		buttonPane.add(removeBtn);
 
 		testBtn = new JButton("Test");
-		testBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+		testBtn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				onTestClicked();
-			}});
+			}
+		});
 		buttonPane.add(testBtn);
 
 		submitBtn = new JButton("Submit");
-		submitBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+		submitBtn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				onSubmitClicked();
-			}});
+			}
+		});
 		buttonPane.add(submitBtn);
 
 		updateButtonsEnabled();
@@ -82,10 +96,13 @@ public class TranslationTool extends JFrame
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		setLocationRelativeTo(null);
 
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent evt) {
+		addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent evt)
+			{
 				closeWindow();
-			}});
+			}
+		});
 	}
 
 	private void closeWindow()
@@ -96,16 +113,16 @@ public class TranslationTool extends JFrame
 
 	private File getMicropolisJarFile()
 	{
-		try{
+		try {
 
-		Class mclass = micropolisj.engine.Micropolis.class;
-		return new File(
-			mclass.getProtectionDomain()
-				.getCodeSource().getLocation().toURI().getPath()
+			Class mclass = micropolisj.engine.Micropolis.class;
+			return new File(
+					mclass.getProtectionDomain()
+							.getCodeSource().getLocation().toURI().getPath()
 			);
 
 		} catch (java.net.URISyntaxException e) {
-			throw new Error("unexpected: "+e, e);
+			throw new Error("unexpected: " + e, e);
 		}
 	}
 
@@ -116,12 +133,12 @@ public class TranslationTool extends JFrame
 		String code = pickLocale(
 				"Which locale do you want to test?",
 				"Test Locale"
-				);
+		);
 		if (code == null) {
 			return;
 		}
 
-		String [] localeParts = code.split("_");
+		String[] localeParts = code.split("_");
 		String selLanguage = localeParts.length >= 1 ? localeParts[0] : "";
 		String selCountry = localeParts.length >= 2 ? localeParts[1] : "";
 		String selVariant = localeParts.length >= 3 ? localeParts[2] : "";
@@ -130,45 +147,39 @@ public class TranslationTool extends JFrame
 		javaExe = new File(javaExe, "bin");
 		javaExe = new File(javaExe, "java");
 
-		try
-		{
+		try {
 			String javaPath = javaExe.toString();
 			String classPath = stringsModel.workingDirectory.toString()
-				+ System.getProperty("path.separator")
-				+ getMicropolisJarFile().toString();
+					+ System.getProperty("path.separator")
+					+ getMicropolisJarFile().toString();
 
 			ProcessBuilder processBuilder =
-			new ProcessBuilder(javaPath,
-				"-Duser.language="+selLanguage,
-				"-Duser.country="+selCountry,
-				"-Duser.variant="+selVariant,
-				"-cp",
-				classPath,
-				"micropolisj.Main"
-				);
+					new ProcessBuilder(javaPath,
+							"-Duser.language=" + selLanguage,
+							"-Duser.country=" + selCountry,
+							"-Duser.variant=" + selVariant,
+							"-cp",
+							classPath,
+							"micropolisj.Main"
+					);
 			processBuilder.start();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this,
-				e.getMessage(),
-				"Error",
-				JOptionPane.ERROR_MESSAGE);
+					e.getMessage(),
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	private void maybeSave()
 	{
-		try
-		{
+		try {
 			stringsModel.save();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this,
-				e.getMessage(),
-				"Error",
-				JOptionPane.ERROR_MESSAGE);
+					e.getMessage(),
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -182,25 +193,24 @@ public class TranslationTool extends JFrame
 		JTextField countryEntry = new JTextField(L.getCountry());
 		JTextField variantEntry = new JTextField(L.getVariant());
 
-		JComponent [] inputs = new JComponent[] {
-			new JLabel("Language"),
-			langEntry,
-			new JLabel("Country"),
-			countryEntry,
-			new JLabel("Variant (optional)"),
-			variantEntry
-			};
+		JComponent[] inputs = new JComponent[]{
+				new JLabel("Language"),
+				langEntry,
+				new JLabel("Country"),
+				countryEntry,
+				new JLabel("Variant (optional)"),
+				variantEntry
+		};
 		int rv = JOptionPane.showOptionDialog(this,
-			inputs,
-			"Add Locale",
-			JOptionPane.OK_CANCEL_OPTION,
-			JOptionPane.PLAIN_MESSAGE,
-			null, null, null);
+				inputs,
+				"Add Locale",
+				JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE,
+				null, null, null);
 		if (rv != JOptionPane.OK_OPTION)
 			return;
 
-		try
-		{
+		try {
 			String lastLanguage = langEntry.getText();
 			String lastCountry = countryEntry.getText();
 			String lastVariant = variantEntry.getText();
@@ -215,20 +225,17 @@ public class TranslationTool extends JFrame
 				if (lastVariant.length() != 0) {
 					code += "_" + lastVariant;
 				}
-			}
-			else if (lastVariant.length() != 0) {
+			} else if (lastVariant.length() != 0) {
 				throw new Exception("Cannot specify variant without a country code.");
 			}
 
 			stringsModel.addLocale(code);
 			updateButtonsEnabled();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this,
-				e.getMessage(),
-				"Error",
-				JOptionPane.ERROR_MESSAGE);
+					e.getMessage(),
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -252,23 +259,22 @@ public class TranslationTool extends JFrame
 
 		if (localeCb.getItemCount() == 1) {
 			return (String) localeCb.getItemAt(0);
-		}
-		else if (localeCb.getItemCount() == 0) {
+		} else if (localeCb.getItemCount() == 0) {
 			return null;
 		}
 
-		localeCb.setSelectedIndex(localeCb.getItemCount()-1);
+		localeCb.setSelectedIndex(localeCb.getItemCount() - 1);
 
-		JComponent [] inputs = new JComponent[] {
-			new JLabel(message),
-			localeCb
-			};
+		JComponent[] inputs = new JComponent[]{
+				new JLabel(message),
+				localeCb
+		};
 		int rv = JOptionPane.showOptionDialog(this,
-			inputs,
-			dlgTitle,
-			JOptionPane.OK_CANCEL_OPTION,
-			JOptionPane.PLAIN_MESSAGE,
-			null, null, null);
+				inputs,
+				dlgTitle,
+				JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE,
+				null, null, null);
 		if (rv != JOptionPane.OK_OPTION)
 			return null;
 
@@ -281,7 +287,7 @@ public class TranslationTool extends JFrame
 		String code = pickLocale(
 				"Which locale do you want to remove?",
 				"Remove Locale"
-				);
+		);
 		if (code != null) {
 			stringsModel.removeLocale(code);
 			updateButtonsEnabled();
@@ -294,7 +300,7 @@ public class TranslationTool extends JFrame
 		String code = pickLocale(
 				"Which locale do you want to submit?",
 				"Submit Locale"
-				);
+		);
 		if (code == null) return;
 
 		String msg = "";
@@ -303,8 +309,8 @@ public class TranslationTool extends JFrame
 		msg = msg + "as:\n";
 		for (int i = 0; i < stringsModel.FILES.length; i++) {
 			msg = msg + " * "
-				+ stringsModel.FILES[i]+"_"+code+".properties"
-				+ "\n";
+					+ stringsModel.FILES[i] + "_" + code + ".properties"
+					+ "\n";
 		}
 		msg = msg + "\n";
 		msg = msg + "Submit these files to the Micropolis website\n";
@@ -312,12 +318,12 @@ public class TranslationTool extends JFrame
 		msg = msg + "(Open a new \"Issue\" and attach the files to the issue.)";
 
 		JOptionPane.showMessageDialog(this,
-			msg, "Submit Locale",
-			JOptionPane.INFORMATION_MESSAGE);
+				msg, "Submit Locale",
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	public static void main(String [] args)
-		throws Exception
+	public static void main(String[] args)
+			throws Exception
 	{
 		new TranslationTool().setVisible(true);
 	}

@@ -25,7 +25,7 @@ public class CityDimension
 	@Override
 	public int hashCode()
 	{
-		return width*33+height;
+		return width * 33 + height;
 	}
 
 	@Override
@@ -34,8 +34,7 @@ public class CityDimension
 		if (obj instanceof CityDimension) {
 			CityDimension rhs = (CityDimension) obj;
 			return this.width == rhs.width && this.height == rhs.height;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -43,6 +42,6 @@ public class CityDimension
 	@Override
 	public String toString()
 	{
-		return width+"x"+height;
+		return width + "x" + height;
 	}
 }

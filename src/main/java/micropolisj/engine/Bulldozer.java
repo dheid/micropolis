@@ -26,7 +26,7 @@ class Bulldozer extends ToolStroke
 		for (int y = 0; y < b.height; y++) {
 			for (int x = 0; x < b.width; x++) {
 
-				ToolEffectIfc subEff = new TranslatedToolEffect(eff, b.x+x, b.y+y);
+				ToolEffectIfc subEff = new TranslatedToolEffect(eff, b.x + x, b.y + y);
 				if (city.isTileDozeable(subEff)) {
 
 					dozeField(subEff);
@@ -39,8 +39,8 @@ class Bulldozer extends ToolStroke
 		for (int y = 0; y < b.height; y++) {
 			for (int x = 0; x < b.width; x++) {
 
-				if (isZoneCenter(eff.getTile(b.x+x,b.y+y))) {
-					dozeZone(new TranslatedToolEffect(eff, b.x+x, b.y+y));
+				if (isZoneCenter(eff.getTile(b.x + x, b.y + y))) {
+					dozeZone(new TranslatedToolEffect(eff, b.x + x, b.y + y));
 				}
 			}
 		}
@@ -65,11 +65,9 @@ class Bulldozer extends ToolStroke
 
 		if (dim.width * dim.height < 16) {
 			eff.makeSound(0, 0, Sound.EXPLOSION_HIGH);
-		}
-		else if (dim.width * dim.height < 36) {
+		} else if (dim.width * dim.height < 36) {
 			eff.makeSound(0, 0, Sound.EXPLOSION_LOW);
-		}
-		else {
+		} else {
 			eff.makeSound(0, 0, Sound.EXPLOSION_BOTH);
 		}
 
@@ -81,13 +79,10 @@ class Bulldozer extends ToolStroke
 	{
 		int tile = eff.getTile(0, 0);
 
-		if (isOverWater(tile))
-		{
+		if (isOverWater(tile)) {
 			// dozing over water, replace with water.
 			eff.setTile(0, 0, RIVER);
-		}
-		else
-		{
+		} else {
 			// dozing on land, replace with land. Simple, eh?
 			eff.setTile(0, 0, DIRT);
 		}
@@ -101,7 +96,7 @@ class Bulldozer extends ToolStroke
 	{
 		for (int yy = 0; yy < h; yy++) {
 			for (int xx = 0; xx < w; xx++) {
-				int tile = eff.getTile(xx,yy);
+				int tile = eff.getTile(xx, yy);
 				if (tile == CLEAR)
 					continue;
 

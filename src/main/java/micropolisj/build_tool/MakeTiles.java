@@ -1,20 +1,22 @@
 package micropolisj.build_tool;
 
 import micropolisj.engine.TileSpec;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.*;
-import javax.imageio.*;
-import javax.swing.ImageIcon;
+import java.util.HashMap;
+import java.util.Properties;
 
 import static micropolisj.engine.TileSpec.generateTileNames;
 
 public class MakeTiles
 {
-	static HashMap<String,String> tileData = new HashMap<String,String>();
-	static HashMap<String,SourceImage> loadedImages = new HashMap<String,SourceImage>();
+	static HashMap<String, String> tileData = new HashMap<String, String>();
+	static HashMap<String, SourceImage> loadedImages = new HashMap<String, SourceImage>();
 
 	static final Charset UTF8 = Charset.forName("UTF-8");
 	static int SKIP_TILES = 0;
@@ -22,7 +24,7 @@ public class MakeTiles
 	static final int STD_SIZE = 16;
 	static int TILE_SIZE = STD_SIZE;
 
-	public static void main(String [] args)
+	public static void main(String[] args)
 		throws Exception
 	{
 		if (args.length != 2) {
@@ -56,11 +58,11 @@ public class MakeTiles
 			));
 
 		// count number of images
-		String [] tileNames = generateTileNames(recipe);
+		String[] tileNames = generateTileNames(recipe);
 		int ntiles = COUNT_TILES == -1 ? tileNames.length : COUNT_TILES;
 
 		// actually assemble the image
-		BufferedImage buf = new BufferedImage(TILE_SIZE,TILE_SIZE*ntiles,BufferedImage.TYPE_INT_RGB);
+		BufferedImage buf = new BufferedImage(TILE_SIZE, TILE_SIZE * ntiles, BufferedImage.TYPE_INT_RGB);
 		Graphics2D gr = buf.createGraphics();
 
 		for (int i = 0; i < ntiles; i++) {
@@ -80,7 +82,7 @@ public class MakeTiles
 				continue;
 			}
 
-			drawTo(ref, gr, 0, TILE_SIZE*i);
+			drawTo(ref, gr, 0, TILE_SIZE * i);
 		}
 
 		// make parent directories if necessary
@@ -88,22 +90,22 @@ public class MakeTiles
 
 		// output the composed images
 		File outputFile = new File(outputDir, "tiles.png");
-		System.out.println("Generating tiles array: "+outputFile);
+		System.out.println("Generating tiles array: " + outputFile);
 		ImageIO.write(buf, "png", outputFile);
 
 		// output an index of all tile names and their offset into
 		// the composed tile array
 		File indexFile = new File(outputDir, "tiles.idx");
-		System.out.println("Generating tiles index: "+indexFile);
+		System.out.println("Generating tiles index: " + indexFile);
 		writeIndexFile(tileNames, indexFile);
 	}
 
-	static void writeIndexFile(String [] tileNames, File indexFile)
+	static void writeIndexFile(String[] tileNames, File indexFile)
 		throws IOException
 	{
 		PrintWriter out = new PrintWriter(
 			new FileWriter(indexFile)
-			);
+		);
 		for (int i = 0; i < tileNames.length; i++) {
 			out.printf("%s %d\n", tileNames[i], i);
 		}
@@ -122,7 +124,7 @@ public class MakeTiles
 		gr.drawImage(
 			sourceImg.image,
 			destX, destY,
-			destX+TILE_SIZE, destY+TILE_SIZE,
+			destX + TILE_SIZE, destY + TILE_SIZE,
 			ref.offsetX * sourceImg.basisSize / STD_SIZE,
 			ref.offsetY * sourceImg.basisSize / STD_SIZE,
 			(ref.offsetX + STD_SIZE) * sourceImg.basisSize / STD_SIZE,
@@ -135,7 +137,8 @@ public class MakeTiles
 		Image image;
 		int basisSize;
 
-		SourceImage(Image image, int basisSize) {
+		SourceImage(Image image, int basisSize)
+		{
 			this.image = image;
 			this.basisSize = basisSize;
 		}
@@ -156,23 +159,23 @@ public class MakeTiles
 
 		for (String layerStr : spec.getImages()) {
 
-		FrameSpec rv = new FrameSpec();
-		rv.background = result;
-		result = rv;
+			FrameSpec rv = new FrameSpec();
+			rv.background = result;
+			result = rv;
 
-		String [] parts = layerStr.split("@", 2);
-		rv.image = loadImage(parts[0]);
+			String[] parts = layerStr.split("@", 2);
+			rv.image = loadImage(parts[0]);
 
-		if (parts.length >= 2) {
-			String offsetInfo = parts[1];
-			parts = offsetInfo.split(",");
-			if (parts.length >= 1) {
-				rv.offsetX = Integer.parseInt(parts[0]);
-			}
 			if (parts.length >= 2) {
-				rv.offsetY = Integer.parseInt(parts[1]);
-			}
-		}//endif something given after '@' in image specifier
+				String offsetInfo = parts[1];
+				parts = offsetInfo.split(",");
+				if (parts.length >= 1) {
+					rv.offsetX = Integer.parseInt(parts[0]);
+				}
+				if (parts.length >= 2) {
+					rv.offsetY = Integer.parseInt(parts[1]);
+				}
+			}//endif something given after '@' in image specifier
 
 		}//end foreach layer in image specification
 
@@ -186,11 +189,11 @@ public class MakeTiles
 			exeName += ".exe";
 		}
 
-		File [] pathsToTry = {
+		File[] pathsToTry = {
 			new File("/usr/bin"),
 			new File("c:\\Program Files\\Inkscape"),
 			new File("c:\\Program Files (x86)\\Inkscape")
-			};
+		};
 		for (File p : pathsToTry) {
 			File f = new File(p, exeName);
 			if (f.exists()) {
@@ -201,48 +204,46 @@ public class MakeTiles
 	}
 
 	static File stagingDir = new File("generated");
+
 	static File renderSvg(String fileName, File svgFile)
 		throws IOException
 	{
-		File pngFile = new File(stagingDir, fileName+"_"+TILE_SIZE+"x"+TILE_SIZE+".png");
+		File pngFile = new File(stagingDir, fileName + "_" + TILE_SIZE + "x" + TILE_SIZE + ".png");
 		if (pngFile.exists() &&
-			pngFile.lastModified() > svgFile.lastModified())
-		{
+			pngFile.lastModified() > svgFile.lastModified()) {
 			// looks like the PNG file is already up-to-date
 			return pngFile;
 		}
 
 		File inkscapeBin = findInkscape();
 
-		System.out.println("Generating raster image: "+pngFile);
+		System.out.println("Generating raster image: " + pngFile);
 		if (pngFile.exists()) {
 			pngFile.delete();
-		}
-		else {
+		} else {
 			pngFile.getParentFile().mkdirs();
 		}
 
-		String [] cmdline = {
+		String[] cmdline = {
 			inkscapeBin.toString(),
-			"--export-dpi="+(TILE_SIZE*90.0/STD_SIZE),
-			"--export-png="+pngFile.toString(),
+			"--export-dpi=" + (TILE_SIZE * 90.0 / STD_SIZE),
+			"--export-png=" + pngFile.toString(),
 			svgFile.toString()
-			};
+		};
 		Process p = Runtime.getRuntime().exec(cmdline);
 		int exit_value;
 		try {
 			exit_value = p.waitFor();
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 
 		if (exit_value != 0) {
-			throw new RuntimeException("Helper exit status: "+exit_value);
+			throw new RuntimeException("Helper exit status: " + exit_value);
 		}
 
 		if (!pngFile.exists()) {
-			throw new RuntimeException("File not found: "+pngFile);
+			throw new RuntimeException("File not found: " + pngFile);
 		}
 
 		return pngFile;
@@ -264,13 +265,12 @@ public class MakeTiles
 	{
 		File svgFile, pngFile = null;
 
-		svgFile = new File(fileName+"_"+TILE_SIZE+"x"+TILE_SIZE+".svg");
+		svgFile = new File(fileName + "_" + TILE_SIZE + "x" + TILE_SIZE + ".svg");
 
 		if (svgFile.exists()) {
 			pngFile = renderSvg(fileName, svgFile);
-		}
-		else {
-			svgFile = new File(fileName+".svg");
+		} else {
+			svgFile = new File(fileName + ".svg");
 			if (svgFile.exists()) {
 				pngFile = renderSvg(fileName, svgFile);
 			}
@@ -283,7 +283,7 @@ public class MakeTiles
 				TILE_SIZE);
 		}
 
-		pngFile = new File(fileName+"_"+TILE_SIZE+"x"+TILE_SIZE+".png");
+		pngFile = new File(fileName + "_" + TILE_SIZE + "x" + TILE_SIZE + ".png");
 		if (pngFile.exists()) {
 			ImageIcon ii = new ImageIcon(pngFile.toString());
 			return new SourceImage(
@@ -291,7 +291,7 @@ public class MakeTiles
 				TILE_SIZE);
 		}
 
-		pngFile = new File(fileName+".png");
+		pngFile = new File(fileName + ".png");
 		if (pngFile.exists()) {
 			ImageIcon ii = new ImageIcon(pngFile.toString());
 			return new SourceImage(
@@ -299,6 +299,6 @@ public class MakeTiles
 				STD_SIZE);
 		}
 
-		throw new IOException("File not found: "+fileName+".{svg,png}");
+		throw new IOException("File not found: " + fileName + ".{svg,png}");
 	}
 }

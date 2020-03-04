@@ -13,8 +13,8 @@ package micropolisj.engine;
  */
 public class TornadoSprite extends Sprite
 {
-	static int [] CDx = {  2,  3,  2,  0, -2, -3 };
-	static int [] CDy = { -2,  0,  2,  3,  2,  0 };
+	static int[] CDx = {2, 3, 2, 0, -2, -3};
+	static int[] CDy = {-2, 0, 2, 3, 2, 0};
 
 	boolean flag;
 	int count;
@@ -45,8 +45,7 @@ public class TornadoSprite extends Sprite
 				z = 3;
 			else
 				z = 1;
-		}
-		else {
+		} else {
 			this.flag = (z == 1);
 			z = 2;
 		}
@@ -59,11 +58,11 @@ public class TornadoSprite extends Sprite
 
 		for (Sprite s : city.allSprites()) {
 			if (checkSpriteCollision(s) &&
-				(s.kind == SpriteKind.AIR ||
-				 s.kind == SpriteKind.COP ||
-				 s.kind == SpriteKind.SHI ||
-				 s.kind == SpriteKind.TRA)
-				) {
+					(s.kind == SpriteKind.AIR ||
+							s.kind == SpriteKind.COP ||
+							s.kind == SpriteKind.SHI ||
+							s.kind == SpriteKind.TRA)
+			) {
 				s.explodeSprite();
 			}
 		}
@@ -72,7 +71,7 @@ public class TornadoSprite extends Sprite
 		x += CDx[zz];
 		y += CDy[zz];
 
-		if (!city.testBounds(x/16, y/16)) {
+		if (!city.testBounds(x / 16, y / 16)) {
 			// out of bounds
 			this.frame = 0;
 			return;
@@ -84,6 +83,6 @@ public class TornadoSprite extends Sprite
 			return;
 		}
 
-		destroyTile(x/16, y/16);
+		destroyTile(x / 16, y / 16);
 	}
 }

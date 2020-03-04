@@ -15,16 +15,24 @@ package micropolisj.engine;
  */
 public class CityRect
 {
-	/** The X coordinate of the upper-left corner of the rectangle. */
+	/**
+	 * The X coordinate of the upper-left corner of the rectangle.
+	 */
 	public int x;
 
-	/** The Y coordinate of the upper-left corner of the rectangle. */
+	/**
+	 * The Y coordinate of the upper-left corner of the rectangle.
+	 */
 	public int y;
 
-	/** The width of the rectangle. */
+	/**
+	 * The width of the rectangle.
+	 */
 	public int width;
 
-	/** The height of the rectangle. */
+	/**
+	 * The height of the rectangle.
+	 */
 	public int height;
 
 	public CityRect()
@@ -43,13 +51,12 @@ public class CityRect
 	public boolean equals(Object obj)
 	{
 		if (obj instanceof CityRect) {
-			CityRect rhs = (CityRect)obj;
+			CityRect rhs = (CityRect) obj;
 			return this.x == rhs.x &&
-				this.y == rhs.y &&
-				this.width == rhs.width &&
-				this.height == rhs.height;
-		}
-		else {
+					this.y == rhs.y &&
+					this.width == rhs.width &&
+					this.height == rhs.height;
+		} else {
 			return false;
 		}
 	}
@@ -57,6 +64,6 @@ public class CityRect
 	@Override
 	public String toString()
 	{
-		return "["+x+","+y+","+width+"x"+height+"]";
+		return "[" + x + "," + y + "," + width + "x" + height + "]";
 	}
 }

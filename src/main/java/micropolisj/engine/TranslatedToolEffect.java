@@ -24,19 +24,19 @@ class TranslatedToolEffect implements ToolEffectIfc
 	//implements ToolEffectIfc
 	public int getTile(int x, int y)
 	{
-		return base.getTile(x+dx, y+dy);
+		return base.getTile(x + dx, y + dy);
 	}
 
 	//implements ToolEffectIfc
 	public void makeSound(int x, int y, Sound sound)
 	{
-		base.makeSound(x+dx, y+dy, sound);
+		base.makeSound(x + dx, y + dy, sound);
 	}
 
 	//implements ToolEffectIfc
 	public void setTile(int x, int y, int tileValue)
 	{
-		base.setTile(x+dx, y+dy, tileValue);
+		base.setTile(x + dx, y + dy, tileValue);
 	}
 
 	//implements ToolEffectIfc

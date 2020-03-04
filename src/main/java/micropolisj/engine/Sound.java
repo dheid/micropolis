@@ -17,22 +17,23 @@ import java.net.URL;
  */
 public enum Sound
 {
-	EXPLOSION_LOW ("explosion-low"),
+	EXPLOSION_LOW("explosion-low"),
 	EXPLOSION_HIGH("explosion-high"),
 	EXPLOSION_BOTH("explosion-low"),
-	UHUH          ("bop"),
-	SORRY         ("bop"),
-	BUILD         ("layzone"),
-	BULLDOZE      (null),
-	HONKHONK_LOW  ("honkhonk-low"),
-	HONKHONK_MED  ("honkhonk-med"),
-	HONKHONK_HIGH ("honkhonk-high"),
-	HONKHONK_HI   ("honkhonk-hi"),
-	SIREN         ("siren"),
-	HEAVYTRAFFIC  ("heavytraffic"),
-	MONSTER       ("zombie-roar-5");
+	UHUH("bop"),
+	SORRY("bop"),
+	BUILD("layzone"),
+	BULLDOZE(null),
+	HONKHONK_LOW("honkhonk-low"),
+	HONKHONK_MED("honkhonk-med"),
+	HONKHONK_HIGH("honkhonk-high"),
+	HONKHONK_HI("honkhonk-hi"),
+	SIREN("siren"),
+	HEAVYTRAFFIC("heavytraffic"),
+	MONSTER("zombie-roar-5");
 
 	String wavName;
+
 	private Sound(String wavName)
 	{
 		this.wavName = wavName;
@@ -40,7 +41,7 @@ public enum Sound
 
 	public URL getAudioFile()
 	{
-		String n2 = "/sounds/"+wavName+".wav";
+		String n2 = "/sounds/" + wavName + ".wav";
 		URL u = Sound.class.getResource(n2);
 		return u;
 	}

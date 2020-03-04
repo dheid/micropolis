@@ -8,9 +8,13 @@
 
 package micropolisj.engine;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Provides global methods for loading tile specifications.
@@ -18,32 +22,32 @@ import java.util.*;
 public class Tiles
 {
 	static final Charset UTF8 = Charset.forName("UTF-8");
-	static TileSpec [] tiles;
-	static Map<String,TileSpec> tilesByName = new HashMap<String,TileSpec>();
+	static TileSpec[] tiles;
+	static Map<String, TileSpec> tilesByName = new HashMap<String, TileSpec>();
+
 	static {
 		try {
 			readTiles();
 			checkTiles();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	static void readTiles()
-		throws IOException
+			throws IOException
 	{
 		ArrayList<TileSpec> tilesList = new ArrayList<TileSpec>();
 
 		Properties tilesRc = new Properties();
 		tilesRc.load(
-			new InputStreamReader(
-				Tiles.class.getResourceAsStream("/tiles.rc"),
-				UTF8
+				new InputStreamReader(
+						Tiles.class.getResourceAsStream("/tiles.rc"),
+						UTF8
 				)
-			);
+		);
 
-		String [] tileNames = TileSpec.generateTileNames(tilesRc);
+		String[] tileNames = TileSpec.generateTileNames(tilesRc);
 		tiles = new TileSpec[tileNames.length];
 
 		for (int i = 0; i < tileNames.length; i++) {
@@ -69,9 +73,8 @@ public class Tiles
 					int offy = (bi.height >= 3 ? -1 : 0) + j / bi.width;
 
 					if (tiles[tid].owner == null &&
-						(offx != 0 || offy != 0)
-						)
-					{
+							(offx != 0 || offy != 0)
+					) {
 						tiles[tid].owner = tiles[i];
 						tiles[tid].ownerOffsetX = offx;
 						tiles[tid].ownerOffsetY = offy;
@@ -96,8 +99,7 @@ public class Tiles
 	{
 		if (tileNumber >= 0 && tileNumber < tiles.length) {
 			return tiles[tileNumber];
-		}
-		else {
+		} else {
 			return null;
 		}
 	}

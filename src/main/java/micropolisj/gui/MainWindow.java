@@ -8,25 +8,28 @@
 
 package micropolisj.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.URL;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.prefs.*;
-import javax.sound.sampled.*;
-import javax.swing.*;
-import javax.swing.Timer;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import micropolisj.engine.*;
 import micropolisj.util.TranslationTool;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.swing.Timer;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URL;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.prefs.Preferences;
+
 public class MainWindow extends JFrame
-	implements Micropolis.Listener, EarthquakeListener
+		implements Micropolis.Listener, EarthquakeListener
 {
 	Micropolis engine;
 	MicropolisDrawingArea drawingArea;
@@ -43,8 +46,8 @@ public class MainWindow extends JFrame
 	JLabel popLbl;
 	JLabel currentToolLbl;
 	JLabel currentToolCostLbl;
-	Map<MicropolisTool,JToggleButton> toolBtns;
-	EnumMap<MapState,JMenuItem> mapStateMenuItems = new EnumMap<MapState,JMenuItem>(MapState.class);
+	Map<MicropolisTool, JToggleButton> toolBtns;
+	EnumMap<MapState, JMenuItem> mapStateMenuItems = new EnumMap<MapState, JMenuItem>(MapState.class);
 	MicropolisTool currentTool;
 	File currentFile;
 	boolean doSounds = true;
@@ -54,6 +57,7 @@ public class MainWindow extends JFrame
 	boolean autoBudgetPending;
 
 	static ImageIcon appIcon;
+
 	static {
 		appIcon = new ImageIcon(MainWindow.class.getResource("/micropolism.png"));
 	}
@@ -100,7 +104,7 @@ public class MainWindow extends JFrame
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = c.gridy = 0;
 		c.anchor = GridBagConstraints.SOUTHWEST;
-		c.insets = new Insets(4,4,4,4);
+		c.insets = new Insets(4, 4, 4, 4);
 		c.weightx = 1.0;
 
 		demandInd = new DemandIndicator();
@@ -118,7 +122,7 @@ public class MainWindow extends JFrame
 		c.gridwidth = 2;
 		c.weighty = 0.0;
 		c.anchor = GridBagConstraints.NORTH;
-		c.insets = new Insets(0,0,0,0);
+		c.insets = new Insets(0, 0, 0, 0);
 
 		JPanel mapViewContainer = new JPanel(new BorderLayout());
 		mapViewContainer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -166,13 +170,13 @@ public class MainWindow extends JFrame
 		c.gridwidth = 2;
 		c.weighty = 1.0;
 		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(0,0,0,0);
+		c.insets = new Insets(0, 0, 0, 0);
 
 		messagesPane = new MessagesPane();
 		JScrollPane scroll2 = new JScrollPane(messagesPane);
 		scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scroll2.setPreferredSize(new Dimension(0,0));
-		scroll2.setMinimumSize(new Dimension(0,0));
+		scroll2.setPreferredSize(new Dimension(0, 0));
+		scroll2.setMinimumSize(new Dimension(0, 0));
 		leftPane.add(scroll2, c);
 
 		c.gridy = 3;
@@ -184,31 +188,38 @@ public class MainWindow extends JFrame
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		setLocationRelativeTo(null);
 
-		InputMap inputMap = ((JComponent)getContentPane()).getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		InputMap inputMap = ((JComponent) getContentPane()).getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 		inputMap.put(KeyStroke.getKeyStroke("ADD"), "zoomIn");
 		inputMap.put(KeyStroke.getKeyStroke("shift EQUALS"), "zoomIn");
 		inputMap.put(KeyStroke.getKeyStroke("SUBTRACT"), "zoomOut");
 		inputMap.put(KeyStroke.getKeyStroke("MINUS"), "zoomOut");
 		inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "escape");
 
-		ActionMap actionMap = ((JComponent)getContentPane()).getActionMap();
-		actionMap.put("zoomIn", new AbstractAction() {
-			public void actionPerformed(ActionEvent evt) {
+		ActionMap actionMap = ((JComponent) getContentPane()).getActionMap();
+		actionMap.put("zoomIn", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				doZoom(1);
 			}
-			});
-		actionMap.put("zoomOut", new AbstractAction() {
-			public void actionPerformed(ActionEvent evt) {
+		});
+		actionMap.put("zoomOut", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				doZoom(-1);
 			}
-			});
-		actionMap.put("escape", new AbstractAction() {
-			public void actionPerformed(ActionEvent evt) {
+		});
+		actionMap.put("escape", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				onEscapePressed();
 			}
-			});
+		});
 
-		MouseAdapter mouse = new MouseAdapter() {
+		MouseAdapter mouse = new MouseAdapter()
+		{
 			public void mousePressed(MouseEvent ev)
 			{
 				try {
@@ -217,6 +228,7 @@ public class MainWindow extends JFrame
 					showErrorMessage(e);
 				}
 			}
+
 			public void mouseReleased(MouseEvent ev)
 			{
 				try {
@@ -225,6 +237,7 @@ public class MainWindow extends JFrame
 					showErrorMessage(e);
 				}
 			}
+
 			public void mouseDragged(MouseEvent ev)
 			{
 				try {
@@ -233,6 +246,7 @@ public class MainWindow extends JFrame
 					showErrorMessage(e);
 				}
 			}
+
 			public void mouseMoved(MouseEvent ev)
 			{
 				try {
@@ -241,6 +255,7 @@ public class MainWindow extends JFrame
 					showErrorMessage(e);
 				}
 			}
+
 			public void mouseExited(MouseEvent ev)
 			{
 				try {
@@ -249,6 +264,7 @@ public class MainWindow extends JFrame
 					showErrorMessage(e);
 				}
 			}
+
 			public void mouseWheelMoved(MouseWheelEvent evt)
 			{
 				try {
@@ -257,21 +273,23 @@ public class MainWindow extends JFrame
 					showErrorMessage(e);
 				}
 			}
-			};
+		};
 		drawingArea.addMouseListener(mouse);
 		drawingArea.addMouseMotionListener(mouse);
 		drawingArea.addMouseWheelListener(mouse);
 
-		addWindowListener(new WindowAdapter() {
+		addWindowListener(new WindowAdapter()
+		{
 			public void windowClosing(WindowEvent ev)
 			{
 				closeWindow();
 			}
+
 			public void windowClosed(WindowEvent ev)
 			{
 				onWindowClosed(ev);
 			}
-			});
+		});
 
 		Preferences prefs = Preferences.userNodeForPackage(MainWindow.class);
 		doSounds = prefs.getBoolean(SOUNDS_PREF, true);
@@ -338,32 +356,32 @@ public class MainWindow extends JFrame
 
 	boolean maybeSaveCity()
 	{
-		if (needsSaved())
-		{
+		if (needsSaved()) {
 			boolean timerEnabled = isTimerActive();
 			if (timerEnabled) {
 				stopTimer();
 			}
 
 			try {
-			int rv = JOptionPane.showConfirmDialog(
-				this,
-				strings.getString("main.save_query"),
-				PRODUCT_NAME,
-				JOptionPane.YES_NO_CANCEL_OPTION,
-				JOptionPane.WARNING_MESSAGE);
-			if (rv == JOptionPane.CANCEL_OPTION)
-				return false;
-
-			if (rv == JOptionPane.YES_OPTION) {
-				if (!onSaveCityClicked()) {
-					// canceled save dialog
+				int rv = JOptionPane.showConfirmDialog(
+						this,
+						strings.getString("main.save_query"),
+						PRODUCT_NAME,
+						JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+				if (rv == JOptionPane.CANCEL_OPTION)
 					return false;
+
+				if (rv == JOptionPane.YES_OPTION) {
+					if (!onSaveCityClicked()) {
+						// canceled save dialog
+						return false;
+					}
 				}
-			}
-			}
-			finally {
-				if (timerEnabled) { startTimer(); }
+			} finally {
+				if (timerEnabled) {
+					startTimer();
+				}
 			}
 		}
 		return true;
@@ -411,27 +429,27 @@ public class MainWindow extends JFrame
 
 	private void setupKeys(JMenu menu, String prefix)
 	{
-		if (strings.containsKey(prefix+".key")) {
-			String mnemonic = strings.getString(prefix+".key");
+		if (strings.containsKey(prefix + ".key")) {
+			String mnemonic = strings.getString(prefix + ".key");
 			menu.setMnemonic(
-				KeyStroke.getKeyStroke(mnemonic).getKeyCode()
-				);
+					KeyStroke.getKeyStroke(mnemonic).getKeyCode()
+			);
 		}
 	}
 
 	private void setupKeys(JMenuItem menuItem, String prefix)
 	{
-		if (strings.containsKey(prefix+".key")) {
-			String mnemonic = strings.getString(prefix+".key");
+		if (strings.containsKey(prefix + ".key")) {
+			String mnemonic = strings.getString(prefix + ".key");
 			menuItem.setMnemonic(
-				KeyStroke.getKeyStroke(mnemonic).getKeyCode()
-				);
+					KeyStroke.getKeyStroke(mnemonic).getKeyCode()
+			);
 		}
-		if (strings.containsKey(prefix+".shortcut")) {
-			String shortcut = strings.getString(prefix+".shortcut");
+		if (strings.containsKey(prefix + ".shortcut")) {
+			String shortcut = strings.getString(prefix + ".shortcut");
 			menuItem.setAccelerator(
-				KeyStroke.getKeyStroke(shortcut)
-				);
+					KeyStroke.getKeyStroke(shortcut)
+			);
 		}
 	}
 
@@ -447,56 +465,61 @@ public class MainWindow extends JFrame
 		menuItem = new JMenuItem(strings.getString("menu.game.new"));
 		setupKeys(menuItem, "menu.game.new");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onNewCityClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onNewCityClicked();
+					}
+				}));
 		gameMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.game.load"));
 		setupKeys(menuItem, "menu.game.load");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onLoadGameClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onLoadGameClicked();
+					}
+				}));
 		gameMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.game.save"));
 		setupKeys(menuItem, "menu.game.save");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onSaveCityClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onSaveCityClicked();
+					}
+				}));
 		gameMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.game.save_as"));
 		setupKeys(menuItem, "menu.game.save_as");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onSaveCityAsClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onSaveCityAsClicked();
+					}
+				}));
 		gameMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.game.exit"));
 		setupKeys(menuItem, "menu.game.exit");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				closeWindow();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						closeWindow();
+					}
+				}));
 		gameMenu.add(menuItem);
 
 		JMenu optionsMenu = new JMenu(strings.getString("menu.options"));
@@ -507,18 +530,19 @@ public class MainWindow extends JFrame
 		setupKeys(levelMenu, "menu.difficulty");
 		optionsMenu.add(levelMenu);
 
-		difficultyMenuItems = new HashMap<Integer,JMenuItem>();
-		for (int i = GameLevel.MIN_LEVEL; i <= GameLevel.MAX_LEVEL; i++)
-		{
+		difficultyMenuItems = new HashMap<Integer, JMenuItem>();
+		for (int i = GameLevel.MIN_LEVEL; i <= GameLevel.MAX_LEVEL; i++) {
 			final int level = i;
-			menuItem = new JRadioButtonMenuItem(strings.getString("menu.difficulty."+level));
-			setupKeys(menuItem, "menu.difficulty."+level);
+			menuItem = new JRadioButtonMenuItem(strings.getString("menu.difficulty." + level));
+			setupKeys(menuItem, "menu.difficulty." + level);
 			menuItem.addActionListener(wrapActionListener(
-				new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					onDifficultyClicked(level);
-				}
-			}));
+					new ActionListener()
+					{
+						public void actionPerformed(ActionEvent evt)
+						{
+							onDifficultyClicked(level);
+						}
+					}));
 			levelMenu.add(menuItem);
 			difficultyMenuItems.put(level, menuItem);
 		}
@@ -526,65 +550,73 @@ public class MainWindow extends JFrame
 		autoBudgetMenuItem = new JCheckBoxMenuItem(strings.getString("menu.options.auto_budget"));
 		setupKeys(autoBudgetMenuItem, "menu.options.auto_budget");
 		autoBudgetMenuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onAutoBudgetClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onAutoBudgetClicked();
+					}
+				}));
 		optionsMenu.add(autoBudgetMenuItem);
 
 		autoBulldozeMenuItem = new JCheckBoxMenuItem(strings.getString("menu.options.auto_bulldoze"));
 		setupKeys(autoBulldozeMenuItem, "menu.options.auto_bulldoze");
 		autoBulldozeMenuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onAutoBulldozeClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onAutoBulldozeClicked();
+					}
+				}));
 		optionsMenu.add(autoBulldozeMenuItem);
 
 		disastersMenuItem = new JCheckBoxMenuItem(strings.getString("menu.options.disasters"));
 		setupKeys(disastersMenuItem, "menu.options.disasters");
 		disastersMenuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onDisastersClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onDisastersClicked();
+					}
+				}));
 		optionsMenu.add(disastersMenuItem);
 
 		soundsMenuItem = new JCheckBoxMenuItem(strings.getString("menu.options.sound"));
 		setupKeys(soundsMenuItem, "menu.options.sound");
 		soundsMenuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onSoundClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onSoundClicked();
+					}
+				}));
 		optionsMenu.add(soundsMenuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.options.zoom_in"));
 		setupKeys(menuItem, "menu.options.zoom_in");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				doZoom(1);
-			}}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						doZoom(1);
+					}
+				}));
 		optionsMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.options.zoom_out"));
 		setupKeys(menuItem, "menu.options.zoom_out");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				doZoom(-1);
-			}}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						doZoom(-1);
+					}
+				}));
 		optionsMenu.add(menuItem);
 
 		JMenu disastersMenu = new JMenu(strings.getString("menu.disasters"));
@@ -594,131 +626,142 @@ public class MainWindow extends JFrame
 		menuItem = new JMenuItem(strings.getString("menu.disasters.MONSTER"));
 		setupKeys(menuItem, "menu.disasters.MONSTER");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onInvokeDisasterClicked(Disaster.MONSTER);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onInvokeDisasterClicked(Disaster.MONSTER);
+					}
+				}));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.FIRE"));
 		setupKeys(menuItem, "menu.disasters.FIRE");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onInvokeDisasterClicked(Disaster.FIRE);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onInvokeDisasterClicked(Disaster.FIRE);
+					}
+				}));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.FLOOD"));
 		setupKeys(menuItem, "menu.disasters.FLOOD");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onInvokeDisasterClicked(Disaster.FLOOD);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onInvokeDisasterClicked(Disaster.FLOOD);
+					}
+				}));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.MELTDOWN"));
 		setupKeys(menuItem, "menu.disasters.MELTDOWN");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onInvokeDisasterClicked(Disaster.MELTDOWN);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onInvokeDisasterClicked(Disaster.MELTDOWN);
+					}
+				}));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.TORNADO"));
 		setupKeys(menuItem, "menu.disasters.TORNADO");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onInvokeDisasterClicked(Disaster.TORNADO);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onInvokeDisasterClicked(Disaster.TORNADO);
+					}
+				}));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.EARTHQUAKE"));
 		setupKeys(menuItem, "menu.disasters.EARTHQUAKE");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onInvokeDisasterClicked(Disaster.EARTHQUAKE);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onInvokeDisasterClicked(Disaster.EARTHQUAKE);
+					}
+				}));
 		disastersMenu.add(menuItem);
 
 		JMenu priorityMenu = new JMenu(strings.getString("menu.speed"));
 		setupKeys(priorityMenu, "menu.speed");
 		menuBar.add(priorityMenu);
 
-		priorityMenuItems = new EnumMap<Speed,JMenuItem>(Speed.class);
+		priorityMenuItems = new EnumMap<Speed, JMenuItem>(Speed.class);
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.SUPER_FAST"));
 		setupKeys(menuItem, "menu.speed.SUPER_FAST");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onPriorityClicked(Speed.SUPER_FAST);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onPriorityClicked(Speed.SUPER_FAST);
+					}
+				}));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.SUPER_FAST, menuItem);
 
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.FAST"));
 		setupKeys(menuItem, "menu.speed.FAST");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onPriorityClicked(Speed.FAST);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onPriorityClicked(Speed.FAST);
+					}
+				}));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.FAST, menuItem);
 
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.NORMAL"));
 		setupKeys(menuItem, "menu.speed.NORMAL");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onPriorityClicked(Speed.NORMAL);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onPriorityClicked(Speed.NORMAL);
+					}
+				}));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.NORMAL, menuItem);
 
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.SLOW"));
 		setupKeys(menuItem, "menu.speed.SLOW");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onPriorityClicked(Speed.SLOW);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onPriorityClicked(Speed.SLOW);
+					}
+				}));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.SLOW, menuItem);
 
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.PAUSED"));
 		setupKeys(menuItem, "menu.speed.PAUSED");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onPriorityClicked(Speed.PAUSED);
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onPriorityClicked(Speed.PAUSED);
+					}
+				}));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.PAUSED, menuItem);
 
@@ -729,34 +772,37 @@ public class MainWindow extends JFrame
 		menuItem = new JMenuItem(strings.getString("menu.windows.budget"));
 		setupKeys(menuItem, "menu.windows.budget");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onViewBudgetClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onViewBudgetClicked();
+					}
+				}));
 		windowsMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.windows.evaluation"));
 		setupKeys(menuItem, "menu.windows.evaluation");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onViewEvaluationClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onViewEvaluationClicked();
+					}
+				}));
 		windowsMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.windows.graph"));
 		setupKeys(menuItem, "menu.windows.graph");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onViewGraphClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onViewGraphClicked();
+					}
+				}));
 		windowsMenu.add(menuItem);
 
 		JMenu helpMenu = new JMenu(strings.getString("menu.help"));
@@ -765,22 +811,25 @@ public class MainWindow extends JFrame
 
 		menuItem = new JMenuItem(strings.getString("menu.help.launch-translation-tool"));
 		setupKeys(menuItem, "menu.help.launch-translation-tool");
-		menuItem.addActionListener(new ActionListener() {
+		menuItem.addActionListener(new ActionListener()
+		{
 			public void actionPerformed(ActionEvent evt)
 			{
 				onLaunchTranslationToolClicked();
-			}});
+			}
+		});
 		helpMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.help.about"));
 		setupKeys(menuItem, "menu.help.about");
 		menuItem.addActionListener(wrapActionListener(
-			new ActionListener() {
-			public void actionPerformed(ActionEvent ev)
-			{
-				onAboutClicked();
-			}
-			}));
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ev)
+					{
+						onAboutClicked();
+					}
+				}));
 		helpMenu.add(menuItem);
 
 		setJMenuBar(menuBar);
@@ -795,8 +844,8 @@ public class MainWindow extends JFrame
 	JMenuItem autoBulldozeMenuItem;
 	JMenuItem disastersMenuItem;
 	JMenuItem soundsMenuItem;
-	Map<Speed,JMenuItem> priorityMenuItems;
-	Map<Integer,JMenuItem> difficultyMenuItems;
+	Map<Speed, JMenuItem> priorityMenuItems;
+	Map<Integer, JMenuItem> difficultyMenuItems;
 
 	private void onAutoBudgetClicked()
 	{
@@ -817,6 +866,7 @@ public class MainWindow extends JFrame
 	}
 
 	static final String SOUNDS_PREF = "enable_sounds";
+
 	private void onSoundClicked()
 	{
 		doSounds = !doSounds;
@@ -832,70 +882,63 @@ public class MainWindow extends JFrame
 		lastSavedTime = System.currentTimeMillis();
 		if (currentFile != null) {
 			String fileName = currentFile.getName();
-			if (fileName.endsWith("."+EXTENSION)) {
+			if (fileName.endsWith("." + EXTENSION)) {
 				fileName = fileName.substring(0, fileName.length() - 1 - EXTENSION.length());
 			}
 			setTitle(MessageFormat.format(strings.getString("main.caption_named_city"), fileName));
-		}
-		else {
+		} else {
 			setTitle(strings.getString("main.caption_unnamed_city"));
 		}
 	}
 
 	private boolean onSaveCityClicked()
 	{
-		if (currentFile == null)
-		{
+		if (currentFile == null) {
 			return onSaveCityAsClicked();
 		}
 
-		try
-		{
+		try {
 			getEngine().save(currentFile);
 			makeClean();
 			return true;
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace(System.err);
 			JOptionPane.showMessageDialog(this, e, strings.getString("main.error_caption"),
-				JOptionPane.ERROR_MESSAGE);
+					JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 	}
 
 	static final String EXTENSION = "cty";
+
 	private boolean onSaveCityAsClicked()
 	{
 		boolean timerEnabled = isTimerActive();
 		if (timerEnabled) {
 			stopTimer();
 		}
-		try
-		{
+		try {
 			JFileChooser fc = new JFileChooser();
 			FileNameExtensionFilter filter1 = new FileNameExtensionFilter(strings.getString("cty_file"), EXTENSION);
 			fc.setFileFilter(filter1);
 			int rv = fc.showSaveDialog(this);
 			if (rv == JFileChooser.APPROVE_OPTION) {
 				currentFile = fc.getSelectedFile();
-				if (!currentFile.getName().endsWith("."+EXTENSION)) {
-					currentFile = new File(currentFile.getPath()+"."+EXTENSION);
+				if (!currentFile.getName().endsWith("." + EXTENSION)) {
+					currentFile = new File(currentFile.getPath() + "." + EXTENSION);
 				}
 				getEngine().save(currentFile);
 				makeClean();
 				return true;
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			JOptionPane.showMessageDialog(this, e, strings.getString("main.error_caption"),
-				JOptionPane.ERROR_MESSAGE);
-		}
-		finally
-		{
-			if (timerEnabled) { startTimer(); }
+					JOptionPane.ERROR_MESSAGE);
+		} finally {
+			if (timerEnabled) {
+				startTimer();
+			}
 		}
 		return false;
 	}
@@ -912,8 +955,7 @@ public class MainWindow extends JFrame
 			stopTimer();
 		}
 
-		try
-		{
+		try {
 			JFileChooser fc = new JFileChooser();
 			FileNameExtensionFilter filter1 = new FileNameExtensionFilter(strings.getString("cty_file"), EXTENSION);
 			fc.setFileFilter(filter1);
@@ -929,14 +971,11 @@ public class MainWindow extends JFrame
 				currentFile = file;
 				makeClean();
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			JOptionPane.showMessageDialog(this, e, strings.getString("main.error_caption"),
-				JOptionPane.ERROR_MESSAGE);
-		}
-		finally {
+					JOptionPane.ERROR_MESSAGE);
+		} finally {
 			if (timerEnabled) {
 				startTimer();
 			}
@@ -945,28 +984,29 @@ public class MainWindow extends JFrame
 
 	private JToggleButton makeToolBtn(final MicropolisTool tool)
 	{
-		String iconName = strings.containsKey("tool."+tool.name()+".icon") ?
-			strings.getString("tool."+tool.name()+".icon") :
-			"/graphics/tools/"+tool.name().toLowerCase()+".png";
-		String iconSelectedName = strings.containsKey("tool."+tool.name()+".selected_icon") ?
-			strings.getString("tool."+tool.name()+".selected_icon") :
-			iconName;
-		String tipText = strings.containsKey("tool."+tool.name()+".tip") ?
-			strings.getString("tool."+tool.name()+".tip") :
-			tool.name();
+		String iconName = strings.containsKey("tool." + tool.name() + ".icon") ?
+				strings.getString("tool." + tool.name() + ".icon") :
+				"/graphics/tools/" + tool.name().toLowerCase() + ".png";
+		String iconSelectedName = strings.containsKey("tool." + tool.name() + ".selected_icon") ?
+				strings.getString("tool." + tool.name() + ".selected_icon") :
+				iconName;
+		String tipText = strings.containsKey("tool." + tool.name() + ".tip") ?
+				strings.getString("tool." + tool.name() + ".tip") :
+				tool.name();
 
 		JToggleButton btn = new JToggleButton();
 		btn.setIcon(new ImageIcon(MainWindow.class.getResource(iconName)));
 		btn.setSelectedIcon(new ImageIcon(MainWindow.class.getResource(iconSelectedName)));
 		btn.setToolTipText(tipText);
-		btn.setMargin(new Insets(0,0,0,0));
+		btn.setMargin(new Insets(0, 0, 0, 0));
 		btn.setBorderPainted(false);
-		btn.addActionListener(new ActionListener() {
+		btn.addActionListener(new ActionListener()
+		{
 			public void actionPerformed(ActionEvent ev)
 			{
 				selectTool(tool);
 			}
-			});
+		});
 		toolBtns.put(tool, btn);
 		return btn;
 	}
@@ -985,21 +1025,21 @@ public class MainWindow extends JFrame
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = c.gridy = 0;
 		c.anchor = GridBagConstraints.NORTH;
-		c.insets = new Insets(8,0,0,0);
+		c.insets = new Insets(8, 0, 0, 0);
 		currentToolLbl = new JLabel(" ");
 		gridBox.add(currentToolLbl, c);
 
 		c.gridy = 1;
-		c.insets = new Insets(0,0,12,0);
+		c.insets = new Insets(0, 0, 12, 0);
 		currentToolCostLbl = new JLabel(" ");
 		gridBox.add(currentToolCostLbl, c);
 
 		c.gridy++;
 		c.fill = GridBagConstraints.NONE;
 		c.weightx = 1.0;
-		c.insets = new Insets(0,0,0,0);
+		c.insets = new Insets(0, 0, 0, 0);
 		Box b0 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b0,c);
+		gridBox.add(b0, c);
 
 		b0.add(makeToolBtn(MicropolisTool.BULLDOZER));
 		b0.add(makeToolBtn(MicropolisTool.WIRE));
@@ -1007,14 +1047,14 @@ public class MainWindow extends JFrame
 
 		c.gridy++;
 		Box b1 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b1,c);
+		gridBox.add(b1, c);
 
 		b1.add(makeToolBtn(MicropolisTool.ROADS));
 		b1.add(makeToolBtn(MicropolisTool.RAIL));
 
 		c.gridy++;
 		Box b2 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b2,c);
+		gridBox.add(b2, c);
 
 		b2.add(makeToolBtn(MicropolisTool.RESIDENTIAL));
 		b2.add(makeToolBtn(MicropolisTool.COMMERCIAL));
@@ -1022,7 +1062,7 @@ public class MainWindow extends JFrame
 
 		c.gridy++;
 		Box b3 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b3,c);
+		gridBox.add(b3, c);
 
 		b3.add(makeToolBtn(MicropolisTool.FIRE));
 		b3.add(makeToolBtn(MicropolisTool.QUERY));
@@ -1030,21 +1070,21 @@ public class MainWindow extends JFrame
 
 		c.gridy++;
 		Box b4 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b4,c);
+		gridBox.add(b4, c);
 
 		b4.add(makeToolBtn(MicropolisTool.POWERPLANT));
 		b4.add(makeToolBtn(MicropolisTool.NUCLEAR));
 
 		c.gridy++;
 		Box b5 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b5,c);
+		gridBox.add(b5, c);
 
 		b5.add(makeToolBtn(MicropolisTool.STADIUM));
 		b5.add(makeToolBtn(MicropolisTool.SEAPORT));
 
 		c.gridy++;
 		Box b6 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b6,c);
+		gridBox.add(b6, c);
 
 		b6.add(makeToolBtn(MicropolisTool.AIRPORT));
 
@@ -1070,10 +1110,10 @@ public class MainWindow extends JFrame
 		currentTool = newTool;
 
 		currentToolLbl.setText(
-			strings.containsKey("tool."+currentTool.name()+".name") ?
-			strings.getString("tool."+currentTool.name()+".name") :
-			currentTool.name()
-			);
+				strings.containsKey("tool." + currentTool.name() + ".name") ?
+						strings.getString("tool." + currentTool.name() + ".name") :
+						currentTool.name()
+		);
 
 		int cost = currentTool.getToolCost();
 		currentToolCostLbl.setText(cost != 0 ? formatFunds(cost) : " ");
@@ -1113,16 +1153,19 @@ public class MainWindow extends JFrame
 	{
 		int oldZoom = drawingArea.getTileSize();
 		int newZoom = dir < 0 ? (oldZoom / 2) : (oldZoom * 2);
-		if (newZoom < 8) { newZoom = 8; }
-		if (newZoom > 32) { newZoom = 32; }
+		if (newZoom < 8) {
+			newZoom = 8;
+		}
+		if (newZoom > 32) {
+			newZoom = 32;
+		}
 
-		if (oldZoom != newZoom)
-		{
+		if (oldZoom != newZoom) {
 			// preserve effective mouse position in viewport when changing zoom level
-			double f = (double)newZoom / (double)oldZoom;
+			double f = (double) newZoom / (double) oldZoom;
 			Point pos = drawingAreaScroll.getViewport().getViewPosition();
-			int newX = (int)Math.round(mousePt.x * f - (mousePt.x - pos.x));
-			int newY = (int)Math.round(mousePt.y * f - (mousePt.y - pos.y));
+			int newX = (int) Math.round(mousePt.x * f - (mousePt.x - pos.x));
+			int newY = (int) Math.round(mousePt.y * f - (mousePt.y - pos.y));
 			drawingArea.selectTileSize(newZoom);
 			drawingAreaScroll.validate();
 			drawingAreaScroll.getViewport().setViewPosition(new Point(newX, newY));
@@ -1133,18 +1176,17 @@ public class MainWindow extends JFrame
 	{
 		Rectangle rect = drawingAreaScroll.getViewport().getViewRect();
 		doZoom(dir,
-			new Point(rect.x + rect.width/2,
-				rect.y + rect.height/2
+				new Point(rect.x + rect.width / 2,
+						rect.y + rect.height / 2
 				)
-			);
+		);
 	}
 
 	private void onMouseWheelMoved(MouseWheelEvent evt)
 	{
 		if (evt.getWheelRotation() < 0) {
 			doZoom(1, evt.getPoint());
-		}
-		else {
+		} else {
 			doZoom(-1, evt.getPoint());
 		}
 	}
@@ -1177,8 +1219,7 @@ public class MainWindow extends JFrame
 		if (currentTool == MicropolisTool.QUERY) {
 			doQueryTool(x, y);
 			this.toolStroke = null;
-		}
-		else {
+		} else {
 			this.toolStroke = currentTool.beginStroke(engine, x, y);
 			previewTool();
 		}
@@ -1195,8 +1236,7 @@ public class MainWindow extends JFrame
 			toolStroke = null;
 			drawingArea.setToolPreview(null);
 			drawingArea.setToolCursor(null);
-		}
-		else {
+		} else {
 			// dismiss any alerts currently visible
 			notificationPane.setVisible(false);
 		}
@@ -1227,12 +1267,12 @@ public class MainWindow extends JFrame
 		assert this.currentTool != null;
 
 		drawingArea.setToolCursor(
-			toolStroke.getBounds(),
-			currentTool
-			);
+				toolStroke.getBounds(),
+				currentTool
+		);
 		drawingArea.setToolPreview(
-			toolStroke.getPreview()
-			);
+				toolStroke.getPreview()
+		);
 	}
 
 	private void onToolDrag(MouseEvent ev)
@@ -1251,8 +1291,7 @@ public class MainWindow extends JFrame
 		if (toolStroke != null) {
 			toolStroke.dragTo(x, y);
 			previewTool();
-		}
-		else if (currentTool == MicropolisTool.QUERY) {
+		} else if (currentTool == MicropolisTool.QUERY) {
 			doQueryTool(x, y);
 		}
 
@@ -1262,8 +1301,7 @@ public class MainWindow extends JFrame
 
 	private void onToolHover(MouseEvent ev)
 	{
-		if (currentTool == null || currentTool == MicropolisTool.QUERY)
-		{
+		if (currentTool == null || currentTool == MicropolisTool.QUERY) {
 			drawingArea.setToolCursor(null);
 			return;
 		}
@@ -1279,7 +1317,7 @@ public class MainWindow extends JFrame
 		if (h >= 3)
 			y--;
 
-		drawingArea.setToolCursor(new CityRect(x,y,w,h), currentTool);
+		drawingArea.setToolCursor(new CityRect(x, y, w, h), currentTool);
 	}
 
 	private void onToolExited(MouseEvent ev)
@@ -1290,46 +1328,47 @@ public class MainWindow extends JFrame
 	private void showToolResult(CityLocation loc, ToolResult result)
 	{
 		switch (result) {
-		case SUCCESS:
-			citySound(currentTool == MicropolisTool.BULLDOZER ? Sound.BULLDOZE : Sound.BUILD, loc);
-			dirty1 = true;
-			break;
+			case SUCCESS:
+				citySound(currentTool == MicropolisTool.BULLDOZER ? Sound.BULLDOZE : Sound.BUILD, loc);
+				dirty1 = true;
+				break;
 
-		case NONE: break;
-		case UH_OH:
-			messagesPane.appendCityMessage(MicropolisMessage.BULLDOZE_FIRST);
-			citySound(Sound.UHUH, loc);
-			break;
+			case NONE:
+				break;
+			case UH_OH:
+				messagesPane.appendCityMessage(MicropolisMessage.BULLDOZE_FIRST);
+				citySound(Sound.UHUH, loc);
+				break;
 
-		case INSUFFICIENT_FUNDS:
-			messagesPane.appendCityMessage(MicropolisMessage.INSUFFICIENT_FUNDS);
-			citySound(Sound.SORRY, loc);
-			break;
+			case INSUFFICIENT_FUNDS:
+				messagesPane.appendCityMessage(MicropolisMessage.INSUFFICIENT_FUNDS);
+				citySound(Sound.SORRY, loc);
+				break;
 
-		default:
-			assert false;
+			default:
+				assert false;
 		}
 	}
 
 	public static String formatFunds(int funds)
 	{
 		return MessageFormat.format(
-			strings.getString("funds"), funds
-			);
+				strings.getString("funds"), funds
+		);
 	}
 
 	public static String formatGameDate(int cityTime)
 	{
 		Calendar c = Calendar.getInstance();
-		c.set(1900 + cityTime/48,
-			(cityTime%48)/4,
-			(cityTime%4)*7 + 1
-			);
+		c.set(1900 + cityTime / 48,
+				(cityTime % 48) / 4,
+				(cityTime % 4) * 7 + 1
+		);
 
 		return MessageFormat.format(
-			strings.getString("citytime"),
-			c.getTime()
-			);
+				strings.getString("citytime"),
+				c.getTime()
+		);
 	}
 
 	private void updateDateLabel()
@@ -1353,37 +1392,39 @@ public class MainWindow extends JFrame
 		if (engine.simSpeed == Speed.PAUSED)
 			return;
 
-		if (currentEarthquake != null)
-		{
+		if (currentEarthquake != null) {
 			int interval = 3000 / MicropolisDrawingArea.SHAKE_STEPS;
-			shakeTimer = new Timer(interval, new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
+			shakeTimer = new Timer(interval, new ActionListener()
+			{
+				public void actionPerformed(ActionEvent evt)
+				{
 					currentEarthquake.oneStep();
 					if (currentEarthquake.count == 0) {
 						stopTimer();
 						currentEarthquake = null;
 						startTimer();
 					}
-				}});
+				}
+			});
 			shakeTimer.start();
 			return;
 		}
 
-		ActionListener taskPerformer = new ActionListener() {
-		public void actionPerformed(ActionEvent evt)
+		ActionListener taskPerformer = new ActionListener()
 		{
-			for (int i = 0; i < count; i++)
+			public void actionPerformed(ActionEvent evt)
 			{
-				engine.animate();
-				if (!engine.autoBudget && engine.isBudgetTime())
-				{
-					showAutoBudget();
-					return;
+				for (int i = 0; i < count; i++) {
+					engine.animate();
+					if (!engine.autoBudget && engine.isBudgetTime()) {
+						showAutoBudget();
+						return;
+					}
 				}
+				updateDateLabel();
+				dirty2 = true;
 			}
-			updateDateLabel();
-			dirty2 = true;
-		}};
+		};
 		taskPerformer = wrapActionListener(taskPerformer);
 
 		assert simTimer == null;
@@ -1393,14 +1434,17 @@ public class MainWindow extends JFrame
 
 	ActionListener wrapActionListener(final ActionListener l)
 	{
-		return new ActionListener() {
-		public void actionPerformed(ActionEvent evt) {
-			try {
-				l.actionPerformed(evt);
-			} catch (Throwable e) {
-				showErrorMessage(e);
+		return new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				try {
+					l.actionPerformed(evt);
+				} catch (Throwable e) {
+					showErrorMessage(e);
+				}
 			}
-		}};
+		};
 	}
 
 	private void showErrorMessage(Throwable e)
@@ -1414,35 +1458,33 @@ public class MainWindow extends JFrame
 
 		final JScrollPane detailsPane = new JScrollPane(stackTracePane);
 		detailsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		detailsPane.setPreferredSize(new Dimension(480,240));
-		detailsPane.setMinimumSize(new Dimension(0,0));
+		detailsPane.setPreferredSize(new Dimension(480, 240));
+		detailsPane.setMinimumSize(new Dimension(0, 0));
 
 		int rv = JOptionPane.showOptionDialog(this, e,
-			strings.getString("main.error_unexpected"),
-			JOptionPane.DEFAULT_OPTION,
-			JOptionPane.ERROR_MESSAGE,
-			null,
-			new String[] {
-				strings.getString("main.error_show_stacktrace"),
-				strings.getString("main.error_close"),
-				strings.getString("main.error_shutdown")
+				strings.getString("main.error_unexpected"),
+				JOptionPane.DEFAULT_OPTION,
+				JOptionPane.ERROR_MESSAGE,
+				null,
+				new String[]{
+						strings.getString("main.error_show_stacktrace"),
+						strings.getString("main.error_close"),
+						strings.getString("main.error_shutdown")
 				},
-			1
-			);
-		if (rv == 0)
-		{
+				1
+		);
+		if (rv == 0) {
 			JOptionPane.showMessageDialog(this, detailsPane,
-				strings.getString("main.error_unexpected"),
-				JOptionPane.ERROR_MESSAGE);
+					strings.getString("main.error_unexpected"),
+					JOptionPane.ERROR_MESSAGE);
 		}
-		if (rv == 2)
-		{
+		if (rv == 2) {
 			rv = JOptionPane.showConfirmDialog(
-				this,
-				strings.getString("error.shutdown_query"),
-				strings.getString("main.error_unexpected"),
-				JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.WARNING_MESSAGE);
+					this,
+					strings.getString("error.shutdown_query"),
+					strings.getString("main.error_unexpected"),
+					JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.WARNING_MESSAGE);
 			if (rv == JOptionPane.OK_OPTION) {
 				System.exit(1);
 			}
@@ -1452,12 +1494,14 @@ public class MainWindow extends JFrame
 	class EarthquakeStepper
 	{
 		int count = 0;
+
 		void oneStep()
 		{
 			count = (count + 1) % MicropolisDrawingArea.SHAKE_STEPS;
 			drawingArea.shake(count);
 		}
 	}
+
 	EarthquakeStepper currentEarthquake;
 
 	//implements EarthquakeListener
@@ -1523,28 +1567,28 @@ public class MainWindow extends JFrame
 	{
 		dirty1 = true;
 		switch (disaster) {
-		case FIRE:
-			getEngine().makeFire();
-			break;
-		case FLOOD:
-			getEngine().makeFlood();
-			break;
-		case MONSTER:
-			getEngine().makeMonster();
-			break;
-		case MELTDOWN:
-			if (!getEngine().makeMeltdown()) {
-				messagesPane.appendCityMessage(MicropolisMessage.NO_NUCLEAR_PLANTS);
-			}
-			break;
-		case TORNADO:
-			getEngine().makeTornado();
-			break;
-		case EARTHQUAKE:
-			getEngine().makeEarthquake();
-			break;
-		default:
-			assert false; //unknown disaster
+			case FIRE:
+				getEngine().makeFire();
+				break;
+			case FLOOD:
+				getEngine().makeFlood();
+				break;
+			case MONSTER:
+				getEngine().makeMonster();
+				break;
+			case MELTDOWN:
+				if (!getEngine().makeMeltdown()) {
+					messagesPane.appendCityMessage(MicropolisMessage.NO_NUCLEAR_PLANTS);
+				}
+				break;
+			case TORNADO:
+				getEngine().makeTornado();
+				break;
+			case EARTHQUAKE:
+				getEngine().makeEarthquake();
+				break;
+			default:
+				assert false; //unknown disaster
 		}
 	}
 
@@ -1558,8 +1602,7 @@ public class MainWindow extends JFrame
 	{
 		messagesPane.appendCityMessage(m);
 
-		if (m.useNotificationPane && p != null)
-		{
+		if (m.useNotificationPane && p != null) {
 			notificationPane.showMessage(engine, m, p.x, p.y);
 		}
 	}
@@ -1582,12 +1625,10 @@ public class MainWindow extends JFrame
 		autoBulldozeMenuItem.setSelected(getEngine().autoBulldoze);
 		disastersMenuItem.setSelected(!getEngine().noDisasters);
 		soundsMenuItem.setSelected(doSounds);
-		for (Speed spd : priorityMenuItems.keySet())
-		{
+		for (Speed spd : priorityMenuItems.keySet()) {
 			priorityMenuItems.get(spd).setSelected(getEngine().simSpeed == spd);
 		}
-		for (int i = GameLevel.MIN_LEVEL; i <= GameLevel.MAX_LEVEL; i++)
-		{
+		for (int i = GameLevel.MIN_LEVEL; i <= GameLevel.MAX_LEVEL; i++) {
 			difficultyMenuItems.get(i).setSelected(getEngine().gameLevel == i);
 		}
 	}
@@ -1604,26 +1645,31 @@ public class MainWindow extends JFrame
 
 		boolean isOnScreen = drawingAreaScroll.getViewport().getViewRect().contains(
 				drawingArea.getTileBounds(loc.x, loc.y)
-			);
+		);
 		if (sound == Sound.HONKHONK_LOW && !isOnScreen)
 			return;
 
-		try
-		{
+		try {
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(afile));
 			clip.start();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
 	}
 
 	//implements Micropolis.Listener
-	public void censusChanged() { }
-	public void demandChanged() { }
-	public void evaluationChanged() { }
+	public void censusChanged()
+	{
+	}
+
+	public void demandChanged()
+	{
+	}
+
+	public void evaluationChanged()
+	{
+	}
 
 	void onViewBudgetClicked()
 	{
@@ -1645,8 +1691,7 @@ public class MainWindow extends JFrame
 	{
 		if (toolStroke == null) {
 			showBudgetWindow(true);
-		}
-		else {
+		} else {
 			autoBudgetPending = true;
 		}
 	}
@@ -1672,11 +1717,13 @@ public class MainWindow extends JFrame
 		String caption = strings.getString(stringPrefix);
 		JMenuItem menuItem = new JRadioButtonMenuItem(caption);
 		setupKeys(menuItem, stringPrefix);
-		menuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+		menuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				setMapState(state);
 			}
-			});
+		});
 		mapStateMenuItems.put(state, menuItem);
 		return menuItem;
 	}
@@ -1691,7 +1738,7 @@ public class MainWindow extends JFrame
 
 	private void setMapLegend(MapState state)
 	{
-		String k = "legend_image."+state.name();
+		String k = "legend_image." + state.name();
 		java.net.URL iconUrl = null;
 		if (strings.containsKey(k)) {
 			String iconName = strings.getString(k);
@@ -1699,8 +1746,7 @@ public class MainWindow extends JFrame
 		}
 		if (iconUrl != null) {
 			mapLegendLbl.setIcon(new ImageIcon(iconUrl));
-		}
-		else {
+		} else {
 			mapLegendLbl.setIcon(null);
 		}
 	}
@@ -1723,11 +1769,11 @@ public class MainWindow extends JFrame
 
 		JLabel appNameLbl = new JLabel(versionStr);
 		JLabel appDetailsLbl = new JLabel(strings.getString("main.about_text"));
-		JComponent [] inputs = new JComponent[] {  appNameLbl, appDetailsLbl };
+		JComponent[] inputs = new JComponent[]{appNameLbl, appDetailsLbl};
 		JOptionPane.showMessageDialog(this,
-			inputs,
-			strings.getString("main.about_caption"),
-			JOptionPane.PLAIN_MESSAGE,
-			appIcon);
+				inputs,
+				strings.getString("main.about_caption"),
+				JOptionPane.PLAIN_MESSAGE,
+				appIcon);
 	}
 }

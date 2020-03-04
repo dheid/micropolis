@@ -8,14 +8,19 @@
 
 package micropolisj.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import java.text.NumberFormat;
-import java.util.*;
+import micropolisj.engine.BudgetNumbers;
+import micropolisj.engine.Micropolis;
+import micropolisj.engine.Speed;
 
-import micropolisj.engine.*;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
+
 import static micropolisj.gui.MainWindow.formatFunds;
 import static micropolisj.gui.MainWindow.formatGameDate;
 
@@ -56,9 +61,9 @@ public class BudgetDialog extends JDialog
 		int newFirePct = ((Number) fireFundEntry.getValue()).intValue();
 
 		engine.cityTax = newTaxRate;
-		engine.roadPercent = (double)newRoadPct / 100.0;
-		engine.policePercent = (double)newPolicePct / 100.0;
-		engine.firePercent = (double)newFirePct / 100.0;
+		engine.roadPercent = (double) newRoadPct / 100.0;
+		engine.policePercent = (double) newPolicePct / 100.0;
+		engine.firePercent = (double) newFirePct / 100.0;
 
 		loadBudgetNumbers(false);
 	}
@@ -66,12 +71,11 @@ public class BudgetDialog extends JDialog
 	private void loadBudgetNumbers(boolean updateEntries)
 	{
 		BudgetNumbers b = engine.generateBudget();
-		if (updateEntries)
-		{
-		taxRateEntry.setValue(b.taxRate);
-		roadFundEntry.setValue((int)Math.round(b.roadPercent*100.0));
-		policeFundEntry.setValue((int)Math.round(b.policePercent*100.0));
-		fireFundEntry.setValue((int)Math.round(b.firePercent*100.0));
+		if (updateEntries) {
+			taxRateEntry.setValue(b.taxRate);
+			roadFundEntry.setValue((int) Math.round(b.roadPercent * 100.0));
+			policeFundEntry.setValue((int) Math.round(b.policePercent * 100.0));
+			fireFundEntry.setValue((int) Math.round(b.firePercent * 100.0));
 		}
 
 		taxRevenueLbl.setText(formatFunds(b.taxIncome));
@@ -90,8 +94,8 @@ public class BudgetDialog extends JDialog
 	{
 		Dimension sz = slider.getPreferredSize();
 		slider.setPreferredSize(
-			new Dimension(80, sz.height)
-			);
+				new Dimension(80, sz.height)
+		);
 	}
 
 	public BudgetDialog(Window owner, Micropolis engine)
@@ -106,7 +110,7 @@ public class BudgetDialog extends JDialog
 		this.origPolicePct = engine.policePercent;
 
 		// give text fields of the fund-level spinners a minimum size
-		taxRateEntry = new JSpinner(new SpinnerNumberModel(7,0,20,1));
+		taxRateEntry = new JSpinner(new SpinnerNumberModel(7, 0, 20, 1));
 
 		// widgets to set funding levels
 		roadFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
@@ -116,10 +120,12 @@ public class BudgetDialog extends JDialog
 		policeFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
 		adjustSliderSize(policeFundEntry);
 
-		ChangeListener change = new ChangeListener() {
-		public void stateChanged(ChangeEvent ev) {
-			applyChange();
-		}
+		ChangeListener change = new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent ev)
+			{
+				applyChange();
+			}
 		};
 		taxRateEntry.addChangeListener(change);
 		roadFundEntry.addChangeListener(change);
@@ -127,7 +133,7 @@ public class BudgetDialog extends JDialog
 		policeFundEntry.addChangeListener(change);
 
 		Box mainBox = new Box(BoxLayout.Y_AXIS);
-		mainBox.setBorder(BorderFactory.createEmptyBorder(8,8,8,8));
+		mainBox.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 		add(mainBox, BorderLayout.CENTER);
 
 		mainBox.add(makeTaxPane());
@@ -151,17 +157,23 @@ public class BudgetDialog extends JDialog
 		add(buttonPane, BorderLayout.SOUTH);
 
 		JButton continueBtn = new JButton(strings.getString("budgetdlg.continue"));
-		continueBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ev) {
+		continueBtn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent ev)
+			{
 				onContinueClicked();
-			}});
+			}
+		});
 		buttonPane.add(continueBtn);
 
 		JButton resetBtn = new JButton(strings.getString("budgetdlg.reset"));
-		resetBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ev) {
+		resetBtn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent ev)
+			{
 				onResetClicked();
-			}});
+			}
+		});
 		buttonPane.add(resetBtn);
 
 		loadBudgetNumbers(true);
@@ -169,23 +181,24 @@ public class BudgetDialog extends JDialog
 		pack();
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(owner);
-		getRootPane().registerKeyboardAction(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				dispose();
-			}},
-			KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
+		getRootPane().registerKeyboardAction(new ActionListener()
+											 {
+												 public void actionPerformed(ActionEvent evt)
+												 {
+													 dispose();
+												 }
+											 },
+				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+				JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
 	private void setAutoRequestFocus_compat(boolean v)
 	{
-		try
-		{
+		try {
 			if (super.getClass().getMethod("setAutoRequestFocus", boolean.class) != null) {
 				super.setAutoRequestFocus(v);
 			}
-		}
-		catch (NoSuchMethodException e) {
+		} catch (NoSuchMethodException e) {
 			// ok to ignore
 		}
 	}
@@ -193,7 +206,7 @@ public class BudgetDialog extends JDialog
 	private JComponent makeFundingRatesPane()
 	{
 		JPanel fundingRatesPane = new JPanel(new GridBagLayout());
-		fundingRatesPane.setBorder(BorderFactory.createEmptyBorder(8,0,8,0));
+		fundingRatesPane.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
 
 		GridBagConstraints c0 = new GridBagConstraints();
 		c0.gridx = 0;
@@ -241,7 +254,7 @@ public class BudgetDialog extends JDialog
 	private JComponent makeOptionsPane()
 	{
 		JPanel optionsPane = new JPanel(new GridBagLayout());
-		optionsPane.setBorder(BorderFactory.createEmptyBorder(8,0,0,0));
+		optionsPane.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
 
 		GridBagConstraints c0 = new GridBagConstraints();
 		GridBagConstraints c1 = new GridBagConstraints();
@@ -263,7 +276,7 @@ public class BudgetDialog extends JDialog
 	private JComponent makeTaxPane()
 	{
 		JPanel pane = new JPanel(new GridBagLayout());
-		pane.setBorder(BorderFactory.createEmptyBorder(0,0,8,0));
+		pane.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
 
 		GridBagConstraints c0 = new GridBagConstraints();
 		GridBagConstraints c1 = new GridBagConstraints();
@@ -298,8 +311,7 @@ public class BudgetDialog extends JDialog
 		}
 		if (pauseBtn.isSelected() && engine.simSpeed != Speed.PAUSED) {
 			engine.setSpeed(Speed.PAUSED);
-		}
-		else if (!pauseBtn.isSelected() && engine.simSpeed == Speed.PAUSED) {
+		} else if (!pauseBtn.isSelected() && engine.simSpeed == Speed.PAUSED) {
 			engine.setSpeed(Speed.NORMAL);
 		}
 
@@ -318,7 +330,7 @@ public class BudgetDialog extends JDialog
 	private JComponent makeBalancePane()
 	{
 		JPanel balancePane = new JPanel(new GridBagLayout());
-		balancePane.setBorder(BorderFactory.createEmptyBorder(8,24,8,24));
+		balancePane.setBorder(BorderFactory.createEmptyBorder(8, 24, 8, 24));
 
 		GridBagConstraints c0 = new GridBagConstraints();
 		GridBagConstraints c1 = new GridBagConstraints();
@@ -357,14 +369,14 @@ public class BudgetDialog extends JDialog
 			}
 
 			Micropolis.FinancialHistory f = engine.financialHistory.get(i);
-			Micropolis.FinancialHistory fPrior = engine.financialHistory.get(i+1);
+			Micropolis.FinancialHistory fPrior = engine.financialHistory.get(i + 1);
 			int cashFlow = f.totalFunds - fPrior.totalFunds;
 			int capExpenses = -(cashFlow - f.taxIncome + f.operatingExpenses);
 
 			c1.gridx++;
 			c1.gridy = 0;
 
-			thLbl = new JLabel(formatGameDate(f.cityTime-1));
+			thLbl = new JLabel(formatGameDate(f.cityTime - 1));
 			thLbl.setFont(headFont);
 			thLbl.setForeground(Color.MAGENTA);
 			balancePane.add(thLbl, c1);

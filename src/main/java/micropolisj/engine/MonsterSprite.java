@@ -8,7 +8,7 @@
 
 package micropolisj.engine;
 
-import static micropolisj.engine.TileConstants.*;
+import static micropolisj.engine.TileConstants.RIVER;
 
 /**
  * Implements a monster (one of the Micropolis disasters).
@@ -35,13 +35,13 @@ public class MonsterSprite extends Sprite
 	//      16 : west
 
 	// movement deltas
-	static int [] Gx = { 2, 2, -2, -2, 0 };
-	static int [] Gy = { -2, 2, 2, -2, 0 };
+	static int[] Gx = {2, 2, -2, -2, 0};
+	static int[] Gy = {-2, 2, 2, -2, 0};
 
-	static int [] ND1 = {  0, 1, 2, 3 };
-	static int [] ND2 = {  1, 2, 3, 0 };
-	static int [] nn1 = {  2, 5, 8, 11 };
-	static int [] nn2 = { 11, 2, 5,  8 };
+	static int[] ND1 = {0, 1, 2, 3};
+	static int[] ND2 = {1, 2, 3, 0};
+	static int[] nn1 = {2, 5, 8, 11};
+	static int[] nn2 = {11, 2, 5, 8};
 
 	public MonsterSprite(Micropolis engine, int xpos, int ypos)
 	{
@@ -57,8 +57,8 @@ public class MonsterSprite extends Sprite
 		this.origY = y;
 
 		this.frame = xpos > city.getWidth() / 2 ?
-			(ypos > city.getHeight() / 2 ? 10 : 7) :
-			(ypos > city.getHeight() / 2 ? 1 : 4);
+				(ypos > city.getHeight() / 2 ? 10 : 7) :
+				(ypos > city.getHeight() / 2 ? 1 : 4);
 
 		this.count = 1000;
 		CityLocation p = city.getLocationOfMaxPollution();
@@ -98,8 +98,7 @@ public class MonsterSprite extends Sprite
 					flag = true;
 					destX = origX;
 					destY = origY;
-				}
-				else {
+				} else {
 					// destination was origX, origY;
 					// hide the sprite
 					this.frame = 0;
@@ -115,19 +114,17 @@ public class MonsterSprite extends Sprite
 				// randomly determine direction to turn
 				if (city.PRNG.nextInt(2) == 0) {
 					z = ND1[d];
-				}
-				else {
+				} else {
 					z = ND2[d];
 				}
 				d = 4;  //transition heading
 
 				if (soundCount == 0) {
-					city.makeSound(x/16, y/16, Sound.MONSTER);
+					city.makeSound(x / 16, y / 16, Sound.MONSTER);
 					soundCount = 50 + city.PRNG.nextInt(101);
 				}
 			}
-		}
-		else {
+		} else {
 			assert this.frame >= 13 && this.frame <= 16;
 
 			int z2 = (this.frame - 13) % 4;
@@ -139,12 +136,11 @@ public class MonsterSprite extends Sprite
 				} else {
 					newFrame = nn2[z2];
 				}
-				d = (newFrame-1) / 3;
-				z = (newFrame-1) % 3;
+				d = (newFrame - 1) / 3;
+				z = (newFrame - 1) % 3;
 
 				assert d < 4;
-			}
-			else {
+			} else {
 				d = 4;
 			}
 		}
@@ -162,19 +158,18 @@ public class MonsterSprite extends Sprite
 
 		int c = getChar(x, y);
 		if (c == -1 ||
-			(c == RIVER && this.count != 0 && false)
-			) {
+				(c == RIVER && this.count != 0 && false)
+		) {
 			this.frame = 0; //kill zilla
 		}
 
-		for (Sprite s : city.allSprites())
-		{
+		for (Sprite s : city.allSprites()) {
 			if (checkSpriteCollision(s) &&
-				(s.kind == SpriteKind.AIR ||
-				 s.kind == SpriteKind.COP ||
-				 s.kind == SpriteKind.SHI ||
-				 s.kind == SpriteKind.TRA)
-				) {
+					(s.kind == SpriteKind.AIR ||
+							s.kind == SpriteKind.COP ||
+							s.kind == SpriteKind.SHI ||
+							s.kind == SpriteKind.TRA)
+			) {
 				s.explodeSprite();
 			}
 		}

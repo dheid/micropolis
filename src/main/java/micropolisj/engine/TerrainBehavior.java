@@ -34,26 +34,26 @@ class TerrainBehavior extends TileBehavior
 	public void apply()
 	{
 		switch (behavior) {
-		case FIRE:
-			doFire();
-			return;
-		case FLOOD:
-			doFlood();
-			return;
-		case RADIOACTIVE:
-			doRadioactiveTile();
-			return;
-		case ROAD:
-			doRoad();
-			return;
-		case RAIL:
-			doRail();
-			return;
-		case EXPLOSION:
-			doExplosion();
-			return;
-		default:
-			assert false;
+			case FIRE:
+				doFire();
+				return;
+			case FLOOD:
+				doFlood();
+				return;
+			case RADIOACTIVE:
+				doRadioactiveTile();
+				return;
+			case ROAD:
+				doRoad();
+				return;
+			case RAIL:
+				doRail();
+				return;
+			case EXPLOSION:
+				doExplosion();
+				return;
+			default:
+				assert false;
 		}
 	}
 
@@ -66,13 +66,11 @@ class TerrainBehavior extends TileBehavior
 			return;
 		}
 
-		final int [] DX = { 0, 1, 0, -1 };
-		final int [] DY = { -1, 0, 1, 0 };
+		final int[] DX = {0, 1, 0, -1};
+		final int[] DY = {-1, 0, 1, 0};
 
-		for (int dir = 0; dir < 4; dir++)
-		{
-			if (PRNG.nextInt(8) == 0)
-			{
+		for (int dir = 0; dir < 4; dir++) {
+			if (PRNG.nextInt(8) == 0) {
 				int xtem = xpos + DX[dir];
 				int ytem = ypos + DY[dir];
 				if (!city.testBounds(xtem, ytem))
@@ -86,18 +84,18 @@ class TerrainBehavior extends TileBehavior
 							city.makeExplosion(xtem, ytem);
 						}
 					}
-					city.setTile(xtem, ytem, (char)(FIRE + PRNG.nextInt(4)));
+					city.setTile(xtem, ytem, (char) (FIRE + PRNG.nextInt(4)));
 				}
 			}
 		}
 
 		int cov = city.getFireStationCoverage(xpos, ypos);
 		int rate = cov > 100 ? 1 :
-			cov > 20 ? 2 :
-			cov != 0 ? 3 : 10;
+				cov > 20 ? 2 :
+						cov != 0 ? 3 : 10;
 
-		if (PRNG.nextInt(rate+1) == 0) {
-			city.setTile(xpos, ypos, (char)(RUBBLE + PRNG.nextInt(4)));
+		if (PRNG.nextInt(rate + 1) == 0) {
+			city.setTile(xpos, ypos, (char) (RUBBLE + PRNG.nextInt(4)));
 		}
 	}
 
@@ -106,32 +104,28 @@ class TerrainBehavior extends TileBehavior
 	 */
 	void doFlood()
 	{
-		final int [] DX = { 0, 1, 0, -1 };
-		final int [] DY = { -1, 0, 1, 0 };
+		final int[] DX = {0, 1, 0, -1};
+		final int[] DY = {-1, 0, 1, 0};
 
-		if (city.floodCnt != 0)
-		{
-			for (int z = 0; z < 4; z++)
-			{
+		if (city.floodCnt != 0) {
+			for (int z = 0; z < 4; z++) {
 				if (PRNG.nextInt(8) == 0) {
 					int xx = xpos + DX[z];
 					int yy = ypos + DY[z];
 					if (city.testBounds(xx, yy)) {
 						int t = city.getTile(xx, yy);
 						if (isCombustible(t)
-							|| t == DIRT
-							|| (t >= WOODS5 && t < FLOOD))
-						{
+								|| t == DIRT
+								|| (t >= WOODS5 && t < FLOOD)) {
 							if (isZoneCenter(t)) {
 								city.killZone(xx, yy, t);
 							}
-							city.setTile(xx, yy, (char)(FLOOD + PRNG.nextInt(3)));
+							city.setTile(xx, yy, (char) (FLOOD + PRNG.nextInt(3)));
 						}
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			if (PRNG.nextInt(16) == 0) {
 				city.setTile(xpos, ypos, DIRT);
 			}
@@ -143,14 +137,13 @@ class TerrainBehavior extends TileBehavior
 	 */
 	void doRadioactiveTile()
 	{
-		if (PRNG.nextInt(4096) == 0)
-		{
+		if (PRNG.nextInt(4096) == 0) {
 			// radioactive decay
 			city.setTile(xpos, ypos, DIRT);
 		}
 	}
 
-	static int [] TRAFFIC_DENSITY_TAB = { ROADBASE, LTRFBASE, HTRFBASE };
+	static int[] TRAFFIC_DENSITY_TAB = {ROADBASE, LTRFBASE, HTRFBASE};
 
 	/**
 	 * Called when the current tile is a road tile.
@@ -159,19 +152,15 @@ class TerrainBehavior extends TileBehavior
 	{
 		city.roadTotal++;
 
-		if (city.roadEffect < 30)
-		{
+		if (city.roadEffect < 30) {
 			// deteriorating roads
-			if (PRNG.nextInt(512) == 0)
-			{
-				if (!isConductive(tile))
-				{
-					if (city.roadEffect < PRNG.nextInt(32))
-					{
+			if (PRNG.nextInt(512) == 0) {
+				if (!isConductive(tile)) {
+					if (city.roadEffect < PRNG.nextInt(32)) {
 						if (isOverWater(tile))
 							city.setTile(xpos, ypos, RIVER);
 						else
-							city.setTile(xpos, ypos, (char)(RUBBLE + PRNG.nextInt(4)));
+							city.setTile(xpos, ypos, (char) (RUBBLE + PRNG.nextInt(4)));
 						return;
 					}
 				}
@@ -197,12 +186,11 @@ class TerrainBehavior extends TileBehavior
 
 		int trafficDensity = city.getTrafficDensity(xpos, ypos);
 		int newLevel = trafficDensity < 64 ? 0 :
-			trafficDensity < 192 ? 1 : 2;
-		
+				trafficDensity < 192 ? 1 : 2;
+
 		assert newLevel >= 0 && newLevel < TRAFFIC_DENSITY_TAB.length;
 
-		if (tden != newLevel)
-		{
+		if (tden != newLevel) {
 			int z = ((tile - ROADBASE) & 15) + TRAFFIC_DENSITY_TAB[newLevel];
 			city.setTile(xpos, ypos, (char) z);
 		}
@@ -221,9 +209,9 @@ class TerrainBehavior extends TileBehavior
 				if (!isConductive(tile)) {
 					if (city.roadEffect < PRNG.nextInt(32)) {
 						if (isOverWater(tile)) {
-							city.setTile(xpos,ypos,RIVER);
+							city.setTile(xpos, ypos, RIVER);
 						} else {
-							city.setTile(xpos,ypos,(char)(RUBBLE + PRNG.nextInt(4)));
+							city.setTile(xpos, ypos, (char) (RUBBLE + PRNG.nextInt(4)));
 						}
 					}
 				}
@@ -244,73 +232,71 @@ class TerrainBehavior extends TileBehavior
 	 */
 	boolean doBridge()
 	{
-		final int HDx[] = { -2,  2, -2, -1,  0,  1,  2 };
-		final int HDy[] = { -1, -1,  0,  0,  0,  0,  0 };
+		final int HDx[] = {-2, 2, -2, -1, 0, 1, 2};
+		final int HDy[] = {-1, -1, 0, 0, 0, 0, 0};
 		final char HBRTAB[] = {
-			HBRDG1,       HBRDG3,
-			HBRDG0,       RIVER,
-			BRWH,         RIVER,
-			HBRDG2 };
+				HBRDG1, HBRDG3,
+				HBRDG0, RIVER,
+				BRWH, RIVER,
+				HBRDG2};
 		final char HBRTAB2[] = {
-			RIVER,        RIVER,
-			HBRIDGE,      HBRIDGE,
-			HBRIDGE,      HBRIDGE,
-			HBRIDGE };
+				RIVER, RIVER,
+				HBRIDGE, HBRIDGE,
+				HBRIDGE, HBRIDGE,
+				HBRIDGE};
 
-		final int VDx[] = {  0,  1,  0,  0,  0,  0,  1 };
-		final int VDy[] = { -2, -2, -1,  0,  1,  2,  2 };
+		final int VDx[] = {0, 1, 0, 0, 0, 0, 1};
+		final int VDy[] = {-2, -2, -1, 0, 1, 2, 2};
 		final char VBRTAB[] = {
-			VBRDG0,       VBRDG1,
-			RIVER,        BRWV,
-			RIVER,        VBRDG2,
-			VBRDG3 };
+				VBRDG0, VBRDG1,
+				RIVER, BRWV,
+				RIVER, VBRDG2,
+				VBRDG3};
 		final char VBRTAB2[] = {
-			VBRIDGE,      RIVER,
-			VBRIDGE,      VBRIDGE,
-			VBRIDGE,      VBRIDGE,
-			RIVER };
+				VBRIDGE, RIVER,
+				VBRIDGE, VBRIDGE,
+				VBRIDGE, VBRIDGE,
+				RIVER};
 
 		if (tile == BRWV) {
 			// vertical bridge, open
-			if (PRNG.nextInt(4) == 0 && getBoatDis() > 340/16) {
+			if (PRNG.nextInt(4) == 0 && getBoatDis() > 340 / 16) {
 				//close the bridge
 				applyBridgeChange(VDx, VDy, VBRTAB, VBRTAB2);
 			}
 			return true;
-		}
-		else if (tile == BRWH) {
+		} else if (tile == BRWH) {
 			// horizontal bridge, open
-			if (PRNG.nextInt(4) == 0 && getBoatDis() > 340/16) {
+			if (PRNG.nextInt(4) == 0 && getBoatDis() > 340 / 16) {
 				// close the bridge
 				applyBridgeChange(HDx, HDy, HBRTAB, HBRTAB2);
 			}
 			return true;
 		}
 
-		if (getBoatDis() < 300/16 && PRNG.nextInt(8) == 0) {
+		if (getBoatDis() < 300 / 16 && PRNG.nextInt(8) == 0) {
 			if ((tile & 1) != 0) {
 				// vertical bridge
-				if (xpos < city.getWidth()-1) {
+				if (xpos < city.getWidth() - 1) {
 					// look for CHANNEL tile to right of
 					// bridge. the CHANNEL tiles are only
 					// found in the very center of the
 					// river
-					if (city.getTile(xpos+1,ypos) == CHANNEL) {
+					if (city.getTile(xpos + 1, ypos) == CHANNEL) {
 						// vertical bridge, open it up
 						applyBridgeChange(VDx, VDy, VBRTAB2, VBRTAB);
 						return true;
 					}
 				}
 				return false;
-			}
-			else {
+			} else {
 				// horizontal bridge
 				if (ypos > 0) {
 					// look for CHANNEL tile just above
 					// bridge. the CHANNEL tiles are only
 					// found in the very center of the
 					// river
-					if (city.getTile(xpos, ypos-1) == CHANNEL) {
+					if (city.getTile(xpos, ypos - 1) == CHANNEL) {
 						// open it up
 						applyBridgeChange(HDx, HDy, HBRTAB2, HBRTAB);
 						return true;
@@ -326,20 +312,20 @@ class TerrainBehavior extends TileBehavior
 	/**
 	 * Helper function for doBridge- it toggles the draw-bridge.
 	 */
-	private void applyBridgeChange(int [] Dx, int [] Dy, char [] fromTab, char [] toTab)
+	private void applyBridgeChange(int[] Dx, int[] Dy, char[] fromTab, char[] toTab)
 	{
-	//FIXME- a closed bridge with traffic on it is not
-	// correctly handled by this subroutine, because the
-	// the tiles representing traffic on a bridge do not match
-	// the expected tile values of fromTab
+		//FIXME- a closed bridge with traffic on it is not
+		// correctly handled by this subroutine, because the
+		// the tiles representing traffic on a bridge do not match
+		// the expected tile values of fromTab
 
 		for (int z = 0; z < 7; z++) {
 			int x = xpos + Dx[z];
 			int y = ypos + Dy[z];
-			if (city.testBounds(x,y)) {
-				if ((city.getTile(x,y) == fromTab[z]) ||
-					(city.getTile(x,y) == CHANNEL)
-					) {
+			if (city.testBounds(x, y)) {
+				if ((city.getTile(x, y) == fromTab[z]) ||
+						(city.getTile(x, y) == CHANNEL)
+				) {
 					city.setTile(x, y, toTab[z]);
 				}
 			}
@@ -353,13 +339,11 @@ class TerrainBehavior extends TileBehavior
 	int getBoatDis()
 	{
 		int dist = 99999;
-		for (Sprite s : city.sprites)
-		{
-			if (s.isVisible() && s.kind == SpriteKind.SHI)
-			{
+		for (Sprite s : city.sprites) {
+			if (s.isVisible() && s.kind == SpriteKind.SHI) {
 				int x = s.x / 16;
 				int y = s.y / 16;
-				int d = Math.abs(xpos-x) + Math.abs(ypos-y);
+				int d = Math.abs(xpos - x) + Math.abs(ypos - y);
 				dist = Math.min(d, dist);
 			}
 		}
@@ -369,6 +353,6 @@ class TerrainBehavior extends TileBehavior
 	void doExplosion()
 	{
 		// clear AniRubble
-		city.setTile(xpos, ypos, (char)(RUBBLE + PRNG.nextInt(4)));
+		city.setTile(xpos, ypos, (char) (RUBBLE + PRNG.nextInt(4)));
 	}
 }

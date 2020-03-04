@@ -21,14 +21,19 @@ public class GameLevel
 	public static int getStartingFunds(int lev)
 	{
 		switch (lev) {
-		case 0: return 20000;
-		case 1: return 10000;
-		case 2: return 5000;
-		default:
-			throw new Error("unexpected game level: "+lev);
+			case 0:
+				return 20000;
+			case 1:
+				return 10000;
+			case 2:
+				return 5000;
+			default:
+				throw new Error("unexpected game level: " + lev);
 		}
 	}
 
 	//prevent this class from being instantiated
-	private GameLevel() {}
+	private GameLevel()
+	{
+	}
 }

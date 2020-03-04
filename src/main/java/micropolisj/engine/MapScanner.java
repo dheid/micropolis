@@ -8,8 +8,6 @@
 
 package micropolisj.engine;
 
-import java.util.*;
-
 import static micropolisj.engine.TileConstants.*;
 import static micropolisj.engine.TrafficGen.ZoneType;
 
@@ -50,44 +48,44 @@ class MapScanner extends TileBehavior
 	public void apply()
 	{
 		switch (behavior) {
-		case RESIDENTIAL:
-			doResidential();
-			return;
-		case HOSPITAL_CHURCH:
-			doHospitalChurch();
-			return;
-		case COMMERCIAL:
-			doCommercial();
-			return;
-		case INDUSTRIAL:
-			doIndustrial();
-			return;
-		case COAL:
-			doCoalPower();
-			return;
-		case NUCLEAR:
-			doNuclearPower();
-			return;
-		case FIRESTATION:
-			doFireStation();
-			return;
-		case POLICESTATION:
-			doPoliceStation();
-			return;
-		case STADIUM_EMPTY:
-			doStadiumEmpty();
-			return;
-		case STADIUM_FULL:
-			doStadiumFull();
-			return;
-		case AIRPORT:
-			doAirport();
-			return;
-		case SEAPORT:
-			doSeaport();
-			return;
-		default:
-			assert false;
+			case RESIDENTIAL:
+				doResidential();
+				return;
+			case HOSPITAL_CHURCH:
+				doHospitalChurch();
+				return;
+			case COMMERCIAL:
+				doCommercial();
+				return;
+			case INDUSTRIAL:
+				doIndustrial();
+				return;
+			case COAL:
+				doCoalPower();
+				return;
+			case NUCLEAR:
+				doNuclearPower();
+				return;
+			case FIRESTATION:
+				doFireStation();
+				return;
+			case POLICESTATION:
+				doPoliceStation();
+				return;
+			case STADIUM_EMPTY:
+				doStadiumEmpty();
+				return;
+			case STADIUM_FULL:
+				doStadiumFull();
+				return;
+			case AIRPORT:
+				doAirport();
+				return;
+			case SEAPORT:
+				doSeaport();
+				return;
+			default:
+				assert false;
 		}
 	}
 
@@ -95,12 +93,9 @@ class MapScanner extends TileBehavior
 	{
 		boolean zonePwrFlag = setZonePower();
 
-		if (zonePwrFlag)
-		{
+		if (zonePwrFlag) {
 			city.poweredZoneCount++;
-		}
-		else
-		{
+		} else {
 			city.unpoweredZoneCount++;
 		}
 
@@ -111,18 +106,15 @@ class MapScanner extends TileBehavior
 	{
 		boolean oldPower = city.isTilePowered(xpos, ypos);
 		boolean newPower = (
-			tile == NUCLEAR ||
-			tile == POWERPLANT ||
-			city.hasPower(xpos,ypos)
-			);
+				tile == NUCLEAR ||
+						tile == POWERPLANT ||
+						city.hasPower(xpos, ypos)
+		);
 
-		if (newPower && !oldPower)
-		{
+		if (newPower && !oldPower) {
 			city.setTilePower(xpos, ypos, true);
 			city.powerZone(xpos, ypos, getZoneSizeFor(tile));
-		}
-		else if (!newPower && oldPower)
-		{
+		} else if (!newPower && oldPower) {
 			city.setTilePower(xpos, ypos, false);
 			city.shutdownZone(xpos, ypos, getZoneSizeFor(tile));
 		}
@@ -147,14 +139,12 @@ class MapScanner extends TileBehavior
 		if (bi == null)
 			return false;
 
-		for (int y = ypos-1; y < ypos-1+bi.height; y++)
-		{
-			for (int x = xpos-1; x < xpos-1+bi.width; x++)
-			{
+		for (int y = ypos - 1; y < ypos - 1 + bi.height; y++) {
+			for (int x = xpos - 1; x < xpos - 1 + bi.width; x++) {
 				if (!city.testBounds(x, y)) {
 					return false;
 				}
-				if (isIndestructible2(city.getTile(x,y))) {
+				if (isIndestructible2(city.getTile(x, y))) {
 					// radioactive, on fire, or flooded
 					return false;
 				}
@@ -163,10 +153,8 @@ class MapScanner extends TileBehavior
 
 		assert bi.members.length == bi.width * bi.height;
 		int i = 0;
-		for (int y = ypos-1; y < ypos-1+bi.height; y++)
-		{
-			for (int x = xpos-1; x < xpos-1+bi.width; x++)
-			{
+		for (int y = ypos - 1; y < ypos - 1 + bi.height; y++) {
+			for (int x = xpos - 1; x < xpos - 1 + bi.width; x++) {
 				city.setTile(x, y, (char) bi.members[i]);
 				i++;
 			}
@@ -187,13 +175,13 @@ class MapScanner extends TileBehavior
 			repairZone(POWERPLANT, 4);
 		}
 
-		city.powerPlants.add(new CityLocation(xpos,ypos));
+		city.powerPlants.add(new CityLocation(xpos, ypos));
 	}
 
 	void doNuclearPower()
 	{
 		boolean powerOn = checkZonePower();
-		if (!city.noDisasters && PRNG.nextInt(city.MltdwnTab[city.gameLevel]+1) == 0) {
+		if (!city.noDisasters && PRNG.nextInt(city.MltdwnTab[city.gameLevel] + 1) == 0) {
 			city.doMeltdown(xpos, ypos);
 			return;
 		}
@@ -218,7 +206,7 @@ class MapScanner extends TileBehavior
 		if (powerOn) {
 			z = city.fireEffect;  //if powered, get effect
 		} else {
-			z = city.fireEffect/2; // from the funding ratio
+			z = city.fireEffect / 2; // from the funding ratio
 		}
 
 		traffic.mapX = xpos;
@@ -227,7 +215,7 @@ class MapScanner extends TileBehavior
 			z /= 2;
 		}
 
-		city.fireStMap[ypos/8][xpos/8] += z;
+		city.fireStMap[ypos / 8][xpos / 8] += z;
 	}
 
 	void doPoliceStation()
@@ -251,7 +239,7 @@ class MapScanner extends TileBehavior
 			z /= 2;
 		}
 
-		city.policeMap[ypos/8][xpos/8] += z;
+		city.policeMap[ypos / 8][xpos / 8] += z;
 	}
 
 	void doStadiumEmpty()
@@ -262,12 +250,11 @@ class MapScanner extends TileBehavior
 			repairZone(STADIUM, 4);
 		}
 
-		if (powerOn)
-		{
+		if (powerOn) {
 			if (((city.cityTime + xpos + ypos) % 32) == 0) {
 				drawStadium(FULLSTADIUM);
-				city.setTile(xpos+1,ypos, (char)(FOOTBALLGAME1));
-				city.setTile(xpos+1,ypos+1,(char)(FOOTBALLGAME2));
+				city.setTile(xpos + 1, ypos, (char) (FOOTBALLGAME1));
+				city.setTile(xpos + 1, ypos + 1, (char) (FOOTBALLGAME2));
 			}
 		}
 	}
@@ -319,15 +306,13 @@ class MapScanner extends TileBehavior
 	 */
 	void makeHospital()
 	{
-		if (city.needHospital > 0)
-		{
+		if (city.needHospital > 0) {
 			zonePlop(HOSPITAL);
 			city.needHospital = 0;
 		}
 
 //FIXME- should be 'else if'
-		if (city.needChurch > 0)
-		{
+		if (city.needChurch > 0) {
 			zonePlop(CHURCH);
 			city.needChurch = 0;
 		}
@@ -340,34 +325,27 @@ class MapScanner extends TileBehavior
 	void doHospitalChurch()
 	{
 		boolean powerOn = checkZonePower();
-		if (tile == HOSPITAL)
-		{
+		if (tile == HOSPITAL) {
 			city.hospitalCount++;
 
-			if (city.cityTime % 16 == 0)
-			{
+			if (city.cityTime % 16 == 0) {
 				repairZone(HOSPITAL, 3);
 			}
 			if (city.needHospital == -1)  //too many hospitals
 			{
-				if (PRNG.nextInt(21) == 0)
-				{
+				if (PRNG.nextInt(21) == 0) {
 					zonePlop(RESCLR);
 				}
 			}
-		}
-		else if (tile == CHURCH)
-		{
+		} else if (tile == CHURCH) {
 			city.churchCount++;
 
-			if (city.cityTime % 16 == 0)
-			{
+			if (city.cityTime % 16 == 0) {
 				repairZone(CHURCH, 3);
 			}
 			if (city.needChurch == -1) //too many churches
 			{
-				if (PRNG.nextInt(21) == 0)
-				{
+				if (PRNG.nextInt(21) == 0) {
 					zonePlop(RESCLR);
 				}
 			}
@@ -379,9 +357,10 @@ class MapScanner extends TileBehavior
 	 * fire, etc.
 	 * Only tiles that are not rubble, radioactive, flooded, or
 	 * on fire will be regenerated.
+	 *
 	 * @param zoneCenter the tile value for the "center" tile of the zone
-	 * @param zoneSize integer (3-6) indicating the width/height of
-	 * the zone.
+	 * @param zoneSize   integer (3-6) indicating the width/height of
+	 *                   the zone.
 	 */
 	void repairZone(char zoneCenter, int zoneSize)
 	{
@@ -389,15 +368,12 @@ class MapScanner extends TileBehavior
 		// northwest tile should be
 		int zoneBase = zoneCenter - 1 - zoneSize;
 
-		for (int y = 0; y < zoneSize; y++)
-		{
-			for (int x = 0; x < zoneSize; x++, zoneBase++)
-			{
+		for (int y = 0; y < zoneSize; y++) {
+			for (int x = 0; x < zoneSize; x++, zoneBase++) {
 				int xx = xpos - 1 + x;
 				int yy = ypos - 1 + y;
 
-				if (city.testBounds(xx, yy))
-				{
+				if (city.testBounds(xx, yy)) {
 					int thCh = city.getTile(xx, yy);
 					if (isZoneCenter(thCh)) {
 						continue;
@@ -406,10 +382,9 @@ class MapScanner extends TileBehavior
 					if (isAnimated(thCh))
 						continue;
 
-					if (!isIndestructible(thCh))
-					{  //not rubble, radiactive, on fire or flooded
+					if (!isIndestructible(thCh)) {  //not rubble, radiactive, on fire or flooded
 
-						city.setTile(xx,yy,(char) zoneBase);
+						city.setTile(xx, yy, (char) zoneBase);
 					}
 				}
 			}
@@ -429,24 +404,19 @@ class MapScanner extends TileBehavior
 		city.comPop += tpop;
 
 		int trafficGood;
-		if (tpop > PRNG.nextInt(6))
-		{
+		if (tpop > PRNG.nextInt(6)) {
 			trafficGood = makeTraffic(ZoneType.COMMERCIAL);
-		}
-		else
-		{
+		} else {
 			trafficGood = 1;
 		}
 
-		if (trafficGood == -1)
-		{
+		if (trafficGood == -1) {
 			int value = getCRValue();
 			doCommercialOut(tpop, value);
 			return;
 		}
 
-		if (PRNG.nextInt(8) == 0)
-		{
+		if (PRNG.nextInt(8) == 0) {
 			int locValve = evalCommercial(trafficGood);
 			int zscore = city.comValve + locValve;
 
@@ -454,16 +424,14 @@ class MapScanner extends TileBehavior
 				zscore = -500;
 
 			if (trafficGood != 0 &&
-				zscore > -350 &&
-				zscore - 26380 > (PRNG.nextInt(0x10000)-0x8000))
-			{
+					zscore > -350 &&
+					zscore - 26380 > (PRNG.nextInt(0x10000) - 0x8000)) {
 				int value = getCRValue();
 				doCommercialIn(tpop, value);
 				return;
 			}
 
-			if (zscore < 350 && zscore + 26380 < (PRNG.nextInt(0x10000)-0x8000))
-			{
+			if (zscore < 350 && zscore + 26380 < (PRNG.nextInt(0x10000) - 0x8000)) {
 				int value = getCRValue();
 				doCommercialOut(tpop, value);
 			}
@@ -483,23 +451,18 @@ class MapScanner extends TileBehavior
 		city.indPop += tpop;
 
 		int trafficGood;
-		if (tpop > PRNG.nextInt(6))
-		{
+		if (tpop > PRNG.nextInt(6)) {
 			trafficGood = makeTraffic(ZoneType.INDUSTRIAL);
-		}
-		else
-		{
+		} else {
 			trafficGood = 1;
 		}
 
-		if (trafficGood == -1)
-		{
+		if (trafficGood == -1) {
 			doIndustrialOut(tpop, PRNG.nextInt(2));
 			return;
 		}
 
-		if (PRNG.nextInt(8) == 0)
-		{
+		if (PRNG.nextInt(8) == 0) {
 			int locValve = evalIndustrial(trafficGood);
 			int zscore = city.indValve + locValve;
 
@@ -507,15 +470,13 @@ class MapScanner extends TileBehavior
 				zscore = -500;
 
 			if (zscore > -350 &&
-				zscore - 26380 > (PRNG.nextInt(0x10000)-0x8000))
-			{
+					zscore - 26380 > (PRNG.nextInt(0x10000) - 0x8000)) {
 				int value = PRNG.nextInt(2);
 				doIndustrialIn(tpop, value);
 				return;
 			}
 
-			if (zscore < 350 && zscore + 26380 < (PRNG.nextInt(0x10000)-0x8000))
-			{
+			if (zscore < 350 && zscore + 26380 < (PRNG.nextInt(0x10000) - 0x8000)) {
 				int value = PRNG.nextInt(2);
 				doIndustrialOut(tpop, value);
 			}
@@ -532,46 +493,36 @@ class MapScanner extends TileBehavior
 		city.resZoneCount++;
 
 		int tpop; //population of this zone
-		if (tile == RESCLR)
-		{
+		if (tile == RESCLR) {
 			tpop = city.doFreePop(xpos, ypos);
-		}
-		else
-		{
+		} else {
 			tpop = residentialZonePop(tile);
 		}
 
 		city.resPop += tpop;
 
 		int trafficGood;
-		if (tpop > PRNG.nextInt(36))
-		{
+		if (tpop > PRNG.nextInt(36)) {
 			trafficGood = makeTraffic(ZoneType.RESIDENTIAL);
-		}
-		else
-		{
+		} else {
 			trafficGood = 1;
 		}
 
-		if (trafficGood == -1)
-		{
+		if (trafficGood == -1) {
 			int value = getCRValue();
 			doResidentialOut(tpop, value);
 			return;
 		}
 
-		if (tile == RESCLR || PRNG.nextInt(8) == 0)
-		{
+		if (tile == RESCLR || PRNG.nextInt(8) == 0) {
 			int locValve = evalResidential(trafficGood);
 			int zscore = city.resValve + locValve;
 
 			if (!powerOn)
 				zscore = -500;
 
-			if (zscore > -350 && zscore - 26380 > (PRNG.nextInt(0x10000)-0x8000))
-			{
-				if (tpop == 0 && PRNG.nextInt(4) == 0)
-				{
+			if (zscore > -350 && zscore - 26380 > (PRNG.nextInt(0x10000) - 0x8000)) {
+				if (tpop == 0 && PRNG.nextInt(4) == 0) {
 					makeHospital();
 					return;
 				}
@@ -581,8 +532,7 @@ class MapScanner extends TileBehavior
 				return;
 			}
 
-			if (zscore < 350 && zscore + 26380 < (PRNG.nextInt(0x10000)-0x8000))
-			{
+			if (zscore < 350 && zscore + 26380 < (PRNG.nextInt(0x10000) - 0x8000)) {
 				int value = getCRValue();
 				doResidentialOut(tpop, value);
 			}
@@ -592,31 +542,30 @@ class MapScanner extends TileBehavior
 	/**
 	 * Consider the value of building a single-lot house at certain
 	 * coordinates.
+	 *
 	 * @return integer; positive number indicates good place for
 	 * house to go; zero or a negative number indicates a bad place.
 	 */
 	int evalLot(int x, int y)
 	{
 		// test for clear lot
-		int aTile = city.getTile(x,y);
+		int aTile = city.getTile(x, y);
 		if (aTile != DIRT && !isResidentialClear(aTile)) {
 			return -1;
 		}
 
 		int score = 1;
 
-		final int [] DX = { 0, 1, 0, -1 };
-		final int [] DY = { -1, 0, 1, 0 };
-		for (int z = 0; z < 4; z++)
-		{
+		final int[] DX = {0, 1, 0, -1};
+		final int[] DY = {-1, 0, 1, 0};
+		for (int z = 0; z < 4; z++) {
 			int xx = x + DX[z];
 			int yy = y + DY[z];
 
 			// look for road
 			if (city.testBounds(xx, yy)) {
 				int tmp = city.getTile(xx, yy);
-				if (isRoadAny(tmp) || isRail(tmp))
-				{
+				if (isRoadAny(tmp) || isRail(tmp)) {
 					score++;
 				}
 			}
@@ -632,46 +581,40 @@ class MapScanner extends TileBehavior
 	{
 		assert value >= 0 && value <= 3;
 
-		final int [] ZeX = { 0, -1, 0, 1, -1, 1, -1, 0, 1 };
-		final int [] ZeY = { 0, -1, -1, -1, 0, 0, 1, 1, 1 };
+		final int[] ZeX = {0, -1, 0, 1, -1, 1, -1, 0, 1};
+		final int[] ZeY = {0, -1, -1, -1, 0, 0, 1, 1, 1};
 
 		int bestLoc = 0;
 		int hscore = 0;
 
-		for (int z = 1; z < 9; z++)
-		{
+		for (int z = 1; z < 9; z++) {
 			int xx = xpos + ZeX[z];
 			int yy = ypos + ZeY[z];
 
-			if (city.testBounds(xx, yy))
-			{
+			if (city.testBounds(xx, yy)) {
 				int score = evalLot(xx, yy);
 
-				if (score != 0)
-				{
-					if (score > hscore)
-					{
+				if (score != 0) {
+					if (score > hscore) {
 						hscore = score;
 						bestLoc = z;
 					}
 
-					if ((score == hscore) && PRNG.nextInt(8) == 0)
-					{
+					if ((score == hscore) && PRNG.nextInt(8) == 0) {
 						bestLoc = z;
 					}
 				}
 			}
 		}
 
-		if (bestLoc != 0)
-		{
+		if (bestLoc != 0) {
 			int xx = xpos + ZeX[bestLoc];
 			int yy = ypos + ZeY[bestLoc];
 			int houseNumber = value * 3 + PRNG.nextInt(3);
 			assert houseNumber >= 0 && houseNumber < 12;
 
 			assert city.testBounds(xx, yy);
-			city.setTile(xx, yy, (char)(HOUSE + houseNumber));
+			city.setTile(xx, yy, (char) (HOUSE + houseNumber));
 		}
 	}
 
@@ -681,8 +624,7 @@ class MapScanner extends TileBehavior
 		if (pop > z)
 			return;
 
-		if (pop < 5)
-		{
+		if (pop < 5) {
 			comPlop(pop, value);
 			adjustROG(8);
 		}
@@ -690,8 +632,7 @@ class MapScanner extends TileBehavior
 
 	private void doIndustrialIn(int pop, int value)
 	{
-		if (pop < 4)
-		{
+		if (pop < 4) {
 			indPlop(pop, value);
 			adjustROG(8);
 		}
@@ -701,21 +642,18 @@ class MapScanner extends TileBehavior
 	{
 		assert value >= 0 && value <= 3;
 
-		int z = city.pollutionMem[ypos/2][xpos/2];
+		int z = city.pollutionMem[ypos / 2][xpos / 2];
 		if (z > 128)
 			return;
 
-		if (tile == RESCLR)
-		{
-			if (pop < 8)
-			{
+		if (tile == RESCLR) {
+			if (pop < 8) {
 				buildHouse(value);
 				adjustROG(1);
 				return;
 			}
 
-			if (city.getPopulationDensity(xpos, ypos) > 64)
-			{
+			if (city.getPopulationDensity(xpos, ypos) > 64) {
 				residentialPlop(0, value);
 				adjustROG(8);
 				return;
@@ -723,8 +661,7 @@ class MapScanner extends TileBehavior
 			return;
 		}
 
-		if (pop < 40)
-		{
+		if (pop < 40) {
 			residentialPlop(pop / 8 - 1, value);
 			adjustROG(8);
 		}
@@ -750,13 +687,10 @@ class MapScanner extends TileBehavior
 
 	private void doCommercialOut(int pop, int value)
 	{
-		if (pop > 1)
-		{
-			comPlop(pop-2, value);
+		if (pop > 1) {
+			comPlop(pop - 2, value);
 			adjustROG(-8);
-		}
-		else if (pop == 1)
-		{
+		} else if (pop == 1) {
 			zonePlop(COMCLR);
 			adjustROG(-8);
 		}
@@ -764,13 +698,10 @@ class MapScanner extends TileBehavior
 
 	private void doIndustrialOut(int pop, int value)
 	{
-		if (pop > 1)
-		{
-			indPlop(pop-2, value);
+		if (pop > 1) {
+			indPlop(pop - 2, value);
 			adjustROG(-8);
-		}
-		else if (pop == 1)
-		{
+		} else if (pop == 1) {
 			zonePlop(INDCLR);
 			adjustROG(-8);
 		}
@@ -780,35 +711,29 @@ class MapScanner extends TileBehavior
 	{
 		assert value >= 0 && value < 4;
 
-		final char [] Brdr = { 0, 3, 6, 1, 4, 7, 2, 5, 8 };
+		final char[] Brdr = {0, 3, 6, 1, 4, 7, 2, 5, 8};
 
 		if (pop == 0)
 			return;
 
-		if (pop > 16)
-		{
+		if (pop > 16) {
 			// downgrade to a lower-density full-size residential zone
-			residentialPlop((pop-24) / 8, value);
+			residentialPlop((pop - 24) / 8, value);
 			adjustROG(-8);
 			return;
 		}
 
-		if (pop == 16)
-		{
+		if (pop == 16) {
 			// downgrade from full-size zone to 8 little houses
 
 			boolean pwr = city.isTilePowered(xpos, ypos);
 			city.setTile(xpos, ypos, RESCLR);
 			city.setTilePower(xpos, ypos, pwr);
 
-			for (int x = xpos-1; x <= xpos+1; x++)
-			{
-				for (int y = ypos-1; y <= ypos+1; y++)
-				{
-					if (city.testBounds(x,y))
-					{
-						if (!(x == xpos && y == ypos))
-						{
+			for (int x = xpos - 1; x <= xpos + 1; x++) {
+				for (int y = ypos - 1; y <= ypos + 1; y++) {
+					if (city.testBounds(x, y)) {
+						if (!(x == xpos && y == ypos)) {
 							// pick a random small house
 							int houseNumber = value * 3 + PRNG.nextInt(3);
 							city.setTile(x, y, (char) (HOUSE + houseNumber));
@@ -821,22 +746,17 @@ class MapScanner extends TileBehavior
 			return;
 		}
 
-		if (pop < 16)
-		{
+		if (pop < 16) {
 			// remove one little house
 			adjustROG(-1);
 			int z = 0;
 
-			for (int x = xpos-1; x <= xpos+1; x++)
-			{
-				for (int y = ypos-1; y <= ypos+1; y++)
-				{
-					if (city.testBounds(x,y))
-					{
+			for (int x = xpos - 1; x <= xpos + 1; x++) {
+				for (int y = ypos - 1; y <= ypos + 1; y++) {
+					if (city.testBounds(x, y)) {
 						int loc = city.map[y][x] & LOMASK;
-						if (loc >= LHTHR && loc <= HHTHR)
-						{ //little house
-							city.setTile(x, y, (char)(Brdr[z] + RESCLR - 4));
+						if (loc >= LHTHR && loc <= HHTHR) { //little house
+							city.setTile(x, y, (char) (Brdr[z] + RESCLR - 4));
 							return;
 						}
 					}
@@ -848,6 +768,7 @@ class MapScanner extends TileBehavior
 
 	/**
 	 * Evaluates the zone value of the current commercial zone location.
+	 *
 	 * @return an integer between -3000 and 3000
 	 * Same meaning as evalResidential.
 	 */
@@ -856,11 +777,12 @@ class MapScanner extends TileBehavior
 		if (traf < 0)
 			return -3000;
 
-		return city.comRate[ypos/8][xpos/8];
+		return city.comRate[ypos / 8][xpos / 8];
 	}
 
 	/**
 	 * Evaluates the zone value of the current industrial zone location.
+	 *
 	 * @return an integer between -3000 and 3000.
 	 * Same meaning as evalResidential.
 	 */
@@ -874,6 +796,7 @@ class MapScanner extends TileBehavior
 
 	/**
 	 * Evaluates the zone value of the current residential zone location.
+	 *
 	 * @return an integer between -3000 and 3000. The higher the
 	 * number, the more likely the zone is to GROW; the lower the
 	 * number, the more likely the zone is to SHRINK.
@@ -884,7 +807,7 @@ class MapScanner extends TileBehavior
 			return -3000;
 
 		int value = city.getLandValue(xpos, ypos);
-		value -= city.pollutionMem[ypos/2][xpos/2];
+		value -= city.pollutionMem[ypos / 2][xpos / 2];
 
 		if (value < 0)
 			value = 0;    //cap at 0
@@ -900,13 +823,14 @@ class MapScanner extends TileBehavior
 	/**
 	 * Gets the land-value class (0-3) for the current
 	 * residential or commercial zone location.
+	 *
 	 * @return integer from 0 to 3, 0 is the lowest-valued
 	 * zone, and 3 is the highest-valued zone.
 	 */
 	int getCRValue()
 	{
 		int lval = city.getLandValue(xpos, ypos);
-		lval -= city.pollutionMem[ypos/2][xpos/2];
+		lval -= city.pollutionMem[ypos / 2][xpos / 2];
 
 		if (lval < 30)
 			return 0;
@@ -930,22 +854,21 @@ class MapScanner extends TileBehavior
 	 */
 	void adjustROG(int amount)
 	{
-		city.rateOGMem[ypos/8][xpos/8] += 4*amount;
+		city.rateOGMem[ypos / 8][xpos / 8] += 4 * amount;
 	}
 
 	/**
 	 * Place tiles for a stadium (full or empty).
+	 *
 	 * @param zoneCenter either STADIUM or FULLSTADIUM
 	 */
 	void drawStadium(int zoneCenter)
 	{
 		int zoneBase = zoneCenter - 1 - 4;
 
-		for (int y = 0; y < 4; y++)
-		{
-			for (int x = 0; x < 4; x++)
-			{
-				city.setTile(xpos - 1 + x, ypos - 1 + y, (char)zoneBase);
+		for (int y = 0; y < 4; y++) {
+			for (int x = 0; x < 4; x++) {
+				city.setTile(xpos - 1 + x, ypos - 1 + y, (char) zoneBase);
 				zoneBase++;
 			}
 		}

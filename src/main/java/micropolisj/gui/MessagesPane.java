@@ -8,11 +8,12 @@
 
 package micropolisj.gui;
 
-import java.util.*;
-import javax.swing.*;
-import javax.swing.text.*;
+import micropolisj.engine.MicropolisMessage;
 
-import micropolisj.engine.*;
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
+import java.util.ResourceBundle;
 
 public class MessagesPane extends JTextPane
 {
@@ -36,8 +37,7 @@ public class MessagesPane extends JTextPane
 				doc.insertString(doc.getLength(), "\n", null);
 			}
 			doc.insertString(doc.getLength(), messageText, null);
-		}
-		catch (BadLocationException e) {
+		} catch (BadLocationException e) {
 			throw new Error("unexpected", e);
 		}
 	}

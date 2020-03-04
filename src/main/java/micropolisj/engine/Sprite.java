@@ -85,15 +85,16 @@ public abstract class Sprite
 
 	/**
 	 * Computes direction from one point to another.
+	 *
 	 * @return integer between 1 and 8, with
-	 *          1 == north,
-	 *          3 == east,
-	 *          5 == south,
-	 *          7 == west.
+	 * 1 == north,
+	 * 3 == east,
+	 * 5 == south,
+	 * 7 == west.
 	 */
 	static final int getDir(int orgX, int orgY, int desX, int desY)
 	{
-		final int Gdtab [] = { 0, 3, 2, 1, 3, 4, 5, 7, 6, 5, 7, 8, 1 };
+		final int Gdtab[] = {0, 3, 2, 1, 3, 4, 5, 7, 6, 5, 7, 8, 1};
 		int dispX = desX - orgX;
 		int dispY = desY - orgY;
 
@@ -103,13 +104,12 @@ public abstract class Sprite
 		dispY = Math.abs(dispY);
 		int absDist = dispX + dispY;
 
-		if (dispX * 2 < dispY)      z++;
+		if (dispX * 2 < dispY) z++;
 		else if (dispY * 2 < dispX) z--;
 
 		if (z >= 1 && z <= 12) {
 			return Gdtab[z];
-		}
-		else {
+		} else {
 			assert false;
 			return 0;
 		}
@@ -120,7 +120,7 @@ public abstract class Sprite
 	 */
 	static final int getDis(int x0, int y0, int x1, int y1)
 	{
-		return Math.abs(x0-x1) + Math.abs(y0-y1);
+		return Math.abs(x0 - x1) + Math.abs(y0 - y1);
 	}
 
 	/**
@@ -131,27 +131,27 @@ public abstract class Sprite
 		this.frame = 0;
 
 		city.makeExplosionAt(x, y);
-		int xpos = x/16;
-		int ypos = y/16;
+		int xpos = x / 16;
+		int ypos = y / 16;
 
 		switch (kind) {
-		case AIR:
-			city.crashLocation = new CityLocation(xpos, ypos);
-			city.sendMessageAt(MicropolisMessage.PLANECRASH_REPORT, xpos, ypos);
-			break;
-		case SHI:
-			city.crashLocation = new CityLocation(xpos, ypos);
-			city.sendMessageAt(MicropolisMessage.SHIPWRECK_REPORT, xpos, ypos);
-			break;
-		case TRA:
-		case BUS:
-			city.crashLocation = new CityLocation(xpos, ypos);
-			city.sendMessageAt(MicropolisMessage.TRAIN_CRASH_REPORT, xpos, ypos);
-			break;
-		case COP:
-			city.crashLocation = new CityLocation(xpos, ypos);
-			city.sendMessageAt(MicropolisMessage.COPTER_CRASH_REPORT, xpos, ypos);
-			break;
+			case AIR:
+				city.crashLocation = new CityLocation(xpos, ypos);
+				city.sendMessageAt(MicropolisMessage.PLANECRASH_REPORT, xpos, ypos);
+				break;
+			case SHI:
+				city.crashLocation = new CityLocation(xpos, ypos);
+				city.sendMessageAt(MicropolisMessage.SHIPWRECK_REPORT, xpos, ypos);
+				break;
+			case TRA:
+			case BUS:
+				city.crashLocation = new CityLocation(xpos, ypos);
+				city.sendMessageAt(MicropolisMessage.TRAIN_CRASH_REPORT, xpos, ypos);
+				break;
+			case COP:
+				city.crashLocation = new CityLocation(xpos, ypos);
+				city.sendMessageAt(MicropolisMessage.COPTER_CRASH_REPORT, xpos, ypos);
+				break;
 		}
 
 		city.makeSound(xpos, ypos, Sound.EXPLOSION_HIGH);
@@ -159,6 +159,7 @@ public abstract class Sprite
 
 	/**
 	 * Checks whether another sprite is in collision ranges.
+	 *
 	 * @return true iff the sprite is in collision range
 	 */
 	final boolean checkSpriteCollision(Sprite otherSprite)
@@ -196,8 +197,7 @@ public abstract class Sprite
 			}
 			if (checkWet(t)) {
 				city.setTile(xpos, ypos, RIVER);
-			}
-			else {
+			} else {
 				city.setTile(xpos, ypos, TINYEXP);
 			}
 		}
@@ -205,6 +205,7 @@ public abstract class Sprite
 
 	/**
 	 * Helper function for rotating a sprite.
+	 *
 	 * @param p the sprite's current attitude (1-8)
 	 * @param d the desired attitude (1-8)
 	 * @return the new attitude
@@ -215,11 +216,10 @@ public abstract class Sprite
 			return p;
 		if (p < d) {
 			if (d - p < 4) p++;
-			else           p--;
-		}
-		else {
+			else p--;
+		} else {
 			if (p - d < 4) p--;
-			else           p++;
+			else p++;
 		}
 		if (p > 8) return 1;
 		if (p < 1) return 8;

@@ -9,7 +9,6 @@
 package micropolisj.engine;
 
 import java.util.Random;
-import static micropolisj.engine.TileConstants.*;
 
 public abstract class TileBehavior
 {

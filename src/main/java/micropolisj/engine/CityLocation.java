@@ -13,14 +13,18 @@ package micropolisj.engine;
  */
 public class CityLocation
 {
-	/** The X coordinate of this location.
+	/**
+	 * The X coordinate of this location.
 	 * Increasing X coordinates correspond to East,
-	 * and decreasing X coordinates correspond to West. */
+	 * and decreasing X coordinates correspond to West.
+	 */
 	public int x;
 
-	/** The Y coordinate of this location.
+	/**
+	 * The Y coordinate of this location.
 	 * Increasing Y coordinates correspond to South,
-	 * and decreasing Y coordinates correspond to North. */
+	 * and decreasing Y coordinates correspond to North.
+	 */
 	public int y;
 
 	/**
@@ -35,17 +39,16 @@ public class CityLocation
 	@Override
 	public int hashCode()
 	{
-		return x*33+y;
+		return x * 33 + y;
 	}
 
 	@Override
 	public boolean equals(Object obj)
 	{
 		if (obj instanceof CityLocation) {
-			CityLocation rhs = (CityLocation)obj;
+			CityLocation rhs = (CityLocation) obj;
 			return this.x == rhs.x && this.y == rhs.y;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -53,6 +56,6 @@ public class CityLocation
 	@Override
 	public String toString()
 	{
-		return "("+x+","+y+")";
+		return "(" + x + "," + y + ")";
 	}
 }

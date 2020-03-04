@@ -22,8 +22,8 @@ public class HelicopterSprite extends Sprite
 	int origX;
 	int origY;
 
-	static int [] CDx = { 0,  0,  3,  5,  3,  0, -3, -5, -3 };
-	static int [] CDy = { 0, -5, -3,  0,  3,  5,  3,  0, -3 };
+	static int[] CDx = {0, 0, 3, 5, 3, 0, -3, -5, -3};
+	static int[] CDy = {0, -5, -3, 0, 3, 5, 3, 0, -3};
 	static final int SOUND_FREQ = 200;
 
 	public HelicopterSprite(Micropolis engine, int xpos, int ypos)
@@ -61,15 +61,13 @@ public class HelicopterSprite extends Sprite
 				this.destX = monster.x;
 				this.destY = monster.y;
 
-			}
-			else if (city.hasSprite(SpriteKind.TOR)) {
+			} else if (city.hasSprite(SpriteKind.TOR)) {
 
 				TornadoSprite tornado = (TornadoSprite) city.getSprite(SpriteKind.TOR);
 				this.destX = tornado.x;
 				this.destY = tornado.y;
 
-			}
-			else {
+			} else {
 				this.destX = origX;
 				this.destY = origY;
 			}
@@ -87,10 +85,9 @@ public class HelicopterSprite extends Sprite
 			int ypos = this.y / 16;
 
 			if (city.getTrafficDensity(xpos, ypos) > 170 &&
-				city.PRNG.nextInt(8) == 0)
-			{
+					city.PRNG.nextInt(8) == 0) {
 				city.sendMessageAt(MicropolisMessage.HEAVY_TRAFFIC_REPORT,
-					xpos, ypos);
+						xpos, ypos);
 				city.makeSound(xpos, ypos, Sound.HEAVYTRAFFIC);
 			}
 		}

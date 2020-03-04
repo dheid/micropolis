@@ -8,9 +8,9 @@
 
 package micropolisj;
 
-import javax.swing.*;
-
 import micropolisj.gui.MainWindow;
+
+import javax.swing.*;
 
 public class Main
 {
@@ -21,11 +21,14 @@ public class Main
 		win.doNewCity(true);
 	}
 
-	public static void main(String [] args)
+	public static void main(String[] args)
 	{
-		SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-			createAndShowGUI();
-		}});
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				createAndShowGUI();
+			}
+		});
 	}
 }

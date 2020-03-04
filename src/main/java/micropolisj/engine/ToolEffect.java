@@ -40,8 +40,7 @@ class ToolEffect implements ToolEffectIfc
 
 		if (city.testBounds(originX + dx, originY + dy)) {
 			return city.getTile(originX + dx, originY + dy);
-		}
-		else {
+		} else {
 			// tiles outside city's boundary assumed to be
 			// tile #0 (dirt).
 			return 0;
@@ -75,10 +74,9 @@ class ToolEffect implements ToolEffectIfc
 	ToolResult apply()
 	{
 		if (originX - preview.offsetX < 0 ||
-			originX - preview.offsetX + preview.getWidth() > city.getWidth() ||
-			originY - preview.offsetY < 0 ||
-			originY - preview.offsetY + preview.getHeight() > city.getHeight())
-		{
+				originX - preview.offsetX + preview.getWidth() > city.getWidth() ||
+				originY - preview.offsetY < 0 ||
+				originY - preview.offsetY + preview.getHeight() > city.getHeight()) {
 			return ToolResult.UH_OH;
 		}
 
@@ -97,16 +95,14 @@ class ToolEffect implements ToolEffectIfc
 			}
 		}
 
-		for (ToolPreview.SoundInfo si : preview.sounds)
-		{
+		for (ToolPreview.SoundInfo si : preview.sounds) {
 			city.makeSound(si.x, si.y, si.sound);
 		}
 
 		if (anyFound && preview.cost != 0) {
 			city.spend(preview.cost);
 			return ToolResult.SUCCESS;
-		}
-		else {
+		} else {
 			return preview.toolResult;
 		}
 	}

@@ -8,15 +8,18 @@
 
 package micropolisj.gui;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.net.URL;
-import javax.swing.*;
+import micropolisj.engine.CityLocation;
+import micropolisj.engine.Micropolis;
+import micropolisj.engine.MicropolisMessage;
+import micropolisj.engine.Sound;
 
-import micropolisj.engine.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 
 public class DemandIndicator extends JComponent
-	implements Micropolis.Listener
+		implements Micropolis.Listener
 {
 	Micropolis engine;
 
@@ -39,13 +42,14 @@ public class DemandIndicator extends JComponent
 	}
 
 	static final BufferedImage backgroundImage = loadImage("/demandg.png");
+
 	static BufferedImage loadImage(String resourceName)
 	{
 		URL iconUrl = MicropolisDrawingArea.class.getResource(resourceName);
 		Image refImage = new ImageIcon(iconUrl).getImage();
 
 		BufferedImage bi = new BufferedImage(refImage.getWidth(null), refImage.getHeight(null),
-					BufferedImage.TYPE_INT_RGB);
+				BufferedImage.TYPE_INT_RGB);
 		Graphics2D gr = bi.createGraphics();
 		gr.drawImage(refImage, 0, 0, null);
 
@@ -53,9 +57,9 @@ public class DemandIndicator extends JComponent
 	}
 
 	static final Dimension MY_SIZE = new Dimension(
-				backgroundImage.getWidth(),
-				backgroundImage.getHeight()
-				);
+			backgroundImage.getWidth(),
+			backgroundImage.getHeight()
+	);
 
 	@Override
 	public Dimension getMinimumSize()
@@ -93,40 +97,41 @@ public class DemandIndicator extends JComponent
 
 		int resValve = engine.getResValve();
 		int ry0 = resValve <= 0 ? LOWER_EDGE : UPPER_EDGE;
-		int ry1 = ry0 - resValve/100;
+		int ry1 = ry0 - resValve / 100;
 
-		if (ry1 - ry0 > MAX_LENGTH) { ry1 = ry0 + MAX_LENGTH; }
-		if (ry1 - ry0 < -MAX_LENGTH) { ry1 = ry0 - MAX_LENGTH; }
+		if (ry1 - ry0 > MAX_LENGTH) {
+			ry1 = ry0 + MAX_LENGTH;
+		}
+		if (ry1 - ry0 < -MAX_LENGTH) {
+			ry1 = ry0 - MAX_LENGTH;
+		}
 
 		int comValve = engine.getComValve();
 		int cy0 = comValve <= 0 ? LOWER_EDGE : UPPER_EDGE;
-		int cy1 = cy0 - comValve/100;
+		int cy1 = cy0 - comValve / 100;
 
 		int indValve = engine.getIndValve();
 		int iy0 = indValve <= 0 ? LOWER_EDGE : UPPER_EDGE;
-		int iy1 = iy0 - indValve/100;
+		int iy1 = iy0 - indValve / 100;
 
-		if (ry0 != ry1)
-		{
-			Rectangle resRect = new Rectangle(RES_LEFT, Math.min(ry0,ry1), BAR_WIDTH, Math.abs(ry1-ry0));
+		if (ry0 != ry1) {
+			Rectangle resRect = new Rectangle(RES_LEFT, Math.min(ry0, ry1), BAR_WIDTH, Math.abs(ry1 - ry0));
 			gr.setColor(Color.GREEN);
 			gr.fill(resRect);
 			gr.setColor(Color.BLACK);
 			gr.draw(resRect);
 		}
 
-		if (cy0 != cy1)
-		{
-			Rectangle comRect = new Rectangle(COM_LEFT, Math.min(cy0,cy1), BAR_WIDTH, Math.abs(cy1-cy0));
+		if (cy0 != cy1) {
+			Rectangle comRect = new Rectangle(COM_LEFT, Math.min(cy0, cy1), BAR_WIDTH, Math.abs(cy1 - cy0));
 			gr.setColor(Color.BLUE);
 			gr.fill(comRect);
 			gr.setColor(Color.BLACK);
 			gr.draw(comRect);
 		}
 
-		if (iy0 != iy1)
-		{
-			Rectangle indRect = new Rectangle(IND_LEFT, Math.min(iy0,iy1), BAR_WIDTH, Math.abs(iy1-iy0));
+		if (iy0 != iy1) {
+			Rectangle indRect = new Rectangle(IND_LEFT, Math.min(iy0, iy1), BAR_WIDTH, Math.abs(iy1 - iy0));
 			gr.setColor(Color.YELLOW);
 			gr.fill(indRect);
 			gr.setColor(Color.BLACK);
@@ -141,10 +146,27 @@ public class DemandIndicator extends JComponent
 	}
 
 	//implements Micropolis.Listener
-	public void cityMessage(MicropolisMessage m, CityLocation p) { }
-	public void citySound(Sound sound, CityLocation p) { }
-	public void censusChanged() { }
-	public void evaluationChanged() { }
-	public void fundsChanged() { }
-	public void optionsChanged() { }
+	public void cityMessage(MicropolisMessage m, CityLocation p)
+	{
+	}
+
+	public void citySound(Sound sound, CityLocation p)
+	{
+	}
+
+	public void censusChanged()
+	{
+	}
+
+	public void evaluationChanged()
+	{
+	}
+
+	public void fundsChanged()
+	{
+	}
+
+	public void optionsChanged()
+	{
+	}
 }

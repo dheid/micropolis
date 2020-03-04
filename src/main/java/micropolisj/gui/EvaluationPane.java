@@ -8,24 +8,26 @@
 
 package micropolisj.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.text.*;
-import java.util.*;
-import javax.swing.*;
-
 import micropolisj.engine.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.ResourceBundle;
+
 import static micropolisj.gui.MainWindow.formatFunds;
 
 public class EvaluationPane extends JPanel
-	implements Micropolis.Listener
+		implements Micropolis.Listener
 {
 	Micropolis engine;
 
 	JLabel yesLbl;
 	JLabel noLbl;
-	JLabel [] voterProblemLbl;
-	JLabel [] voterCountLbl;
+	JLabel[] voterProblemLbl;
+	JLabel[] voterCountLbl;
 	JLabel popLbl;
 	JLabel deltaLbl;
 	JLabel assessLbl;
@@ -42,10 +44,13 @@ public class EvaluationPane extends JPanel
 		super(new BorderLayout());
 
 		JButton dismissBtn = new JButton(gstrings.getString("dismiss-evaluation"));
-		dismissBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+		dismissBtn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				onDismissClicked();
-			}});
+			}
+		});
 		add(dismissBtn, BorderLayout.SOUTH);
 
 		Box b1 = new Box(BoxLayout.X_AXIS);
@@ -94,8 +99,8 @@ public class EvaluationPane extends JPanel
 		JLabel headerLbl = new JLabel(gstrings.getString("public-opinion"));
 		Font curFont = headerLbl.getFont();
 		headerLbl.setFont(
-			curFont.deriveFont(curFont.getStyle() | Font.BOLD, (float)(curFont.getSize() * 1.2))
-			);
+				curFont.deriveFont(curFont.getStyle() | Font.BOLD, (float) (curFont.getSize() * 1.2))
+		);
 		me.add(headerLbl, c1);
 
 		c1.gridy = 1;
@@ -167,13 +172,13 @@ public class EvaluationPane extends JPanel
 		c1.weightx = 1.0;
 		c1.fill = GridBagConstraints.NONE;
 		c1.anchor = GridBagConstraints.NORTH;
-		c1.insets = new Insets(0,0,3,0);
+		c1.insets = new Insets(0, 0, 3, 0);
 
 		JLabel headerLbl = new JLabel(gstrings.getString("statistics-head"));
 		Font curFont = headerLbl.getFont();
 		headerLbl.setFont(
-			curFont.deriveFont(curFont.getStyle() | Font.BOLD, (float)(curFont.getSize() * 1.2))
-			);
+				curFont.deriveFont(curFont.getStyle() | Font.BOLD, (float) (curFont.getSize() * 1.2))
+		);
 		me.add(headerLbl, c1);
 
 		c1.gridy = 20;
@@ -235,19 +240,36 @@ public class EvaluationPane extends JPanel
 		// add glue so that everything will align towards the top
 		c1.gridy = 999;
 		c1.weighty = 1.0;
-		c1.insets = new Insets(0,0,0,0);
+		c1.insets = new Insets(0, 0, 0, 0);
 		me.add(new JLabel(), c1);
 
 		return me;
 	}
 
 	//implements Micropolis.Listener
-	public void cityMessage(MicropolisMessage message, CityLocation loc) {}
-	public void citySound(Sound sound, CityLocation loc) {}
-	public void censusChanged() {}
-	public void demandChanged() {}
-	public void fundsChanged() {}
-	public void optionsChanged() {}
+	public void cityMessage(MicropolisMessage message, CityLocation loc)
+	{
+	}
+
+	public void citySound(Sound sound, CityLocation loc)
+	{
+	}
+
+	public void censusChanged()
+	{
+	}
+
+	public void demandChanged()
+	{
+	}
+
+	public void fundsChanged()
+	{
+	}
+
+	public void optionsChanged()
+	{
+	}
 
 	//implements Micropolis.Listener
 	public void evaluationChanged()
@@ -266,7 +288,7 @@ public class EvaluationPane extends JPanel
 			int numVotes = p != null ? engine.evaluation.problemVotes.get(p) : 0;
 
 			if (numVotes != 0) {
-				voterProblemLbl[i].setText(cstrings.getString("problem."+p.name()));
+				voterProblemLbl[i].setText(cstrings.getString("problem." + p.name()));
 				voterCountLbl[i].setText(pctFmt.format(0.01 * numVotes));
 				voterProblemLbl[i].setVisible(true);
 				voterCountLbl[i].setVisible(true);
@@ -288,11 +310,11 @@ public class EvaluationPane extends JPanel
 
 	static String getCityClassName(int cityClass)
 	{
-		return cstrings.getString("class."+cityClass);
+		return cstrings.getString("class." + cityClass);
 	}
 
 	static String getGameLevelName(int gameLevel)
 	{
-		return cstrings.getString("level."+gameLevel);
+		return cstrings.getString("level." + gameLevel);
 	}
 }

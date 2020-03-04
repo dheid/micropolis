@@ -29,32 +29,31 @@ class BuildingTool extends ToolStroke
 	@Override
 	boolean apply1(ToolEffectIfc eff)
 	{
-		switch (tool)
-		{
-		case FIRE:
-			return applyZone(eff, FIRESTATION);
+		switch (tool) {
+			case FIRE:
+				return applyZone(eff, FIRESTATION);
 
-		case POLICE:
-			return applyZone(eff, POLICESTATION);
+			case POLICE:
+				return applyZone(eff, POLICESTATION);
 
-		case POWERPLANT:
-			return applyZone(eff, POWERPLANT);
+			case POWERPLANT:
+				return applyZone(eff, POWERPLANT);
 
-		case STADIUM:
-			return applyZone(eff, STADIUM);
+			case STADIUM:
+				return applyZone(eff, STADIUM);
 
-		case SEAPORT:
-			return applyZone(eff, PORT);
+			case SEAPORT:
+				return applyZone(eff, PORT);
 
-		case NUCLEAR:
-			return applyZone(eff, NUCLEAR);
+			case NUCLEAR:
+				return applyZone(eff, NUCLEAR);
 
-		case AIRPORT:
-			return applyZone(eff, AIRPORT);
+			case AIRPORT:
+				return applyZone(eff, AIRPORT);
 
-		default:
-			// not expected
-			throw new Error("unexpected tool: "+tool);
+			default:
+				// not expected
+				throw new Error("unexpected tool: " + tool);
 		}
 	}
 }
