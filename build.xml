@@ -30,13 +30,13 @@
 		/>
 </copy>
 <native2ascii encoding="UTF-8" ext=".properties"
-	src="strings"
+	src="src/main/resources/strings"
 	includes="**/*.utf8"
 	dest="${builddir}/micropolisj"
 	/>
 
 <copy todir="${builddir}/micropolisj">
-	<fileset dir="strings" excludes="**/*.utf8" />
+	<fileset dir="src/main/resources/strings" excludes="**/*.utf8" />
 </copy>
 </target>
 
