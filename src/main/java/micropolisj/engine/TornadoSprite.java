@@ -46,7 +46,7 @@ public class TornadoSprite extends Sprite
 			else
 				z = 1;
 		} else {
-			this.flag = (z == 1);
+			this.flag = z == 1;
 			z = 2;
 		}
 

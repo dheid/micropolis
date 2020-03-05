@@ -155,7 +155,7 @@ class RoadLikeTool extends ToolStroke
 				char eTile = neutralizeRoad(eff.getTile(1, 0));
 				if (eTile == RAILHPOWERV ||
 						eTile == HRAIL ||
-						(eTile >= LHRAIL && eTile <= HRAILROAD)) {
+						eTile >= LHRAIL && eTile <= HRAILROAD) {
 					eff.setTile(0, 0, HRAIL);
 					break;
 				}
@@ -166,7 +166,7 @@ class RoadLikeTool extends ToolStroke
 				char wTile = neutralizeRoad(eff.getTile(-1, 0));
 				if (wTile == RAILHPOWERV ||
 						wTile == HRAIL ||
-						(wTile > VRAIL && wTile < VRAILROAD)) {
+						wTile > VRAIL && wTile < VRAILROAD) {
 					eff.setTile(0, 0, HRAIL);
 					break;
 				}
@@ -177,7 +177,7 @@ class RoadLikeTool extends ToolStroke
 				char sTile = neutralizeRoad(eff.getTile(0, 1));
 				if (sTile == RAILVPOWERH ||
 						sTile == VRAILROAD ||
-						(sTile > HRAIL && sTile < HRAILROAD)) {
+						sTile > HRAIL && sTile < HRAILROAD) {
 					eff.setTile(0, 0, VRAIL);
 					break;
 				}
@@ -188,7 +188,7 @@ class RoadLikeTool extends ToolStroke
 				char nTile = neutralizeRoad(eff.getTile(0, -1));
 				if (nTile == RAILVPOWERH ||
 						nTile == VRAILROAD ||
-						(nTile > HRAIL && nTile < HRAILROAD)) {
+						nTile > HRAIL && nTile < HRAILROAD) {
 					eff.setTile(0, 0, VRAIL);
 					break;
 				}
@@ -252,7 +252,7 @@ class RoadLikeTool extends ToolStroke
 				char eTile = neutralizeRoad(eff.getTile(1, 0));
 				if (eTile == VRAILROAD ||
 						eTile == HBRIDGE ||
-						(eTile >= TileConstants.ROADS && eTile <= HROADPOWER)) {
+						eTile >= TileConstants.ROADS && eTile <= HROADPOWER) {
 					eff.setTile(0, 0, HBRIDGE);
 					break;
 				}
@@ -263,7 +263,7 @@ class RoadLikeTool extends ToolStroke
 				char wTile = neutralizeRoad(eff.getTile(-1, 0));
 				if (wTile == VRAILROAD ||
 						wTile == HBRIDGE ||
-						(wTile >= TileConstants.ROADS && wTile <= INTERSECTION)) {
+						wTile >= TileConstants.ROADS && wTile <= INTERSECTION) {
 					eff.setTile(0, 0, HBRIDGE);
 					break;
 				}
@@ -274,7 +274,7 @@ class RoadLikeTool extends ToolStroke
 				char sTile = neutralizeRoad(eff.getTile(0, 1));
 				if (sTile == HRAILROAD ||
 						sTile == VROADPOWER ||
-						(sTile >= VBRIDGE && sTile <= INTERSECTION)) {
+						sTile >= VBRIDGE && sTile <= INTERSECTION) {
 					eff.setTile(0, 0, VBRIDGE);
 					break;
 				}
@@ -285,7 +285,7 @@ class RoadLikeTool extends ToolStroke
 				char nTile = neutralizeRoad(eff.getTile(0, -1));
 				if (nTile == HRAILROAD ||
 						nTile == VROADPOWER ||
-						(nTile >= VBRIDGE && nTile <= INTERSECTION)) {
+						nTile >= VBRIDGE && nTile <= INTERSECTION) {
 					eff.setTile(0, 0, VBRIDGE);
 					break;
 				}

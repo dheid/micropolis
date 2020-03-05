@@ -52,8 +52,8 @@ public class TrainSprite extends Sprite
 		y += Dy[this.dir];
 		if (city.acycle % 4 == 0) {
 			// should be at the center of a cell, if not, correct it
-			x = (x / 16) * 16 + TRA_GROOVE_X;
-			y = (y / 16) * 16 + TRA_GROOVE_Y;
+			x = x / 16 * 16 + TRA_GROOVE_X;
+			y = y / 16 * 16 + TRA_GROOVE_Y;
 			int d1 = city.PRNG.nextInt(4);
 			for (int z = d1; z < d1 + 4; z++) {
 				int d2 = z % 4;
@@ -63,10 +63,10 @@ public class TrainSprite extends Sprite
 				}
 
 				int c = getChar(this.x + Cx[d2], this.y + Cy[d2]);
-				if (((c >= RAILBASE) && (c <= LASTRAIL)) || //track?
-						(c == RAILVPOWERH) ||
-						(c == RAILHPOWERV)) {
-					if ((this.dir != d2) && (this.dir != DIR_NONE)) {
+				if (c >= RAILBASE && c <= LASTRAIL || //track?
+						c == RAILVPOWERH ||
+						c == RAILHPOWERV) {
+					if (this.dir != d2 && this.dir != DIR_NONE) {
 						if (this.dir + d2 == 3)
 							this.frame = FRAME_NW_SE;
 						else
@@ -75,7 +75,7 @@ public class TrainSprite extends Sprite
 						this.frame = TrainPic2[d2];
 					}
 
-					if ((c == RAILBASE) || (c == (RAILBASE + 1))) {
+					if (c == RAILBASE || c == RAILBASE + 1) {
 						//underwater
 						this.frame = FRAME_UNDERWATER;
 					}

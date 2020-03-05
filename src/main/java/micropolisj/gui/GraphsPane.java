@@ -272,14 +272,14 @@ public class GraphsPane extends JPanel
 			boolean isOneTwenty = onetwentyYearsBtn.isSelected();
 			int unitPeriod = isOneTwenty ? 12 * Micropolis.CENSUSRATE : Micropolis.CENSUSRATE;
 			int hashPeriod = isOneTwenty ? 10 * unitPeriod : 12 * unitPeriod;
-			int startTime = ((engine.history.cityTime / unitPeriod) - 119) * unitPeriod;
+			int startTime = (engine.history.cityTime / unitPeriod - 119) * unitPeriod;
 
 			double x_interval = (rightEdge - leftEdge) / 120.0;
 			for (int i = 0; i < 120; i++) {
 				int t = startTime + i * unitPeriod;  // t might be negative
 				if (t % hashPeriod == 0) {
 					// year
-					int year = 1900 + (t / (12 * Micropolis.CENSUSRATE));
+					int year = 1900 + t / (12 * Micropolis.CENSUSRATE);
 					int numHashes = t / hashPeriod;
 					int x = (int) Math.round(leftEdge + i * x_interval);
 					int y = getInsets().top + TOP_MARGIN +

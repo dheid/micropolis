@@ -350,7 +350,7 @@ public class MainWindow extends JFrame
 		// will depend on how much real time has elapsed.
 		// The threshold is 30 seconds.
 
-		return (System.currentTimeMillis() - lastSavedTime > 30000);
+		return System.currentTimeMillis() - lastSavedTime > 30000;
 	}
 
 	boolean maybeSaveCity()
@@ -972,7 +972,7 @@ public class MainWindow extends JFrame
 	private void doZoom(int dir, Point mousePt)
 	{
 		int oldZoom = drawingArea.getTileSize();
-		int newZoom = dir < 0 ? (oldZoom / 2) : (oldZoom * 2);
+		int newZoom = dir < 0 ? oldZoom / 2 : oldZoom * 2;
 		if (newZoom < 8) {
 			newZoom = 8;
 		}
@@ -1181,8 +1181,8 @@ public class MainWindow extends JFrame
 	{
 		Calendar c = Calendar.getInstance();
 		c.set(1900 + cityTime / 48,
-				(cityTime % 48) / 4,
-				(cityTime % 4) * 7 + 1
+				cityTime % 48 / 4,
+				cityTime % 4 * 7 + 1
 		);
 
 		return MessageFormat.format(

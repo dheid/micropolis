@@ -57,8 +57,8 @@ public class MonsterSprite extends Sprite
 		this.origY = y;
 
 		this.frame = xpos > city.getWidth() / 2 ?
-				(ypos > city.getHeight() / 2 ? 10 : 7) :
-				(ypos > city.getHeight() / 2 ? 1 : 4);
+                ypos > city.getHeight() / 2 ? 10 : 7 :
+                ypos > city.getHeight() / 2 ? 1 : 4;
 
 		this.count = 1000;
 		CityLocation p = city.getLocationOfMaxPollution();
@@ -110,7 +110,7 @@ public class MonsterSprite extends Sprite
 			c = (c - 1) / 2;   //convert to one of four basic headings
 			assert c >= 0 && c < 4;
 
-			if ((c != d) && city.PRNG.nextInt(11) == 0) {
+			if (c != d && city.PRNG.nextInt(11) == 0) {
 				// randomly determine direction to turn
 				if (city.PRNG.nextInt(2) == 0) {
 					z = ND1[d];
@@ -145,7 +145,7 @@ public class MonsterSprite extends Sprite
 			}
 		}
 
-		this.frame = ((d * 3) + z) + 1;
+		this.frame = d * 3 + z + 1;
 
 		assert this.frame >= 1 && this.frame <= 16;
 
@@ -158,7 +158,7 @@ public class MonsterSprite extends Sprite
 
 		int c = getChar(x, y);
 		if (c == -1 ||
-				(c == RIVER && this.count != 0 && false)
+                c == RIVER && this.count != 0 && false
 		) {
 			this.frame = 0; //kill zilla
 		}

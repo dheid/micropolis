@@ -158,7 +158,7 @@ public class CityEval
 		problemVotes = voteProblems(problemTable);
 
 		CityProblem[] probOrder = CityProblem.values();
-		Arrays.sort(probOrder, (a, b) -> -(problemVotes.get(a).compareTo(problemVotes.get(b))));
+		Arrays.sort(probOrder, (a, b) -> -problemVotes.get(a).compareTo(problemVotes.get(b)));
 
 		int c = 0;
 		while (c < probOrder.length &&
@@ -209,7 +209,7 @@ public class CityEval
 			}
 		}
 
-		engine.trafficAverage = (int) Math.round(((double) total / (double) count) * 2.4);
+		engine.trafficAverage = (int) Math.round((double) total / (double) count * 2.4);
 		return engine.trafficAverage;
 	}
 
@@ -262,13 +262,13 @@ public class CityEval
 			z = 0.85 * z;
 		}
 		if (engine.roadEffect < 32) {
-			z -= (32 - engine.roadEffect);
+			z -= 32 - engine.roadEffect;
 		}
 		if (engine.policeEffect < 1000) {
-			z *= (0.9 + (engine.policeEffect / 10000.1));
+			z *= 0.9 + engine.policeEffect / 10000.1;
 		}
 		if (engine.fireEffect < 1000) {
-			z *= (0.9 + (engine.fireEffect / 10000.1));
+			z *= 0.9 + engine.fireEffect / 10000.1;
 		}
 		if (engine.resValve < -1000) {
 			z *= 0.85;
@@ -288,14 +288,14 @@ public class CityEval
 		} else if (deltaCityPop > 0) {
 			SM = (double) deltaCityPop / (double) cityPop + 1.0;
 		} else if (deltaCityPop < 0) {
-			SM = 0.95 + ((double) deltaCityPop / (double) (cityPop - deltaCityPop));
+			SM = 0.95 + (double) deltaCityPop / (double) (cityPop - deltaCityPop);
 		}
 		z *= SM;
 		z -= getFire();
 		z -= engine.cityTax;
 
 		int TM = engine.unpoweredZoneCount + engine.poweredZoneCount;
-		SM = TM != 0 ? ((double) engine.poweredZoneCount / (double) TM) : 1.0;
+		SM = TM != 0 ? (double) engine.poweredZoneCount / (double) TM : 1.0;
 		z *= SM;
 
 		z = clamp(z, 0, 1000);

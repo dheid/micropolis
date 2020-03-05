@@ -98,7 +98,7 @@ public abstract class Sprite
 		int dispX = desX - orgX;
 		int dispY = desY - orgY;
 
-		int z = dispX < 0 ? (dispY < 0 ? 11 : 8) : (dispY < 0 ? 2 : 5);
+		int z = dispX < 0 ? dispY < 0 ? 11 : 8 : dispY < 0 ? 2 : 5;
 
 		dispX = Math.abs(dispX);
 		dispY = Math.abs(dispY);
@@ -162,7 +162,7 @@ public abstract class Sprite
 		if (!isVisible()) return false;
 		if (!otherSprite.isVisible()) return false;
 
-		return (getDis(this.x, this.y, otherSprite.x, otherSprite.y) < 30);
+		return getDis(this.x, this.y, otherSprite.x, otherSprite.y) < 30;
 	}
 
 	/**

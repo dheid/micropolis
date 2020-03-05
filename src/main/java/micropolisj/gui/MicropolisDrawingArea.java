@@ -235,7 +235,7 @@ public class MicropolisDrawingArea extends JComponent
 
 			gr.setColor(Color.WHITE);
 			gr.fillRect(x0 - 4, y0 - 4, x1 + 4 - (x0 - 4), 1);
-			gr.fillRect(x0 - 4, y0 - 3, 1, (y1 + 4) - (y0 - 3));
+			gr.fillRect(x0 - 4, y0 - 3, 1, y1 + 4 - (y0 - 3));
 			gr.fillRect(x0 - 1, y1, x1 + 1 - (x0 - 1), 1);
 			gr.fillRect(x1, y0 - 1, 1, y1 - (y0 - 1));
 

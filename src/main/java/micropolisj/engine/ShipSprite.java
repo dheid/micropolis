@@ -70,8 +70,8 @@ public class ShipSprite extends Sprite
 			}
 			int tem = city.PRNG.nextInt(8);
 			int pem;
-			for (pem = tem; pem < (tem + 8); pem++) {
-				int z = (pem % 8) + 1;
+			for (pem = tem; pem < tem + 8; pem++) {
+				int z = pem % 8 + 1;
 				if (z == this.dir)
 					continue;
 
@@ -80,7 +80,7 @@ public class ShipSprite extends Sprite
 
 				if (city.testBounds(xpos, ypos)) {
 					t = city.getTile(xpos, ypos);
-					if ((t == CHANNEL) || (t == BRWH) || (t == BRWV) ||
+					if (t == CHANNEL || t == BRWH || t == BRWV ||
 							tryOther(t, this.dir, z)) {
 						this.newDir = z;
 						this.frame = turnTo(this.frame, this.newDir);
@@ -93,7 +93,7 @@ public class ShipSprite extends Sprite
 				}
 			}
 
-			if (pem == (tem + 8)) {
+			if (pem == tem + 8) {
 				this.dir = 10;
 				this.newDir = city.PRNG.nextInt(8) + 1;
 			}
@@ -130,8 +130,8 @@ public class ShipSprite extends Sprite
 		if (z > 8) z -= 8;
 		if (newDir != z) return false;
 
-		return (tile == POWERBASE || tile == POWERBASE + 1 ||
-				tile == RAILBASE || tile == RAILBASE + 1);
+		return tile == POWERBASE || tile == POWERBASE + 1 ||
+				tile == RAILBASE || tile == RAILBASE + 1;
 	}
 
 	boolean spriteInBounds()

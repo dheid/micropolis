@@ -195,10 +195,8 @@ public class TileConstants
 	public static boolean canAutoBulldozeRRW(int tileValue)
 	{
 		// can we autobulldoze this tile?
-		return (
-				(tileValue >= FIRSTRIVEDGE && tileValue <= LASTRUBBLE) ||
-						(tileValue >= TINYEXP && tileValue <= LASTTINYEXP)
-		);
+		return tileValue >= FIRSTRIVEDGE && tileValue <= LASTRUBBLE ||
+				tileValue >= TINYEXP && tileValue <= LASTTINYEXP;
 	}
 
 	/**
@@ -210,9 +208,9 @@ public class TileConstants
 		//FIXME- what is significance of POWERBASE+2 and POWERBASE+12 ?
 
 		// can we autobulldoze this tile?
-		if ((tileValue >= FIRSTRIVEDGE && tileValue <= LASTRUBBLE) ||
-				(tileValue >= POWERBASE + 2 && tileValue <= POWERBASE + 12) ||
-				(tileValue >= TINYEXP && tileValue <= LASTTINYEXP)) {
+		if (tileValue >= FIRSTRIVEDGE && tileValue <= LASTRUBBLE ||
+				tileValue >= POWERBASE + 2 && tileValue <= POWERBASE + 12 ||
+				tileValue >= TINYEXP && tileValue <= LASTTINYEXP) {
 			return true;
 		} else {
 			return false;
@@ -262,11 +260,9 @@ public class TileConstants
 	{
 		assert (tile & LOMASK) == tile;
 
-		return (
-				!isZoneCenter(tile) &&
-						tile >= LHTHR &&
-						tile <= LASTZONE
-		);
+		return !isZoneCenter(tile) &&
+				tile >= LHTHR &&
+				tile <= LASTZONE;
 	}
 
 	//used by Sprite::destroyTile
@@ -323,16 +319,16 @@ public class TileConstants
 	{
 		assert (tile & LOMASK) == tile;
 
-		return ((tile >= RUBBLE) &&
-				(tile <= LASTRUBBLE));
+		return tile >= RUBBLE &&
+				tile <= LASTRUBBLE;
 	}
 
 	public static boolean isTree(char tile)
 	{
 		assert (tile & LOMASK) == tile;
 
-		return ((tile >= WOODS_LOW) &&
-				(tile <= WOODS_HIGH));
+		return tile >= WOODS_LOW &&
+				tile <= WOODS_HIGH;
 	}
 
 	//used by makeEarthquake
@@ -354,12 +350,12 @@ public class TileConstants
 	{
 		assert (tile & LOMASK) == tile;
 
-		return (tile == POWERBASE ||
+		return tile == POWERBASE ||
 				tile == POWERBASE + 1 ||
 				tile == RAILBASE ||
 				tile == RAILBASE + 1 ||
 				tile == BRWH ||
-				tile == BRWV);
+				tile == BRWV;
 	}
 
 	public static CityDimension getZoneSizeFor(int tile)
@@ -397,7 +393,7 @@ public class TileConstants
 	{
 		assert (tile & LOMASK) == tile;
 
-		return (tile == DIRT || (isDozeable(tile) && isCombustible(tile)));
+		return tile == DIRT || isDozeable(tile) && isCombustible(tile);
 	}
 
 	/**
@@ -409,16 +405,16 @@ public class TileConstants
 	{
 		assert (tile & LOMASK) == tile;
 
-		return (tile >= ROADBASE && tile < POWERBASE);
+		return tile >= ROADBASE && tile < POWERBASE;
 	}
 
 	public static boolean isRoadAny(int tile)
 	{
 		assert (tile & LOMASK) == tile;
 
-		return (tile >= ROADBASE && tile < POWERBASE)
-				|| (tile == HRAILROAD)
-				|| (tile == VRAILROAD);
+		return tile >= ROADBASE && tile < POWERBASE
+				|| tile == HRAILROAD
+				|| tile == VRAILROAD;
 	}
 
 	/**
@@ -428,153 +424,153 @@ public class TileConstants
 	public static boolean isRoadDynamic(int tile)
 	{
 		int tmp = neutralizeRoad(tile);
-		return (tmp >= ROADS && tmp <= INTERSECTION);
+		return tmp >= ROADS && tmp <= INTERSECTION;
 	}
 
 	public static boolean roadConnectsEast(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (((tile == VRAILROAD) ||
-				(tile >= ROADBASE && tile <= VROADPOWER)
+		return (tile == VRAILROAD ||
+				tile >= ROADBASE && tile <= VROADPOWER
 		) &&
-				(tile != VROADPOWER) &&
-				(tile != HRAILROAD) &&
-				(tile != VBRIDGE));
+				tile != VROADPOWER &&
+				tile != HRAILROAD &&
+				tile != VBRIDGE;
 	}
 
 	public static boolean roadConnectsNorth(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (((tile == HRAILROAD) ||
-				(tile >= ROADBASE && tile <= VROADPOWER)
+		return (tile == HRAILROAD ||
+				tile >= ROADBASE && tile <= VROADPOWER
 		) &&
-				(tile != HROADPOWER) &&
-				(tile != VRAILROAD) &&
-				(tile != ROADBASE));
+				tile != HROADPOWER &&
+				tile != VRAILROAD &&
+				tile != ROADBASE;
 	}
 
 	public static boolean roadConnectsSouth(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (((tile == HRAILROAD) ||
-				(tile >= ROADBASE && tile <= VROADPOWER)
+		return (tile == HRAILROAD ||
+				tile >= ROADBASE && tile <= VROADPOWER
 		) &&
-				(tile != HROADPOWER) &&
-				(tile != VRAILROAD) &&
-				(tile != ROADBASE));
+				tile != HROADPOWER &&
+				tile != VRAILROAD &&
+				tile != ROADBASE;
 	}
 
 	public static boolean roadConnectsWest(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (((tile == VRAILROAD) ||
-				(tile >= ROADBASE && tile <= VROADPOWER)
+		return (tile == VRAILROAD ||
+				tile >= ROADBASE && tile <= VROADPOWER
 		) &&
-				(tile != VROADPOWER) &&
-				(tile != HRAILROAD) &&
-				(tile != VBRIDGE));
+				tile != VROADPOWER &&
+				tile != HRAILROAD &&
+				tile != VBRIDGE;
 	}
 
 	public static boolean isRail(int tile)
 	{
 		assert (tile & LOMASK) == tile;
 
-		return (tile >= RAILBASE && tile < RESBASE);
+		return tile >= RAILBASE && tile < RESBASE;
 	}
 
 	public static boolean isRailAny(int tile)
 	{
 		assert (tile & LOMASK) == tile;
 
-		return (tile >= RAILBASE && tile < RESBASE)
-				|| (tile == RAILHPOWERV)
-				|| (tile == RAILVPOWERH);
+		return tile >= RAILBASE && tile < RESBASE
+				|| tile == RAILHPOWERV
+				|| tile == RAILVPOWERH;
 	}
 
 	public static boolean isRailDynamic(int tile)
 	{
 		assert (tile & LOMASK) == tile;
 
-		return (tile >= LHRAIL && tile <= LVRAIL10);
+		return tile >= LHRAIL && tile <= LVRAIL10;
 	}
 
 	public static boolean railConnectsEast(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (tile >= RAILHPOWERV && tile <= VRAILROAD &&
+		return tile >= RAILHPOWERV && tile <= VRAILROAD &&
 				tile != RAILVPOWERH &&
 				tile != VRAILROAD &&
-				tile != VRAIL);
+				tile != VRAIL;
 	}
 
 	public static boolean railConnectsNorth(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (tile >= RAILHPOWERV && tile <= VRAILROAD &&
+		return tile >= RAILHPOWERV && tile <= VRAILROAD &&
 				tile != RAILHPOWERV &&
 				tile != HRAILROAD &&
-				tile != HRAIL);
+				tile != HRAIL;
 	}
 
 	public static boolean railConnectsSouth(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (tile >= RAILHPOWERV && tile <= VRAILROAD &&
+		return tile >= RAILHPOWERV && tile <= VRAILROAD &&
 				tile != RAILHPOWERV &&
 				tile != HRAILROAD &&
-				tile != HRAIL);
+				tile != HRAIL;
 	}
 
 	public static boolean railConnectsWest(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (tile >= RAILHPOWERV && tile <= VRAILROAD &&
+		return tile >= RAILHPOWERV && tile <= VRAILROAD &&
 				tile != RAILVPOWERH &&
 				tile != VRAILROAD &&
-				tile != VRAIL);
+				tile != VRAIL;
 	}
 
 	public static boolean isWireDynamic(int tile)
 	{
 		assert (tile & LOMASK) == tile;
 
-		return (tile >= LHPOWER && tile <= LVPOWER10);
+		return tile >= LHPOWER && tile <= LVPOWER10;
 	}
 
 	public static boolean wireConnectsEast(int tile)
 	{
 		int ntile = neutralizeRoad(tile);
-		return (isConductive(tile) &&
+		return isConductive(tile) &&
 				ntile != HPOWER &&
 				ntile != HROADPOWER &&
-				ntile != RAILHPOWERV);
+				ntile != RAILHPOWERV;
 	}
 
 	public static boolean wireConnectsNorth(int tile)
 	{
 		int ntile = neutralizeRoad(tile);
-		return (isConductive(tile) &&
+		return isConductive(tile) &&
 				ntile != VPOWER &&
 				ntile != VROADPOWER &&
-				ntile != RAILVPOWERH);
+				ntile != RAILVPOWERH;
 	}
 
 	public static boolean wireConnectsSouth(int tile)
 	{
 		int ntile = neutralizeRoad(tile);
-		return (isConductive(tile) &&
+		return isConductive(tile) &&
 				ntile != VPOWER &&
 				ntile != VROADPOWER &&
-				ntile != RAILVPOWERH);
+				ntile != RAILVPOWERH;
 	}
 
 	public static boolean wireConnectsWest(int tile)
 	{
 		int ntile = neutralizeRoad(tile);
-		return (isConductive(tile) &&
+		return isConductive(tile) &&
 				ntile != HPOWER &&
 				ntile != HROADPOWER &&
-				ntile != RAILHPOWERV);
+				ntile != RAILHPOWERV;
 	}
 
 	public static boolean isCommercialZone(int tile)
@@ -659,7 +655,7 @@ public class TileConstants
 		assert (tile & LOMASK) == tile;
 
 		if (tile >= ROADBASE && tile <= LASTROAD) {
-			tile = ((tile - ROADBASE) & 0xf) + ROADBASE;
+			tile = (tile - ROADBASE & 0xf) + ROADBASE;
 		}
 		return (char) tile;
 	}

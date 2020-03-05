@@ -105,11 +105,9 @@ class MapScanner extends TileBehavior
 	boolean setZonePower()
 	{
 		boolean oldPower = city.isTilePowered(xpos, ypos);
-		boolean newPower = (
-				tile == NUCLEAR ||
-						tile == POWERPLANT ||
-						city.hasPower(xpos, ypos)
-		);
+		boolean newPower = tile == NUCLEAR ||
+				tile == POWERPLANT ||
+				city.hasPower(xpos, ypos);
 
 		if (newPower && !oldPower) {
 			city.setTilePower(xpos, ypos, true);
@@ -171,7 +169,7 @@ class MapScanner extends TileBehavior
 	{
 		checkZonePower();
 		city.coalCount++;
-		if ((city.cityTime % 8) == 0) {
+		if (city.cityTime % 8 == 0) {
 			repairZone(POWERPLANT, 4);
 		}
 
@@ -187,7 +185,7 @@ class MapScanner extends TileBehavior
 		}
 
 		city.nuclearCount++;
-		if ((city.cityTime % 8) == 0) {
+		if (city.cityTime % 8 == 0) {
 			repairZone(NUCLEAR, 4);
 		}
 
@@ -198,7 +196,7 @@ class MapScanner extends TileBehavior
 	{
 		boolean powerOn = checkZonePower();
 		city.fireStationCount++;
-		if ((city.cityTime % 8) == 0) {
+		if (city.cityTime % 8 == 0) {
 			repairZone(FIRESTATION, 3);
 		}
 
@@ -222,7 +220,7 @@ class MapScanner extends TileBehavior
 	{
 		boolean powerOn = checkZonePower();
 		city.policeCount++;
-		if ((city.cityTime % 8) == 0) {
+		if (city.cityTime % 8 == 0) {
 			repairZone(POLICESTATION, 3);
 		}
 
@@ -246,15 +244,15 @@ class MapScanner extends TileBehavior
 	{
 		boolean powerOn = checkZonePower();
 		city.stadiumCount++;
-		if ((city.cityTime % 16) == 0) {
+		if (city.cityTime % 16 == 0) {
 			repairZone(STADIUM, 4);
 		}
 
 		if (powerOn) {
-			if (((city.cityTime + xpos + ypos) % 32) == 0) {
+			if ((city.cityTime + xpos + ypos) % 32 == 0) {
 				drawStadium(FULLSTADIUM);
-				city.setTile(xpos + 1, ypos, (char) (FOOTBALLGAME1));
-				city.setTile(xpos + 1, ypos + 1, (char) (FOOTBALLGAME2));
+				city.setTile(xpos + 1, ypos, (char) FOOTBALLGAME1);
+				city.setTile(xpos + 1, ypos + 1, (char) FOOTBALLGAME2);
 			}
 		}
 	}
@@ -263,7 +261,7 @@ class MapScanner extends TileBehavior
 	{
 		checkZonePower();
 		city.stadiumCount++;
-		if (((city.cityTime + xpos + ypos) % 8) == 0) {
+		if ((city.cityTime + xpos + ypos) % 8 == 0) {
 			drawStadium(STADIUM);
 		}
 	}
@@ -272,7 +270,7 @@ class MapScanner extends TileBehavior
 	{
 		boolean powerOn = checkZonePower();
 		city.airportCount++;
-		if ((city.cityTime % 8) == 0) {
+		if (city.cityTime % 8 == 0) {
 			repairZone(AIRPORT, 6);
 		}
 
@@ -292,7 +290,7 @@ class MapScanner extends TileBehavior
 	{
 		boolean powerOn = checkZonePower();
 		city.seaportCount++;
-		if ((city.cityTime % 16) == 0) {
+		if (city.cityTime % 16 == 0) {
 			repairZone(PORT, 4);
 		}
 
@@ -425,13 +423,13 @@ class MapScanner extends TileBehavior
 
 			if (trafficGood != 0 &&
 					zscore > -350 &&
-					zscore - 26380 > (PRNG.nextInt(0x10000) - 0x8000)) {
+					zscore - 26380 > PRNG.nextInt(0x10000) - 0x8000) {
 				int value = getCRValue();
 				doCommercialIn(tpop, value);
 				return;
 			}
 
-			if (zscore < 350 && zscore + 26380 < (PRNG.nextInt(0x10000) - 0x8000)) {
+			if (zscore < 350 && zscore + 26380 < PRNG.nextInt(0x10000) - 0x8000) {
 				int value = getCRValue();
 				doCommercialOut(tpop, value);
 			}
@@ -470,13 +468,13 @@ class MapScanner extends TileBehavior
 				zscore = -500;
 
 			if (zscore > -350 &&
-					zscore - 26380 > (PRNG.nextInt(0x10000) - 0x8000)) {
+					zscore - 26380 > PRNG.nextInt(0x10000) - 0x8000) {
 				int value = PRNG.nextInt(2);
 				doIndustrialIn(tpop, value);
 				return;
 			}
 
-			if (zscore < 350 && zscore + 26380 < (PRNG.nextInt(0x10000) - 0x8000)) {
+			if (zscore < 350 && zscore + 26380 < PRNG.nextInt(0x10000) - 0x8000) {
 				int value = PRNG.nextInt(2);
 				doIndustrialOut(tpop, value);
 			}
@@ -521,7 +519,7 @@ class MapScanner extends TileBehavior
 			if (!powerOn)
 				zscore = -500;
 
-			if (zscore > -350 && zscore - 26380 > (PRNG.nextInt(0x10000) - 0x8000)) {
+			if (zscore > -350 && zscore - 26380 > PRNG.nextInt(0x10000) - 0x8000) {
 				if (tpop == 0 && PRNG.nextInt(4) == 0) {
 					makeHospital();
 					return;
@@ -532,7 +530,7 @@ class MapScanner extends TileBehavior
 				return;
 			}
 
-			if (zscore < 350 && zscore + 26380 < (PRNG.nextInt(0x10000) - 0x8000)) {
+			if (zscore < 350 && zscore + 26380 < PRNG.nextInt(0x10000) - 0x8000) {
 				int value = getCRValue();
 				doResidentialOut(tpop, value);
 			}
@@ -600,7 +598,7 @@ class MapScanner extends TileBehavior
 						bestLoc = z;
 					}
 
-					if ((score == hscore) && PRNG.nextInt(8) == 0) {
+					if (score == hscore && PRNG.nextInt(8) == 0) {
 						bestLoc = z;
 					}
 				}

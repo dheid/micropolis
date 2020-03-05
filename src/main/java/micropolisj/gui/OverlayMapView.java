@@ -226,7 +226,7 @@ public class OverlayMapView extends JComponent
 			return rawTile & LOMASK;
 		} else if (isZoneCenter(rawTile)) {
 			// zone
-			pix = ((rawTile & PWRBIT) != 0) ? POWERED : UNPOWERED;
+			pix = (rawTile & PWRBIT) != 0 ? POWERED : UNPOWERED;
 		} else if (isConductive(rawTile)) {
 			pix = CONDUCTIVE;
 		} else {

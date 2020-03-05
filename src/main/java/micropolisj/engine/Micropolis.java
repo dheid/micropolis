@@ -470,7 +470,7 @@ public class Micropolis
 
 	public void setTilePower(int xpos, int ypos, boolean power)
 	{
-		map[ypos][xpos] = (char) (map[ypos][xpos] & (~PWRBIT) | (power ? PWRBIT : 0));
+		map[ypos][xpos] = (char) (map[ypos][xpos] & ~PWRBIT | (power ? PWRBIT : 0));
 	}
 
 	final public boolean testBounds(int xpos, int ypos)
@@ -490,12 +490,10 @@ public class Micropolis
 	 */
 	public boolean isBudgetTime()
 	{
-		return (
-				cityTime != 0 &&
-						(cityTime % TAXFREQ) == 0 &&
-						((fcycle + 1) % 16) == 10 &&
-						((acycle + 1) % 2) == 0
-		);
+		return cityTime != 0 &&
+				cityTime % TAXFREQ == 0 &&
+				(fcycle + 1) % 16 == 10 &&
+				(acycle + 1) % 2 == 0;
 	}
 
 	void step()
@@ -826,7 +824,7 @@ public class Micropolis
 					crimeMem[hy][hx] = z;
 
 					sum += z;
-					if (z > cmax || (z == cmax && PRNG.nextInt(4) == 0)) {
+					if (z > cmax || z == cmax && PRNG.nextInt(4) == 0) {
 						cmax = z;
 					}
 				} else {
@@ -931,12 +929,10 @@ public class Micropolis
 		boolean rv = false;
 		if (movePowerLocation(loc, dir)) {
 			char t = getTile(loc.x, loc.y);
-			rv = (
-					isConductive(t) &&
-							t != NUCLEAR &&
-							t != POWERPLANT &&
-							!hasPower(loc.x, loc.y)
-			);
+			rv = isConductive(t) &&
+					t != NUCLEAR &&
+					t != POWERPLANT &&
+					!hasPower(loc.x, loc.y);
 		}
 
 		loc.x = xsave;
@@ -1153,7 +1149,7 @@ public class Micropolis
 			}
 		}
 
-		landValueAverage = landValueCount != 0 ? (landValueTotal / landValueCount) : 0;
+		landValueAverage = landValueCount != 0 ? landValueTotal / landValueCount : 0;
 
 		tem = doSmooth(tem);
 		tem = doSmooth(tem);
@@ -1171,7 +1167,7 @@ public class Micropolis
 					ptotal += z;
 
 					if (z > pmax ||
-							(z == pmax && PRNG.nextInt(4) == 0)) {
+							z == pmax && PRNG.nextInt(4) == 0) {
 						pmax = z;
 						pollutionMaxLocationX = 2 * x;
 						pollutionMaxLocationY = 2 * y;
@@ -1180,7 +1176,7 @@ public class Micropolis
 			}
 		}
 
-		pollutionAverage = pcount != 0 ? (ptotal / pcount) : 0;
+		pollutionAverage = pcount != 0 ? ptotal / pcount : 0;
 
 		terrainMem = smoothTerrain(qtem);
 
@@ -1227,7 +1223,7 @@ public class Micropolis
 		double births = (double) normResPop * BIRTH_RATE;
 		double projectedResPop = normResPop + migration + births;
 
-		double temp = (history.com[1] + history.ind[1]);
+		double temp = history.com[1] + history.ind[1];
 		double laborBase;
 		if (temp != 0.0) {
 			laborBase = history.res[1] / temp;
@@ -1367,7 +1363,7 @@ public class Micropolis
 		int xdis = Math.abs(x - centerMassX / 2);
 		int ydis = Math.abs(y - centerMassY / 2);
 
-		int z = (xdis + ydis);
+		int z = xdis + ydis;
 		if (z > 32)
 			return 32;
 		else
@@ -2327,7 +2323,7 @@ public class Micropolis
 				TileSpec ts = Tiles.get(tile & LOMASK);
 				if (ts != null && ts.onPower != null) {
 					setTile(x, y,
-							(char) (ts.onPower.tileNumber | (tile & ALLBITS))
+							(char) (ts.onPower.tileNumber | tile & ALLBITS)
 					);
 				}
 			}
@@ -2354,7 +2350,7 @@ public class Micropolis
 				TileSpec ts = Tiles.get(tile & LOMASK);
 				if (ts != null && ts.onShutdown != null) {
 					setTile(x, y,
-							(char) (ts.onShutdown.tileNumber | (tile & ALLBITS))
+							(char) (ts.onShutdown.tileNumber | tile & ALLBITS)
 					);
 				}
 			}
@@ -2441,19 +2437,19 @@ public class Micropolis
 				}
 				break;
 			case 26:
-				resCap = (resPop > 500 && stadiumCount == 0);
+				resCap = resPop > 500 && stadiumCount == 0;
 				if (resCap) {
 					sendMessage(MicropolisMessage.NEED_STADIUM);
 				}
 				break;
 			case 28:
-				indCap = (indPop > 70 && seaportCount == 0);
+				indCap = indPop > 70 && seaportCount == 0;
 				if (indCap) {
 					sendMessage(MicropolisMessage.NEED_SEAPORT);
 				}
 				break;
 			case 30:
-				comCap = (comPop > 100 && airportCount == 0);
+				comCap = comPop > 100 && airportCount == 0;
 				if (comCap) {
 					sendMessage(MicropolisMessage.NEED_AIRPORT);
 				}
@@ -2540,17 +2536,17 @@ public class Micropolis
 		zs.building = getDescriptionNumber(getTile(xpos, ypos));
 
 		int z;
-		z = (popDensity[ypos / 2][xpos / 2] / 64) % 4;
+		z = popDensity[ypos / 2][xpos / 2] / 64 % 4;
 		zs.popDensity = z + 1;
 
 		z = landValueMem[ypos / 2][xpos / 2];
 		z = z < 30 ? 4 : z < 80 ? 5 : z < 150 ? 6 : 7;
 		zs.landValue = z + 1;
 
-		z = ((crimeMem[ypos / 2][xpos / 2] / 64) % 4) + 8;
+		z = crimeMem[ypos / 2][xpos / 2] / 64 % 4 + 8;
 		zs.crimeLevel = z + 1;
 
-		z = Math.max(13, ((pollutionMem[ypos / 2][xpos / 2] / 64) % 4) + 12);
+		z = Math.max(13, pollutionMem[ypos / 2][xpos / 2] / 64 % 4 + 12);
 		zs.pollution = z + 1;
 
 		z = rateOGMem[ypos / 8][xpos / 8];

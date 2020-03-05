@@ -116,7 +116,7 @@ class TerrainBehavior extends TileBehavior
 						int t = city.getTile(xx, yy);
 						if (isCombustible(t)
 								|| t == DIRT
-								|| (t >= WOODS5 && t < FLOOD)) {
+								|| t >= WOODS5 && t < FLOOD) {
 							if (isZoneCenter(t)) {
 								city.killZone(xx, yy, t);
 							}
@@ -191,7 +191,7 @@ class TerrainBehavior extends TileBehavior
 		assert newLevel >= 0 && newLevel < TRAFFIC_DENSITY_TAB.length;
 
 		if (tden != newLevel) {
-			int z = ((tile - ROADBASE) & 15) + TRAFFIC_DENSITY_TAB[newLevel];
+			int z = (tile - ROADBASE & 15) + TRAFFIC_DENSITY_TAB[newLevel];
 			city.setTile(xpos, ypos, (char) z);
 		}
 	}
@@ -323,8 +323,8 @@ class TerrainBehavior extends TileBehavior
 			int x = xpos + Dx[z];
 			int y = ypos + Dy[z];
 			if (city.testBounds(x, y)) {
-				if ((city.getTile(x, y) == fromTab[z]) ||
-						(city.getTile(x, y) == CHANNEL)
+				if (city.getTile(x, y) == fromTab[z] ||
+                        city.getTile(x, y) == CHANNEL
 				) {
 					city.setTile(x, y, toTab[z]);
 				}

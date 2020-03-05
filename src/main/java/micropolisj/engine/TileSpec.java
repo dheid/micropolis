@@ -53,7 +53,7 @@ public class TileSpec
 	public boolean getBooleanAttribute(String key)
 	{
 		String v = getAttribute(key);
-		return (v != null && v.equals("true"));
+		return v != null && v.equals("true");
 	}
 
 	public static class BuildingInfo

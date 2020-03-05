@@ -148,7 +148,7 @@ public class MapGenerator
 			mapX = x;
 			mapY = erand(ISLAND_RADIUS + 1);
 			BRivPlop();
-			mapY = (WORLD_Y - 10) - erand(ISLAND_RADIUS + 1);
+			mapY = WORLD_Y - 10 - erand(ISLAND_RADIUS + 1);
 			BRivPlop();
 			mapY = 0;
 			SRivPlop();
@@ -160,11 +160,11 @@ public class MapGenerator
 			mapY = y;
 			mapX = erand(ISLAND_RADIUS + 1);
 			BRivPlop();
-			mapX = (WORLD_X - 10) - erand(ISLAND_RADIUS + 1);
+			mapX = WORLD_X - 10 - erand(ISLAND_RADIUS + 1);
 			BRivPlop();
 			mapX = 0;
 			SRivPlop();
-			mapX = (WORLD_X - 6);
+			mapX = WORLD_X - 6;
 			SRivPlop();
 		}
 	}
@@ -369,15 +369,15 @@ public class MapGenerator
 						int xtem = mapX + DX[z];
 						int ytem = mapY + DY[z];
 						if (engine.testBounds(xtem, ytem) &&
-								((map[ytem][xtem] & LOMASK) != DIRT) &&
-								(((map[ytem][xtem] & LOMASK) < WOODS_LOW) ||
-										((map[ytem][xtem] & LOMASK) > WOODS_HIGH))) {
+								(map[ytem][xtem] & LOMASK) != DIRT &&
+								((map[ytem][xtem] & LOMASK) < WOODS_LOW ||
+										(map[ytem][xtem] & LOMASK) > WOODS_HIGH)) {
 							bitindex |= 1;
 						}
 					}
 
 					char temp = REdTab[bitindex & 15];
-					if ((temp != RIVER) && PRNG.nextInt(2) != 0)
+					if (temp != RIVER && PRNG.nextInt(2) != 0)
 						temp++;
 					map[mapY][mapX] = temp;
 				}
@@ -411,7 +411,7 @@ public class MapGenerator
 		if (treeLevel < 0) {
 			dis = PRNG.nextInt(151) + 50;
 		} else {
-			dis = PRNG.nextInt(101 + (treeLevel * 2)) + 50;
+			dis = PRNG.nextInt(101 + treeLevel * 2) + 50;
 		}
 
 		mapX = xloc;
@@ -467,7 +467,7 @@ public class MapGenerator
 					char temp = TEdTab[bitindex & 15];
 					if (temp != 0) {
 						if (temp != WOODS) {
-							if (((mapX + mapY) & 1) != 0) {
+							if ((mapX + mapY & 1) != 0) {
 								temp -= 8;
 							}
 						}
