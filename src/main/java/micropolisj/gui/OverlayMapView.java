@@ -434,13 +434,13 @@ public class OverlayMapView extends JComponent
 		cv.scrollPane.getViewport().setViewPosition(np);
 	}
 
-	//implements Scrollable
+	@Override
 	public Dimension getPreferredScrollableViewportSize()
 	{
 		return new Dimension(120, 120);
 	}
 
-	//implements Scrollable
+	@Override
 	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction)
 	{
 		if (orientation == SwingConstants.VERTICAL)
@@ -449,19 +449,19 @@ public class OverlayMapView extends JComponent
 			return visibleRect.width;
 	}
 
-	//implements Scrollable
+	@Override
 	public boolean getScrollableTracksViewportWidth()
 	{
 		return false;
 	}
 
-	//implements Scrollable
+	@Override
 	public boolean getScrollableTracksViewportHeight()
 	{
 		return false;
 	}
 
-	//implements Scrollable
+	@Override
 	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction)
 	{
 		if (orientation == SwingConstants.VERTICAL)
@@ -470,25 +470,25 @@ public class OverlayMapView extends JComponent
 			return TILE_WIDTH;
 	}
 
-	//implements MapListener
+	@Override
 	public void mapOverlayDataChanged()
 	{
 		repaint();
 	}
 
-	//implements MapListener
+	@Override
 	public void spriteMoved(Sprite sprite)
 	{
 	}
 
-	//implements MapListener
+	@Override
 	public void tileChanged(int xpos, int ypos)
 	{
 		Rectangle r = new Rectangle(xpos * TILE_WIDTH, ypos * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
 		repaint(r);
 	}
 
-	//implements MapListener
+	@Override
 	public void wholeMapChanged()
 	{
 		repaint();
@@ -514,6 +514,7 @@ public class OverlayMapView extends JComponent
 			scrollPane.getViewport().addChangeListener(this);
 		}
 
+		@Override
 		public void stateChanged(ChangeEvent ev)
 		{
 			repaint();

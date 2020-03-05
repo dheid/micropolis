@@ -44,7 +44,7 @@ public class ToolPreview implements ToolEffectIfc
 		this.toolResult = ToolResult.NONE;
 	}
 
-	//implements ToolEffectIfc
+	@Override
 	public int getTile(int dx, int dy)
 	{
 		if (inRange(dx, dy)) {
@@ -139,26 +139,26 @@ public class ToolPreview implements ToolEffectIfc
 		}
 	}
 
-	//implements ToolEffectIfc
+	@Override
 	public void makeSound(int dx, int dy, Sound sound)
 	{
 		sounds.add(new SoundInfo(dx, dy, sound));
 	}
 
-	//implements ToolEffectIfc
+	@Override
 	public void setTile(int dx, int dy, int tileValue)
 	{
 		expandTo(dx, dy);
 		tiles[offsetY + dy][offsetX + dx] = (short) tileValue;
 	}
 
-	//implements ToolEffectIfc
+	@Override
 	public void spend(int amount)
 	{
 		cost += amount;
 	}
 
-	//implements ToolEffectIfc
+	@Override
 	public void toolResult(ToolResult tr)
 	{
 		this.toolResult = tr;

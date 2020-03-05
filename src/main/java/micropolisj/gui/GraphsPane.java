@@ -138,32 +138,37 @@ public class GraphsPane extends JPanel
 		setVisible(false);
 	}
 
-	//implements Micropolis.Listener
+	@Override
 	public void cityMessage(MicropolisMessage message, CityLocation loc)
 	{
 	}
 
+	@Override
 	public void citySound(Sound sound, CityLocation loc)
 	{
 	}
 
+	@Override
 	public void demandChanged()
 	{
 	}
 
+	@Override
 	public void evaluationChanged()
 	{
 	}
 
+	@Override
 	public void fundsChanged()
 	{
 	}
 
+	@Override
 	public void optionsChanged()
 	{
 	}
 
-	//implements Micropolis.Listener
+	@Override
 	public void censusChanged()
 	{
 		graphArea.repaint();

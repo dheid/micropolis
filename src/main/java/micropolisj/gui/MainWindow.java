@@ -197,6 +197,7 @@ public class MainWindow extends JFrame
 		ActionMap actionMap = ((JComponent) getContentPane()).getActionMap();
 		actionMap.put("zoomIn", new AbstractAction()
 		{
+			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
 				doZoom(1);
@@ -204,6 +205,7 @@ public class MainWindow extends JFrame
 		});
 		actionMap.put("zoomOut", new AbstractAction()
 		{
+			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
 				doZoom(-1);
@@ -211,6 +213,7 @@ public class MainWindow extends JFrame
 		});
 		actionMap.put("escape", new AbstractAction()
 		{
+			@Override
 			public void actionPerformed(ActionEvent evt)
 			{
 				onEscapePressed();
@@ -219,6 +222,7 @@ public class MainWindow extends JFrame
 
 		MouseAdapter mouse = new MouseAdapter()
 		{
+			@Override
 			public void mousePressed(MouseEvent ev)
 			{
 				try {
@@ -228,6 +232,7 @@ public class MainWindow extends JFrame
 				}
 			}
 
+			@Override
 			public void mouseReleased(MouseEvent ev)
 			{
 				try {
@@ -237,6 +242,7 @@ public class MainWindow extends JFrame
 				}
 			}
 
+			@Override
 			public void mouseDragged(MouseEvent ev)
 			{
 				try {
@@ -246,6 +252,7 @@ public class MainWindow extends JFrame
 				}
 			}
 
+			@Override
 			public void mouseMoved(MouseEvent ev)
 			{
 				try {
@@ -255,6 +262,7 @@ public class MainWindow extends JFrame
 				}
 			}
 
+			@Override
 			public void mouseExited(MouseEvent ev)
 			{
 				try {
@@ -264,6 +272,7 @@ public class MainWindow extends JFrame
 				}
 			}
 
+			@Override
 			public void mouseWheelMoved(MouseWheelEvent evt)
 			{
 				try {
@@ -279,11 +288,13 @@ public class MainWindow extends JFrame
 
 		addWindowListener(new WindowAdapter()
 		{
+			@Override
 			public void windowClosing(WindowEvent ev)
 			{
 				closeWindow();
 			}
 
+			@Override
 			public void windowClosed(WindowEvent ev)
 			{
 				onWindowClosed();
@@ -1312,7 +1323,7 @@ public class MainWindow extends JFrame
 
 	EarthquakeStepper currentEarthquake;
 
-	//implements EarthquakeListener
+	@Override
 	public void earthquakeStarted()
 	{
 		if (isTimerActive()) {
@@ -1405,7 +1416,7 @@ public class MainWindow extends JFrame
 		fundsLbl.setText(formatFunds(getEngine().budget.totalFunds));
 	}
 
-	//implements Micropolis.Listener
+	@Override
 	public void cityMessage(MicropolisMessage m, CityLocation p)
 	{
 		messagesPane.appendCityMessage(m);
@@ -1415,13 +1426,13 @@ public class MainWindow extends JFrame
 		}
 	}
 
-	//implements Micropolis.Listener
+	@Override
 	public void fundsChanged()
 	{
 		reloadFunds();
 	}
 
-	//implements Micropolis.Listener
+	@Override
 	public void optionsChanged()
 	{
 		reloadOptions();
@@ -1441,14 +1452,14 @@ public class MainWindow extends JFrame
 		}
 	}
 
-	//implements Micropolis.Listener
+	@Override
 	public void citySound(Sound sound, CityLocation loc)
 	{
 		if (!doSounds)
 			return;
 
-		URL afile = sound.getAudioFile();
-		if (afile == null)
+		URL audioFile = sound.getAudioFile();
+		if (audioFile == null)
 			return;
 
 		boolean isOnScreen = drawingAreaScroll.getViewport().getViewRect().contains(
@@ -1459,22 +1470,24 @@ public class MainWindow extends JFrame
 
 		try {
 			Clip clip = AudioSystem.getClip();
-			clip.open(AudioSystem.getAudioInputStream(afile));
+			clip.open(AudioSystem.getAudioInputStream(audioFile));
 			clip.start();
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
 	}
 
-	//implements Micropolis.Listener
+	@Override
 	public void censusChanged()
 	{
 	}
 
+	@Override
 	public void demandChanged()
 	{
 	}
 
+	@Override
 	public void evaluationChanged()
 	{
 	}

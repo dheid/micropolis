@@ -12,8 +12,6 @@ import micropolisj.engine.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
@@ -240,32 +238,38 @@ public class EvaluationPane extends JPanel
 		return me;
 	}
 
-	//implements Micropolis.Listener
+	@Override
 	public void cityMessage(MicropolisMessage message, CityLocation loc)
 	{
 	}
 
+	@Override
 	public void citySound(Sound sound, CityLocation loc)
 	{
 	}
 
+	@Override
 	public void censusChanged()
 	{
 	}
 
+	@Override
 	public void demandChanged()
 	{
 	}
 
+	@Override
 	public void fundsChanged()
 	{
 	}
 
+	@Override
 	public void optionsChanged()
 	{
 	}
 
 	//implements Micropolis.Listener
+	@Override
 	public void evaluationChanged()
 	{
 		loadEvaluation();
