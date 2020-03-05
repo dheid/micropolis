@@ -12,7 +12,7 @@ import micropolisj.gui.MainWindow;
 
 import javax.swing.*;
 
-public class Main
+public class Micropolis
 {
 	static void createAndShowGUI()
 	{
