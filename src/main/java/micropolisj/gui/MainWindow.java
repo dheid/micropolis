@@ -9,7 +9,6 @@
 package micropolisj.gui;
 
 import micropolisj.engine.*;
-import micropolisj.util.TranslationTool;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -808,17 +807,6 @@ public class MainWindow extends JFrame
 		JMenu helpMenu = new JMenu(strings.getString("menu.help"));
 		setupKeys(helpMenu, "menu.help");
 		menuBar.add(helpMenu);
-
-		menuItem = new JMenuItem(strings.getString("menu.help.launch-translation-tool"));
-		setupKeys(menuItem, "menu.help.launch-translation-tool");
-		menuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				onLaunchTranslationToolClicked();
-			}
-		});
-		helpMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.help.about"));
 		setupKeys(menuItem, "menu.help.about");
@@ -1748,15 +1736,6 @@ public class MainWindow extends JFrame
 			mapLegendLbl.setIcon(new ImageIcon(iconUrl));
 		} else {
 			mapLegendLbl.setIcon(null);
-		}
-	}
-
-	private void onLaunchTranslationToolClicked()
-	{
-		if (maybeSaveCity()) {
-			dispose();
-			TranslationTool tt = new TranslationTool();
-			tt.setVisible(true);
 		}
 	}
 
