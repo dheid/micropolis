@@ -87,6 +87,7 @@ public class DemandIndicator extends JComponent
 	static final int IND_LEFT = 26;
 	static final int BAR_WIDTH = 6;
 
+	@Override
 	public void paintComponent(Graphics gr1)
 	{
 		Graphics2D gr = (Graphics2D) gr1;
@@ -139,34 +140,39 @@ public class DemandIndicator extends JComponent
 		}
 	}
 
-	//implements Micropolis.Listener
+	@Override
 	public void demandChanged()
 	{
 		repaint();
 	}
 
-	//implements Micropolis.Listener
-	public void cityMessage(MicropolisMessage m, CityLocation p)
+	@Override
+    public void cityMessage(MicropolisMessage m, CityLocation p)
 	{
 	}
 
-	public void citySound(Sound sound, CityLocation p)
+	@Override
+    public void citySound(Sound sound, CityLocation p)
 	{
 	}
 
-	public void censusChanged()
+	@Override
+    public void censusChanged()
 	{
 	}
 
-	public void evaluationChanged()
+	@Override
+    public void evaluationChanged()
 	{
 	}
 
-	public void fundsChanged()
+	@Override
+    public void fundsChanged()
 	{
 	}
 
-	public void optionsChanged()
+	@Override
+    public void optionsChanged()
 	{
 	}
 }

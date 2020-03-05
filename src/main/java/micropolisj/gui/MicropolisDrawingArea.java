@@ -51,16 +51,19 @@ public class MicropolisDrawingArea extends JComponent
 
 		addAncestorListener(new AncestorListener()
 		{
+			@Override
 			public void ancestorAdded(AncestorEvent evt)
 			{
 				startBlinkTimer();
 			}
 
+			@Override
 			public void ancestorRemoved(AncestorEvent evt)
 			{
 				stopBlinkTimer();
 			}
 
+			@Override
 			public void ancestorMoved(AncestorEvent evt)
 			{
 			}
@@ -179,6 +182,7 @@ public class MicropolisDrawingArea extends JComponent
 		}
 	}
 
+	@Override
 	public void paintComponent(Graphics gr)
 	{
 		final int width = m.getWidth();
@@ -329,13 +333,13 @@ public class MicropolisDrawingArea extends JComponent
 		}
 	}
 
-	//implements Scrollable
+	@Override
 	public Dimension getPreferredScrollableViewportSize()
 	{
 		return PREFERRED_VIEWPORT_SIZE;
 	}
 
-	//implements Scrollable
+	@Override
 	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction)
 	{
 		if (orientation == SwingConstants.VERTICAL)
@@ -344,19 +348,19 @@ public class MicropolisDrawingArea extends JComponent
 			return visibleRect.width;
 	}
 
-	//implements Scrollable
+	@Override
 	public boolean getScrollableTracksViewportWidth()
 	{
 		return false;
 	}
 
-	//implements Scrollable
+	@Override
 	public boolean getScrollableTracksViewportHeight()
 	{
 		return false;
 	}
 
-	//implements Scrollable
+	@Override
 	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction)
 	{
 		if (orientation == SwingConstants.VERTICAL)
@@ -381,25 +385,25 @@ public class MicropolisDrawingArea extends JComponent
 				TILE_WIDTH, TILE_HEIGHT);
 	}
 
-	//implements MapListener
+	@Override
 	public void mapOverlayDataChanged()
 	{
 	}
 
-	//implements MapListener
+	@Override
 	public void spriteMoved(Sprite sprite)
 	{
 		repaint(getSpriteBounds(sprite, sprite.lastX, sprite.lastY));
 		repaint(getSpriteBounds(sprite, sprite.x, sprite.y));
 	}
 
-	//implements MapListener
+	@Override
 	public void tileChanged(int xpos, int ypos)
 	{
 		repaint(getTileBounds(xpos, ypos));
 	}
 
-	//implements MapListener
+	@Override
 	public void wholeMapChanged()
 	{
 		repaint();

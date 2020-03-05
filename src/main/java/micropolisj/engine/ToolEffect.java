@@ -30,7 +30,7 @@ class ToolEffect implements ToolEffectIfc
 		this.originY = ypos;
 	}
 
-	//implements ToolEffectIfc
+	@Override
 	public int getTile(int dx, int dy)
 	{
 		int c = preview.getTile(dx, dy);
@@ -47,26 +47,26 @@ class ToolEffect implements ToolEffectIfc
 		}
 	}
 
-	//implements ToolEffectIfc
-	public void makeSound(int dx, int dy, Sound sound)
+	@Override
+    public void makeSound(int dx, int dy, Sound sound)
 	{
 		preview.makeSound(dx, dy, sound);
 	}
 
-	//implements ToolEffectIfc
-	public void setTile(int dx, int dy, int tileValue)
+	@Override
+    public void setTile(int dx, int dy, int tileValue)
 	{
 		preview.setTile(dx, dy, tileValue);
 	}
 
-	//implements ToolEffectIfc
-	public void spend(int amount)
+	@Override
+    public void spend(int amount)
 	{
 		preview.spend(amount);
 	}
 
-	//implements ToolEffectIfc
-	public void toolResult(ToolResult tr)
+	@Override
+    public void toolResult(ToolResult tr)
 	{
 		preview.toolResult(tr);
 	}

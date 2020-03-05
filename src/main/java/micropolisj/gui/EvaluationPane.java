@@ -268,7 +268,6 @@ public class EvaluationPane extends JPanel
 	{
 	}
 
-	//implements Micropolis.Listener
 	@Override
 	public void evaluationChanged()
 	{
