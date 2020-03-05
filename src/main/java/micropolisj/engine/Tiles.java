@@ -37,8 +37,6 @@ public class Tiles
 	static void readTiles()
 			throws IOException
 	{
-		ArrayList<TileSpec> tilesList = new ArrayList<>();
-
 		Properties tilesRc = new Properties();
 		tilesRc.load(
 				new InputStreamReader(
@@ -82,11 +80,6 @@ public class Tiles
 				}
 			}
 		}
-	}
-
-	public static TileSpec load(String tileName)
-	{
-		return tilesByName.get(tileName);
 	}
 
 	/**

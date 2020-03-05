@@ -258,7 +258,7 @@ public class MainWindow extends JFrame
 			public void mouseExited(MouseEvent ev)
 			{
 				try {
-					onToolExited(ev);
+					onToolExited();
 				} catch (Throwable e) {
 					showErrorMessage(e);
 				}
@@ -286,7 +286,7 @@ public class MainWindow extends JFrame
 
 			public void windowClosed(WindowEvent ev)
 			{
-				onWindowClosed(ev);
+				onWindowClosed();
 			}
 		});
 
@@ -1077,7 +1077,7 @@ public class MainWindow extends JFrame
 
 		if (autoBudgetPending) {
 			autoBudgetPending = false;
-			showBudgetWindow(true);
+			showBudgetWindow();
 		}
 	}
 
@@ -1140,7 +1140,7 @@ public class MainWindow extends JFrame
 		drawingArea.setToolCursor(new CityRect(x, y, w, h), currentTool);
 	}
 
-	private void onToolExited(MouseEvent ev)
+	private void onToolExited()
 	{
 		drawingArea.setToolCursor(null);
 	}
@@ -1349,7 +1349,7 @@ public class MainWindow extends JFrame
 		return simTimer != null || shakeTimer != null;
 	}
 
-	private void onWindowClosed(WindowEvent ev)
+	private void onWindowClosed()
 	{
 		if (isTimerActive()) {
 			stopTimer();
@@ -1482,7 +1482,7 @@ public class MainWindow extends JFrame
 	void onViewBudgetClicked()
 	{
 		dirty1 = true;
-		showBudgetWindow(false);
+		showBudgetWindow();
 	}
 
 	void onViewEvaluationClicked()
@@ -1498,13 +1498,13 @@ public class MainWindow extends JFrame
 	private void showAutoBudget()
 	{
 		if (toolStroke == null) {
-			showBudgetWindow(true);
+			showBudgetWindow();
 		} else {
 			autoBudgetPending = true;
 		}
 	}
 
-	private void showBudgetWindow(boolean isEndOfYear)
+	private void showBudgetWindow()
 	{
 		boolean timerEnabled = isTimerActive();
 		if (timerEnabled) {

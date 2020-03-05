@@ -26,16 +26,10 @@ public class TrainSprite extends Sprite
 	static final int TRA_GROOVE_X = 8;
 	static final int TRA_GROOVE_Y = 8;
 
-	static final int FRAME_NORTHSOUTH = 1;
-	static final int FRAME_EASTWEST = 2;
 	static final int FRAME_NW_SE = 3;
 	static final int FRAME_SW_NE = 4;
 	static final int FRAME_UNDERWATER = 5;
 
-	static final int DIR_NORTH = 0;
-	static final int DIR_EAST = 1;
-	static final int DIR_SOUTH = 2;
-	static final int DIR_WEST = 3;
 	static final int DIR_NONE = 4; //not moving
 
 	public TrainSprite(Micropolis engine, int xpos, int ypos)

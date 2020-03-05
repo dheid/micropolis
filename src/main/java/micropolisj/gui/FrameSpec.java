@@ -2,8 +2,7 @@ package micropolisj.gui;
 
 public class FrameSpec
 {
-    FrameSpec background;
-    SourceImage image;
+	SourceImage image;
     int offsetX;
     int offsetY;
 }

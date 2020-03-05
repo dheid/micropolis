@@ -80,7 +80,7 @@ public class MicropolisDrawingArea extends JComponent
 			public void mouseReleased(MouseEvent e)
 			{
 				if (e.getButton() == MouseEvent.BUTTON2)
-					endDrag(e.getX(), e.getY());
+					endDrag();
 			}
 
 			@Override
@@ -382,7 +382,7 @@ public class MicropolisDrawingArea extends JComponent
 	}
 
 	//implements MapListener
-	public void mapOverlayDataChanged(MapState overlayDataType)
+	public void mapOverlayDataChanged()
 	{
 	}
 
@@ -412,7 +412,7 @@ public class MicropolisDrawingArea extends JComponent
 		dragY = y;
 	}
 
-	protected void endDrag(int x, int y)
+	protected void endDrag()
 	{
 		dragging = false;
 	}

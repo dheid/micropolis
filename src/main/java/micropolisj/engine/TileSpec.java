@@ -68,7 +68,7 @@ public class TileSpec
 		return buildingInfo;
 	}
 
-	private void resolveBuildingInfo(Map<String, TileSpec> tileMap)
+	private void resolveBuildingInfo()
 	{
 		String tmp = getAttribute("building");
 		if (tmp == null) {
@@ -289,11 +289,6 @@ public class TileSpec
 		return "{tile:" + name + "}";
 	}
 
-	boolean isNumberedTile()
-	{
-		return name.matches("^\\d+$");
-	}
-
 	void resolveReferences(Map<String, TileSpec> tileMap)
 	{
 		String tmp = this.getAttribute("becomes");
@@ -313,7 +308,7 @@ public class TileSpec
 			this.handleBuildingPart(tmp, tileMap);
 		}
 
-		resolveBuildingInfo(tileMap);
+		resolveBuildingInfo();
 	}
 
 	private void handleBuildingPart(String text, Map<String, TileSpec> tileMap)

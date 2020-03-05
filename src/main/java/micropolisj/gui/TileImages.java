@@ -43,7 +43,7 @@ public class TileImages
 		this.tileWidth = size;
 		this.tileHeight = size;
 
-		this.images = loadTileImages(size);
+		this.images = loadTileImages();
 		loadSpriteImages();
 	}
 
@@ -63,7 +63,7 @@ public class TileImages
 		return images[tile];
 	}
 
-	private BufferedImage[] loadTileImages(int srcSize)
+	private BufferedImage[] loadTileImages()
 	{
 
 		InputStream recipeFile = TileImages.class.getResourceAsStream("/graphics/tiles.rc");
@@ -119,7 +119,6 @@ public class TileImages
 		for (String layerStr : spec.getImages()) {
 
 			FrameSpec rv = new FrameSpec();
-			rv.background = result;
 			result = rv;
 
 			String[] parts = layerStr.split("@", 2);

@@ -10,7 +10,6 @@ package micropolisj.engine;
 
 public class CityBudget
 {
-	private final Micropolis city;
 
 	/**
 	 * The amount of cash on hand.
@@ -38,8 +37,7 @@ public class CityBudget
 	 */
 	int policeFundEscrow;
 
-	CityBudget(Micropolis city)
+	CityBudget()
 	{
-		this.city = city;
 	}
 }

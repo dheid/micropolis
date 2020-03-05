@@ -26,7 +26,6 @@ public class MapGenerator
 	 */
 	static enum CreateIsland
 	{
-		NEVER,
 		ALWAYS,
 		SELDOM;   // seldom == 10% of the time
 	}

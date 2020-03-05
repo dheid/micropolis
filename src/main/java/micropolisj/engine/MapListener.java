@@ -17,7 +17,7 @@ public interface MapListener
 	/**
 	 * Called whenever data for a specific overlay has changed.
 	 */
-	void mapOverlayDataChanged(MapState overlayDataType);
+	void mapOverlayDataChanged();
 
 	/**
 	 * Called when a sprite moves.

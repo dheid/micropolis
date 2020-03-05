@@ -54,7 +54,6 @@ public class TileConstants
 	static final char RUBBLE = 44;
 	static final char LASTRUBBLE = 47;
 	static final char FLOOD = 48;
-	static final char LASTFLOOD = 51;
 	static final char RADTILE = 52;
 	static final char FIRE = 56;
 	static final char ROADBASE = 64;
@@ -150,7 +149,6 @@ public class TileConstants
 	static final char VBRDG1 = 949;
 	static final char VBRDG2 = 950;
 	static final char VBRDG3 = 951;
-	public static final char LAST_TILE = 956;
 
 	static final char[] RoadTable = new char[]{
 			ROADS, ROADS2, ROADS, ROADS3,
@@ -593,14 +591,6 @@ public class TileConstants
 		return false;
 	}
 
-	public static boolean isHospitalOrChurch(int tile)
-	{
-		assert (tile & LOMASK) == tile;
-
-		return tile >= HOSPITAL &&
-				tile < COMBASE;
-	}
-
 	/**
 	 * Checks whether the tile is defined with the "industrial-zone" attribute.
 	 * Note: the old version of this function erroneously included the coal power
@@ -625,19 +615,6 @@ public class TileConstants
 		assert (tile & LOMASK) == tile;
 
 		return tile >= RESBASE && tile <= RESBASE + 8;
-	}
-
-	/**
-	 * Note: does not include hospital/church.
-	 *
-	 * @see #isHospitalOrChurch
-	 */
-	public static boolean isResidentialZone(int tile)
-	{
-		assert (tile & LOMASK) == tile;
-
-		return tile >= RESBASE &&
-				tile < HOSPITAL;
 	}
 
 	// includes hospital/church.

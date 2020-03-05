@@ -75,11 +75,6 @@ public enum MicropolisTool
 		}
 	}
 
-	public ToolResult apply(Micropolis engine, int xpos, int ypos)
-	{
-		return beginStroke(engine, xpos, ypos).apply();
-	}
-
 	/**
 	 * This is the cost displayed in the GUI when the tool is selected.
 	 * It does not necessarily reflect the cost charged when a tool is

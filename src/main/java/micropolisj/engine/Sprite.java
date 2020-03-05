@@ -102,7 +102,6 @@ public abstract class Sprite
 
 		dispX = Math.abs(dispX);
 		dispY = Math.abs(dispY);
-		int absDist = dispX + dispY;
 
 		if (dispX * 2 < dispY) z++;
 		else if (dispY * 2 < dispX) z--;
@@ -136,20 +135,16 @@ public abstract class Sprite
 
 		switch (kind) {
 			case AIR:
-				city.crashLocation = new CityLocation(xpos, ypos);
 				city.sendMessageAt(MicropolisMessage.PLANECRASH_REPORT, xpos, ypos);
 				break;
 			case SHI:
-				city.crashLocation = new CityLocation(xpos, ypos);
 				city.sendMessageAt(MicropolisMessage.SHIPWRECK_REPORT, xpos, ypos);
 				break;
 			case TRA:
 			case BUS:
-				city.crashLocation = new CityLocation(xpos, ypos);
 				city.sendMessageAt(MicropolisMessage.TRAIN_CRASH_REPORT, xpos, ypos);
 				break;
 			case COP:
-				city.crashLocation = new CityLocation(xpos, ypos);
 				city.sendMessageAt(MicropolisMessage.COPTER_CRASH_REPORT, xpos, ypos);
 				break;
 		}

@@ -165,14 +165,6 @@ public class ToolStroke
 		return true;
 	}
 
-	//compatible function
-	void fixBorder(int left, int top, int right, int bottom)
-	{
-		ToolEffect eff = new ToolEffect(city, left, top);
-		fixBorder(eff, right + 1 - left, bottom + 1 - top);
-		eff.apply();
-	}
-
 	void fixBorder(ToolEffectIfc eff, int width, int height)
 	{
 		for (int x = 0; x < width; x++) {
@@ -219,13 +211,6 @@ public class ToolStroke
 		eff.setTile(0, 0, tile);
 
 		return true;
-	}
-
-	protected void fixZone(int xpos, int ypos)
-	{
-		ToolEffect eff = new ToolEffect(city, xpos, ypos);
-		fixZone(eff);
-		eff.apply();
 	}
 
 	protected void fixZone(ToolEffectIfc eff)

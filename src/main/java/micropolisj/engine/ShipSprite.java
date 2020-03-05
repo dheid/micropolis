@@ -32,7 +32,6 @@ public class ShipSprite extends Sprite
 	public static final int NORTH_EDGE = 5;
 	public static final int EAST_EDGE = 7;
 	public static final int SOUTH_EDGE = 1;
-	public static final int WEST_EDGE = 3;
 
 	public ShipSprite(Micropolis engine, int xpos, int ypos, int edge)
 	{

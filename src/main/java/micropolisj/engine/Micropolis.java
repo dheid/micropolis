@@ -96,7 +96,7 @@ public class Micropolis
 	static final int DEFAULT_WIDTH = 120;
 	static final int DEFAULT_HEIGHT = 100;
 
-	public final CityBudget budget = new CityBudget(this);
+	public final CityBudget budget = new CityBudget();
 	public boolean autoBulldoze = true;
 	public boolean autoBudget = false;
 	public Speed simSpeed = Speed.NORMAL;
@@ -138,16 +138,10 @@ public class Micropolis
 	int lastFireStationCount;
 	int lastPoliceCount;
 
-	int trafficMaxLocationX;
-	int trafficMaxLocationY;
 	int pollutionMaxLocationX;
 	int pollutionMaxLocationY;
-	int crimeMaxLocationX;
-	int crimeMaxLocationY;
 	public int centerMassX;
 	public int centerMassY;
-	CityLocation meltdownLocation;  //may be null
-	CityLocation crashLocation;     //may be null
 
 	int needHospital; // -1 too many already, 0 just right, 1 not enough
 	int needChurch;   // -1 too many already, 0 just right, 1 not enough
@@ -182,11 +176,7 @@ public class Micropolis
 
 	int cashFlow; //net change in totalFunds in previous year
 
-	boolean newPower;
-
 	int floodCnt; //number of turns the flood will last
-	int floodX;
-	int floodY;
 
 	public int cityTime;  //counts "weeks" (actually, 1/48'ths years)
 	int scycle; //same as cityTime, except mod 1024
@@ -197,7 +187,6 @@ public class Micropolis
 
 	ArrayList<Sprite> sprites = new ArrayList<>();
 
-	static final int VALVERATE = 2;
 	public static final int CENSUSRATE = 4;
 	static final int TAXFREQ = 48;
 
@@ -302,10 +291,10 @@ public class Micropolis
 		}
 	}
 
-	void fireMapOverlayDataChanged(MapState overlayDataType)
+	void fireMapOverlayDataChanged()
 	{
 		for (MapListener l : mapListeners) {
-			l.mapOverlayDataChanged(overlayDataType);
+			l.mapOverlayDataChanged();
 		}
 	}
 
@@ -617,19 +606,18 @@ public class Micropolis
 					decROGMem();
 				}
 				decTrafficMem();
-				fireMapOverlayDataChanged(MapState.TRAFFIC_OVERLAY); //TDMAP
-				fireMapOverlayDataChanged(MapState.TRANSPORT);       //RDMAP
-				fireMapOverlayDataChanged(MapState.ALL);             //ALMAP
-				fireMapOverlayDataChanged(MapState.RESIDENTIAL);     //REMAP
-				fireMapOverlayDataChanged(MapState.COMMERCIAL);      //COMAP
-				fireMapOverlayDataChanged(MapState.INDUSTRIAL);      //INMAP
+				fireMapOverlayDataChanged(); //TDMAP
+				fireMapOverlayDataChanged();       //RDMAP
+				fireMapOverlayDataChanged();             //ALMAP
+				fireMapOverlayDataChanged();     //REMAP
+				fireMapOverlayDataChanged();      //COMAP
+				fireMapOverlayDataChanged();      //INMAP
 				doMessages();
 				break;
 
 			case 11:
 				powerScan();
-				fireMapOverlayDataChanged(MapState.POWER_OVERLAY);
-				newPower = true;
+				fireMapOverlayDataChanged();
 				break;
 
 			case 12:
@@ -748,8 +736,8 @@ public class Micropolis
 			centerMassY = (height + 1) / 2;
 		}
 
-		fireMapOverlayDataChanged(MapState.POPDEN_OVERLAY);     //PDMAP
-		fireMapOverlayDataChanged(MapState.GROWTHRATE_OVERLAY); //RGMAP
+		fireMapOverlayDataChanged();     //PDMAP
+		fireMapOverlayDataChanged(); //RGMAP
 	}
 
 	private void distIntMarket()
@@ -840,8 +828,6 @@ public class Micropolis
 					sum += z;
 					if (z > cmax || (z == cmax && PRNG.nextInt(4) == 0)) {
 						cmax = z;
-						crimeMaxLocationX = hx * 2;
-						crimeMaxLocationY = hy * 2;
 					}
 				} else {
 					crimeMem[hy][hx] = 0;
@@ -854,7 +840,7 @@ public class Micropolis
 		else
 			crimeAverage = 0;
 
-		fireMapOverlayDataChanged(MapState.POLICE_OVERLAY);
+		fireMapOverlayDataChanged();
 	}
 
 	void doDisasters()
@@ -934,7 +920,7 @@ public class Micropolis
 			}
 		}
 
-		fireMapOverlayDataChanged(MapState.FIRE_OVERLAY);
+		fireMapOverlayDataChanged();
 	}
 
 	private boolean testForCond(CityLocation loc, int dir)
@@ -1058,8 +1044,6 @@ public class Micropolis
 
 		if (z > 240 && PRNG.nextInt(6) == 0) {
 			z = 240;
-			trafficMaxLocationX = mapX;
-			trafficMaxLocationY = mapY;
 
 			HelicopterSprite copter = (HelicopterSprite) getSprite(SpriteKind.COP);
 			if (copter != null) {
@@ -1200,8 +1184,8 @@ public class Micropolis
 
 		terrainMem = smoothTerrain(qtem);
 
-		fireMapOverlayDataChanged(MapState.POLLUTE_OVERLAY);   //PLMAP
-		fireMapOverlayDataChanged(MapState.LANDVALUE_OVERLAY); //LVMAP
+		fireMapOverlayDataChanged();   //PLMAP
+		fireMapOverlayDataChanged(); //LVMAP
 	}
 
 	public CityLocation getLocationOfMaxPollution()
@@ -1222,9 +1206,6 @@ public class Micropolis
 		public int[] money = new int[240];
 		public int[] pollution = new int[240];
 		public int[] crime = new int[240];
-		int resMax;
-		int comMax;
-		int indMax;
 	}
 
 	public History history = new History();
@@ -1571,12 +1552,6 @@ public class Micropolis
 			history.money[i + 1] = history.money[i];
 		}
 
-		history.resMax = resMax;
-		history.comMax = comMax;
-		history.indMax = indMax;
-
-		//graph10max = Math.max(resMax, Math.max(comMax, indMax));
-
 		history.res[0] = resPop / 8;
 		history.com[0] = comPop;
 		history.ind[0] = indPop;
@@ -1734,7 +1709,6 @@ public class Micropolis
 		b.firePercent = Math.max(0.0, firePercent);
 		b.policePercent = Math.max(0.0, policePercent);
 
-		b.previousBalance = budget.totalFunds;
 		b.taxIncome = (int) Math.round(lastTotalPop * landValueAverage / 120 * b.taxRate * FLevels[gameLevel]);
 		assert b.taxIncome >= 0;
 
@@ -1782,9 +1756,6 @@ public class Micropolis
 			b.policePercent = 0.0;
 		}
 
-		b.operatingExpenses = b.roadFunded + b.fireFunded + b.policeFunded;
-		b.newBalance = b.previousBalance + b.taxIncome - b.operatingExpenses;
-
 		return b;
 	}
 
@@ -1795,7 +1766,6 @@ public class Micropolis
 
 	void doMeltdown(int xpos, int ypos)
 	{
-		meltdownLocation = new CityLocation(xpos, ypos);
 
 		makeExplosion(xpos - 1, ypos - 1);
 		makeExplosion(xpos - 1, ypos + 2);
@@ -2040,7 +2010,6 @@ public class Micropolis
 		}
 
 		powerScan();
-		newPower = true;
 	}
 
 	public void load(InputStream inStream)
@@ -2191,7 +2160,6 @@ public class Micropolis
 
 		if (isArsonable(t)) {
 			setTile(x, y, (char) (FIRE + PRNG.nextInt(8)));
-			crashLocation = new CityLocation(x, y);
 			sendMessageAt(MicropolisMessage.FIRE_REPORT, x, y);
 		}
 	}
@@ -2312,8 +2280,6 @@ public class Micropolis
 							setTile(xx, yy, FLOOD);
 							floodCnt = 30;
 							sendMessageAt(MicropolisMessage.FLOOD_REPORT, xx, yy);
-							floodX = xx;
-							floodY = yy;
 							return;
 						}
 					}
@@ -2339,8 +2305,6 @@ public class Micropolis
 		assert dim != null;
 		assert dim.width >= 3;
 		assert dim.height >= 3;
-
-		int zoneBase = (zoneTile & LOMASK) - 1 - dim.width;
 
 		// this will take care of stopping smoke animations
 		shutdownZone(xpos, ypos, dim);

@@ -59,11 +59,6 @@ public class OverlayMapView extends JComponent
 
 	}
 
-	public Micropolis getEngine()
-	{
-		return engine;
-	}
-
 	public void setEngine(Micropolis newEngine)
 	{
 		assert newEngine != null;
@@ -107,7 +102,6 @@ public class OverlayMapView extends JComponent
 
 	static final int TILE_WIDTH = 3;
 	static final int TILE_HEIGHT = 3;
-	static final int TILE_OFFSET_Y = 3;
 
 	static final Color VAL_LOW = new Color(0xbfbfbf);
 	static final Color VAL_MEDIUM = new Color(0xffff00);
@@ -477,7 +471,7 @@ public class OverlayMapView extends JComponent
 	}
 
 	//implements MapListener
-	public void mapOverlayDataChanged(MapState overlayDataType)
+	public void mapOverlayDataChanged()
 	{
 		repaint();
 	}

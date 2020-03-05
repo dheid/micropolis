@@ -17,9 +17,6 @@ public class BudgetNumbers
 {
 	public int taxRate;
 	public int taxIncome;
-	public int operatingExpenses;
-	public int previousBalance;
-	public int newBalance;
 
 	public int roadRequest;
 	public int roadFunded;
