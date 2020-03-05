@@ -29,10 +29,10 @@ public class NewCityDialog extends JDialog
 {
 	Micropolis engine;
 	JButton previousMapBtn;
-	Stack<Micropolis> previousMaps = new Stack<Micropolis>();
-	Stack<Micropolis> nextMaps = new Stack<Micropolis>();
+	Stack<Micropolis> previousMaps = new Stack<>();
+	Stack<Micropolis> nextMaps = new Stack<>();
 	OverlayMapView mapPane;
-	HashMap<Integer, JRadioButton> levelBtns = new HashMap<Integer, JRadioButton>();
+	HashMap<Integer, JRadioButton> levelBtns = new HashMap<>();
 
 	static final ResourceBundle strings = MainWindow.strings;
 

@@ -23,7 +23,7 @@ class TrafficGen
 	ZoneType sourceZone;
 
 	int lastdir;
-	Stack<CityLocation> positions = new Stack<CityLocation>();
+	Stack<CityLocation> positions = new Stack<>();
 
 	static final int MAX_TRAFFIC_DISTANCE = 30;
 

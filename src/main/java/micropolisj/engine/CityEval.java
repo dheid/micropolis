@@ -74,12 +74,12 @@ public class CityEval
 	/**
 	 * Number of votes given for the various problems identified by problemOrder[].
 	 */
-	public EnumMap<CityProblem, Integer> problemVotes = new EnumMap<CityProblem, Integer>(CityProblem.class);
+	public EnumMap<CityProblem, Integer> problemVotes = new EnumMap<>(CityProblem.class);
 
 	/**
 	 * Score for various problems.
 	 */
-	public EnumMap<CityProblem, Integer> problemTable = new EnumMap<CityProblem, Integer>(CityProblem.class);
+	public EnumMap<CityProblem, Integer> problemTable = new EnumMap<>(CityProblem.class);
 
 	/**
 	 * Perform an evaluation.
@@ -187,7 +187,7 @@ public class CityEval
 			}
 		}
 
-		EnumMap<CityProblem, Integer> rv = new EnumMap<CityProblem, Integer>(CityProblem.class);
+		EnumMap<CityProblem, Integer> rv = new EnumMap<>(CityProblem.class);
 		for (int i = 0; i < pp.length; i++) {
 			rv.put(pp[i], votes[i]);
 		}

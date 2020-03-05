@@ -29,7 +29,7 @@ public class OverlayMapView extends JComponent
 {
 	TileImages tileImages;
 	Micropolis engine;
-	ArrayList<ConnectedView> views = new ArrayList<ConnectedView>();
+	ArrayList<ConnectedView> views = new ArrayList<>();
 	MapState mapState = MapState.ALL;
 
 	public OverlayMapView(Micropolis _engine)

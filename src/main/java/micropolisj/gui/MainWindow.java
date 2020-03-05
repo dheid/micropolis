@@ -46,7 +46,7 @@ public class MainWindow extends JFrame
 	JLabel currentToolLbl;
 	JLabel currentToolCostLbl;
 	Map<MicropolisTool, JToggleButton> toolBtns;
-	EnumMap<MapState, JMenuItem> mapStateMenuItems = new EnumMap<MapState, JMenuItem>(MapState.class);
+	EnumMap<MapState, JMenuItem> mapStateMenuItems = new EnumMap<>(MapState.class);
 	MicropolisTool currentTool;
 	File currentFile;
 	boolean doSounds = true;
@@ -499,7 +499,7 @@ public class MainWindow extends JFrame
 		setupKeys(levelMenu, "menu.difficulty");
 		optionsMenu.add(levelMenu);
 
-		difficultyMenuItems = new HashMap<Integer, JMenuItem>();
+		difficultyMenuItems = new HashMap<>();
 		for (int i = GameLevel.MIN_LEVEL; i <= GameLevel.MAX_LEVEL; i++) {
 			final int level = i;
 			menuItem = new JRadioButtonMenuItem(strings.getString("menu.difficulty." + level));
@@ -590,7 +590,7 @@ public class MainWindow extends JFrame
 		setupKeys(priorityMenu, "menu.speed");
 		menuBar.add(priorityMenu);
 
-		priorityMenuItems = new EnumMap<Speed, JMenuItem>(Speed.class);
+		priorityMenuItems = new EnumMap<>(Speed.class);
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.SUPER_FAST"));
 		setupKeys(menuItem, "menu.speed.SUPER_FAST");
 		menuItem.addActionListener(wrapActionListener(
@@ -833,7 +833,7 @@ public class MainWindow extends JFrame
 
 	private JToolBar makeToolbar()
 	{
-		toolBtns = new EnumMap<MicropolisTool, JToggleButton>(MicropolisTool.class);
+		toolBtns = new EnumMap<>(MicropolisTool.class);
 
 		JToolBar toolBar = new JToolBar(strings.getString("main.tools_caption"), JToolBar.VERTICAL);
 		toolBar.setFloatable(false);

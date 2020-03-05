@@ -26,7 +26,7 @@ public class MicropolisDrawingArea extends JComponent
 {
 	Micropolis m;
 	boolean blinkUnpoweredZones = true;
-	HashSet<Point> unpoweredZones = new HashSet<Point>();
+	HashSet<Point> unpoweredZones = new HashSet<>();
 	boolean blink;
 	Timer blinkTimer;
 	ToolCursor toolCursor;

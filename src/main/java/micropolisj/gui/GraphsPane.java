@@ -47,7 +47,7 @@ public class GraphsPane extends JPanel
 		POLLUTION;
 	}
 
-	EnumMap<GraphData, JToggleButton> dataBtns = new EnumMap<GraphData, JToggleButton>(GraphData.class);
+	EnumMap<GraphData, JToggleButton> dataBtns = new EnumMap<>(GraphData.class);
 
 	static ResourceBundle strings = MainWindow.strings;
 	static final int LEFT_MARGIN = 4;
@@ -291,7 +291,7 @@ public class GraphsPane extends JPanel
 			}
 
 			int H = isOneTwenty ? 239 : 119;
-			final HashMap<GraphData, Path2D.Double> paths = new HashMap<GraphData, Path2D.Double>();
+			final HashMap<GraphData, Path2D.Double> paths = new HashMap<>();
 			double scale = Math.max(256.0, getHistoryMax());
 			for (GraphData gd : GraphData.values()) {
 				if (dataBtns.get(gd).isSelected()) {

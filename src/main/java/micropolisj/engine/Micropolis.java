@@ -195,7 +195,7 @@ public class Micropolis
 
 	public CityEval evaluation;
 
-	ArrayList<Sprite> sprites = new ArrayList<Sprite>();
+	ArrayList<Sprite> sprites = new ArrayList<>();
 
 	static final int VALVERATE = 2;
 	public static final int CENSUSRATE = 4;
@@ -337,9 +337,9 @@ public class Micropolis
 		}
 	}
 
-	ArrayList<Listener> listeners = new ArrayList<Listener>();
-	ArrayList<MapListener> mapListeners = new ArrayList<MapListener>();
-	ArrayList<EarthquakeListener> earthquakeListeners = new ArrayList<EarthquakeListener>();
+	ArrayList<Listener> listeners = new ArrayList<>();
+	ArrayList<MapListener> mapListeners = new ArrayList<>();
+	ArrayList<EarthquakeListener> earthquakeListeners = new ArrayList<>();
 
 	public void addListener(Listener l)
 	{
@@ -1398,7 +1398,7 @@ public class Micropolis
 	void initTileBehaviors()
 	{
 		HashMap<String, TileBehavior> bb;
-		bb = new HashMap<String, TileBehavior>();
+		bb = new HashMap<>();
 
 		bb.put("FIRE", new TerrainBehavior(this, TerrainBehavior.B.FIRE));
 		bb.put("FLOOD", new TerrainBehavior(this, TerrainBehavior.B.FLOOD));
@@ -1526,7 +1526,7 @@ public class Micropolis
 		}
 	}
 
-	Stack<CityLocation> powerPlants = new Stack<CityLocation>();
+	Stack<CityLocation> powerPlants = new Stack<>();
 
 	// counts the population in a certain type of residential zone
 	int doFreePop(int xpos, int ypos)
@@ -1689,7 +1689,7 @@ public class Micropolis
 		public int operatingExpenses;
 	}
 
-	public ArrayList<FinancialHistory> financialHistory = new ArrayList<FinancialHistory>();
+	public ArrayList<FinancialHistory> financialHistory = new ArrayList<>();
 
 	void collectTax()
 	{
@@ -2220,7 +2220,7 @@ public class Micropolis
 	 */
 	public boolean makeMeltdown()
 	{
-		ArrayList<CityLocation> candidates = new ArrayList<CityLocation>();
+		ArrayList<CityLocation> candidates = new ArrayList<>();
 		for (int y = 0; y < map.length; y++) {
 			for (int x = 0; x < map[y].length; x++) {
 				if (getTile(x, y) == NUCLEAR) {

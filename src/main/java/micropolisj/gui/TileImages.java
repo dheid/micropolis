@@ -47,7 +47,7 @@ public class TileImages
 		loadSpriteImages();
 	}
 
-	static Map<Integer, TileImages> savedInstances = new HashMap<Integer, TileImages>();
+	static Map<Integer, TileImages> savedInstances = new HashMap<>();
 
 	public static TileImages getInstance(int size)
 	{
@@ -155,9 +155,9 @@ public class TileImages
 
 	private void loadSpriteImages()
 	{
-		spriteImages = new EnumMap<SpriteKind, Map<Integer, Image>>(SpriteKind.class);
+		spriteImages = new EnumMap<>(SpriteKind.class);
 		for (SpriteKind kind : SpriteKind.values()) {
-			HashMap<Integer, Image> imgs = new HashMap<Integer, Image>();
+			HashMap<Integer, Image> imgs = new HashMap<>();
 			for (int i = 0; i < kind.numFrames; i++) {
 				Image img = loadSpriteImage(kind, i);
 				if (img != null) {
