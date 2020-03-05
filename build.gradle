@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+	id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 
 repositories {
@@ -8,4 +9,11 @@ repositories {
 
 application {
     mainClassName = 'micropolisj.Micropolis'
+}
+
+githubRelease {
+	token getProperty('github.token')
+	owner 'dheid'
+	body changelog()
+	releaseAssets project.fileTree('build/distributions')
 }

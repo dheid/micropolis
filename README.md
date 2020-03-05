@@ -23,17 +23,19 @@ installation instruction here: https://openjdk.java.net/install/
 
 # Running
 
-The release archive comes with wrapper scripts, that start the game.
+The release archive comes with start scripts that ease the process of running the game.
 
 ## Linux and Mac
 
-x.x.x is the version number
+Download the Tar archive of the [latest version of Micropolis](https://github.com/dheid/micropolis/releases/latest). x.x.x is the version number
 
 (1) Extract the tar archive: `tar xf /path/to/micropolis-x.x.x.tar`
     
-(2) Run `./micropolis-x.x.x/bin/micropolis`
+(2) Run `./micropolis-x.x.x/bin/micropolis` to start the game
 
 ## Windows
+
+Download the ZIP archive of the [latest version of Micropolis](https://github.com/dheid/micropolis/releases/latest).
 
 (1) Extract the ZIP archive by double-clicking on the file
 
@@ -94,3 +96,21 @@ Save files have the following format:
 | 0x0B40 | Miscellaneous values                                |
 | 0x0C30 | Map data (by columns, west to east)                 |
 
+# Releasing
+
+To create a release, make sure that your GitHub API token with corresponding repository
+permissions exists in '~/.gradle/gradle.properties':
+
+    github.token=abcdef...
+    
+Update the version property in the `gradle.properties` of this repository.    
+    
+Ensure that you included all the changes into the `master` branch.
+
+    ./gradlew 
+
+Then execute
+
+    ./gradlew clean build githubRelease
+    
+to create a GitHub release from the current master.
