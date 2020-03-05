@@ -9,15 +9,34 @@
 package micropolisj.gui;
 
 import micropolisj.engine.BudgetNumbers;
+import micropolisj.engine.FinancialHistory;
 import micropolisj.engine.Micropolis;
 import micropolisj.engine.Speed;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
@@ -26,77 +45,25 @@ import static micropolisj.gui.MainWindow.formatGameDate;
 
 public class BudgetDialog extends JDialog
 {
-	Micropolis engine;
-
-	JSpinner taxRateEntry;
-	int origTaxRate;
-	double origRoadPct;
-	double origFirePct;
-	double origPolicePct;
-
-	JLabel roadFundRequest = new JLabel();
-	JLabel roadFundAlloc = new JLabel();
-	JSlider roadFundEntry;
-
-	JLabel policeFundRequest = new JLabel();
-	JLabel policeFundAlloc = new JLabel();
-	JSlider policeFundEntry;
-
-	JLabel fireFundRequest = new JLabel();
-	JLabel fireFundAlloc = new JLabel();
-	JSlider fireFundEntry;
-
-	JLabel taxRevenueLbl = new JLabel();
-
-	static ResourceBundle strings = MainWindow.strings;
-
-	JCheckBox autoBudgetBtn = new JCheckBox(strings.getString("budgetdlg.auto_budget"));
-	JCheckBox pauseBtn = new JCheckBox(strings.getString("budgetdlg.pause_game"));
-
-	private void applyChange()
-	{
-		int newTaxRate = ((Number) taxRateEntry.getValue()).intValue();
-		int newRoadPct = ((Number) roadFundEntry.getValue()).intValue();
-		int newPolicePct = ((Number) policeFundEntry.getValue()).intValue();
-		int newFirePct = ((Number) fireFundEntry.getValue()).intValue();
-
-		engine.cityTax = newTaxRate;
-		engine.roadPercent = (double) newRoadPct / 100.0;
-		engine.policePercent = (double) newPolicePct / 100.0;
-		engine.firePercent = (double) newFirePct / 100.0;
-
-		loadBudgetNumbers(false);
-	}
-
-	private void loadBudgetNumbers(boolean updateEntries)
-	{
-		BudgetNumbers b = engine.generateBudget();
-		if (updateEntries) {
-			taxRateEntry.setValue(b.taxRate);
-			roadFundEntry.setValue((int) Math.round(b.roadPercent * 100.0));
-			policeFundEntry.setValue((int) Math.round(b.policePercent * 100.0));
-			fireFundEntry.setValue((int) Math.round(b.firePercent * 100.0));
-		}
-
-		taxRevenueLbl.setText(formatFunds(b.taxIncome));
-
-		roadFundRequest.setText(formatFunds(b.roadRequest));
-		roadFundAlloc.setText(formatFunds(b.roadFunded));
-
-		policeFundRequest.setText(formatFunds(b.policeRequest));
-		policeFundAlloc.setText(formatFunds(b.policeFunded));
-
-		fireFundRequest.setText(formatFunds(b.fireRequest));
-		fireFundAlloc.setText(formatFunds(b.fireFunded));
-	}
-
-	static void adjustSliderSize(JSlider slider)
-	{
-		Dimension sz = slider.getPreferredSize();
-		slider.setPreferredSize(
-				new Dimension(80, sz.height)
-		);
-	}
+	private static final ResourceBundle strings = MainWindow.strings;
+	private final Micropolis engine;
+	private final JSpinner taxRateEntry;
+	private final int origTaxRate;
+	private final double origRoadPct;
+	private final double origFirePct;
+	private final double origPolicePct;
+	private final JLabel roadFundRequest = new JLabel();
+	private final JLabel roadFundAlloc = new JLabel();
+	private final JSlider roadFundEntry;
+	private final JLabel policeFundRequest = new JLabel();
+	private final JLabel policeFundAlloc = new JLabel();
+	private final JSlider policeFundEntry;
+	private final JLabel fireFundRequest = new JLabel();
+	private final JLabel fireFundAlloc = new JLabel();
+	private final JSlider fireFundEntry;
+	private final JLabel taxRevenueLbl = new JLabel();
+	private final JCheckBox autoBudgetBtn = new JCheckBox(strings.getString("budgetdlg.auto_budget"));
+	private final JCheckBox pauseBtn = new JCheckBox(strings.getString("budgetdlg.pause_game"));
 
 	public BudgetDialog(Window owner, Micropolis engine)
 	{
@@ -104,20 +71,20 @@ public class BudgetDialog extends JDialog
 		setTitle(strings.getString("budgetdlg.title"));
 
 		this.engine = engine;
-		this.origTaxRate = engine.cityTax;
-		this.origRoadPct = engine.roadPercent;
-		this.origFirePct = engine.firePercent;
-		this.origPolicePct = engine.policePercent;
+		origTaxRate = engine.getCityTax();
+		origRoadPct = engine.getRoadPercent();
+		origFirePct = engine.getFirePercent();
+		origPolicePct = engine.getPolicePercent();
 
 		// give text fields of the fund-level spinners a minimum size
 		taxRateEntry = new JSpinner(new SpinnerNumberModel(7, 0, 20, 1));
 
 		// widgets to set funding levels
-		roadFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+		roadFundEntry = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 100);
 		adjustSliderSize(roadFundEntry);
-		fireFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+		fireFundEntry = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 100);
 		adjustSliderSize(fireFundEntry);
-		policeFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+		policeFundEntry = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 100);
 		adjustSliderSize(policeFundEntry);
 
 		ChangeListener change = ev -> applyChange();
@@ -126,7 +93,7 @@ public class BudgetDialog extends JDialog
 		fireFundEntry.addChangeListener(change);
 		policeFundEntry.addChangeListener(change);
 
-		Box mainBox = new Box(BoxLayout.Y_AXIS);
+		Box mainBox = new Box(BoxLayout.PAGE_AXIS);
 		mainBox.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 		add(mainBox, BorderLayout.CENTER);
 
@@ -148,7 +115,7 @@ public class BudgetDialog extends JDialog
 		mainBox.add(makeOptionsPane());
 
 		JPanel buttonPane = new JPanel();
-		add(buttonPane, BorderLayout.SOUTH);
+		add(buttonPane, BorderLayout.PAGE_END);
 
 		JButton continueBtn = new JButton(strings.getString("budgetdlg.continue"));
 		continueBtn.addActionListener(ev -> onContinueClicked());
@@ -159,7 +126,7 @@ public class BudgetDialog extends JDialog
 		buttonPane.add(resetBtn);
 
 		loadBudgetNumbers(true);
-		setAutoRequestFocus_compat(false);
+		setAutoRequestFocus_compat();
 		pack();
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(owner);
@@ -168,11 +135,56 @@ public class BudgetDialog extends JDialog
 				JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
-	private void setAutoRequestFocus_compat(boolean v)
+	private static void adjustSliderSize(JSlider slider)
+	{
+		Dimension sz = slider.getPreferredSize();
+		slider.setPreferredSize(
+				new Dimension(80, sz.height)
+		);
+	}
+
+	private void applyChange()
+	{
+		int newTaxRate = ((Number) taxRateEntry.getValue()).intValue();
+		int newRoadPct = ((Number) roadFundEntry.getValue()).intValue();
+		int newPolicePct = ((Number) policeFundEntry.getValue()).intValue();
+		int newFirePct = ((Number) fireFundEntry.getValue()).intValue();
+
+		engine.setCityTax(newTaxRate);
+		engine.setRoadPercent(newRoadPct / 100.0);
+		engine.setPolicePercent(newPolicePct / 100.0);
+		engine.setFirePercent(newFirePct / 100.0);
+
+		loadBudgetNumbers(false);
+	}
+
+	private void loadBudgetNumbers(boolean updateEntries)
+	{
+		BudgetNumbers b = engine.generateBudget();
+		if (updateEntries) {
+			taxRateEntry.setValue(b.getTaxRate());
+			roadFundEntry.setValue((int) Math.round(b.getRoadPercent() * 100.0));
+			policeFundEntry.setValue((int) Math.round(b.getPolicePercent() * 100.0));
+			fireFundEntry.setValue((int) Math.round(b.getFirePercent() * 100.0));
+		}
+
+		taxRevenueLbl.setText(formatFunds(b.getTaxIncome()));
+
+		roadFundRequest.setText(formatFunds(b.getRoadRequest()));
+		roadFundAlloc.setText(formatFunds(b.getRoadFunded()));
+
+		policeFundRequest.setText(formatFunds(b.getPoliceRequest()));
+		policeFundAlloc.setText(formatFunds(b.getPoliceFunded()));
+
+		fireFundRequest.setText(formatFunds(b.getFireRequest()));
+		fireFundAlloc.setText(formatFunds(b.getFireFunded()));
+	}
+
+	private void setAutoRequestFocus_compat()
 	{
 		try {
-			if (super.getClass().getMethod("setAutoRequestFocus", boolean.class) != null) {
-				super.setAutoRequestFocus(v);
+			if (getClass().getMethod("setAutoRequestFocus", boolean.class) != null) {
+				setAutoRequestFocus(false);
 			}
 		} catch (NoSuchMethodException e) {
 			// ok to ignore
@@ -187,19 +199,19 @@ public class BudgetDialog extends JDialog
 		GridBagConstraints c0 = new GridBagConstraints();
 		c0.gridx = 0;
 		c0.weightx = 0.25;
-		c0.anchor = GridBagConstraints.WEST;
+		c0.anchor = GridBagConstraints.LINE_START;
 		GridBagConstraints c1 = new GridBagConstraints();
 		c1.gridx = 1;
 		c1.weightx = 0.25;
-		c1.anchor = GridBagConstraints.EAST;
+		c1.anchor = GridBagConstraints.LINE_END;
 		GridBagConstraints c2 = new GridBagConstraints();
 		c2.gridx = 2;
 		c2.weightx = 0.5;
-		c2.anchor = GridBagConstraints.EAST;
+		c2.anchor = GridBagConstraints.LINE_END;
 		GridBagConstraints c3 = new GridBagConstraints();
 		c3.gridx = 3;
 		c3.weightx = 0.5;
-		c3.anchor = GridBagConstraints.EAST;
+		c3.anchor = GridBagConstraints.LINE_END;
 
 		c1.gridy = c2.gridy = c3.gridy = 0;
 		fundingRatesPane.add(new JLabel(strings.getString("budgetdlg.funding_level_hdr")), c1);
@@ -237,14 +249,14 @@ public class BudgetDialog extends JDialog
 
 		c0.gridx = 0;
 		c1.gridx = 1;
-		c0.anchor = c1.anchor = GridBagConstraints.WEST;
+		c0.anchor = c1.anchor = GridBagConstraints.LINE_START;
 		c0.gridy = c1.gridy = 0;
 		c0.weightx = c1.weightx = 0.5;
 		optionsPane.add(autoBudgetBtn, c0);
 		optionsPane.add(pauseBtn, c1);
 
-		autoBudgetBtn.setSelected(engine.autoBudget);
-		pauseBtn.setSelected(engine.simSpeed == Speed.PAUSED);
+		autoBudgetBtn.setSelected(engine.isAutoBudget());
+		pauseBtn.setSelected(engine.getSimSpeed() == Speed.PAUSED);
 
 		return optionsPane;
 	}
@@ -259,13 +271,13 @@ public class BudgetDialog extends JDialog
 		GridBagConstraints c2 = new GridBagConstraints();
 
 		c0.gridx = 0;
-		c0.anchor = GridBagConstraints.WEST;
+		c0.anchor = GridBagConstraints.LINE_START;
 		c0.weightx = 0.25;
 		c1.gridx = 1;
-		c1.anchor = GridBagConstraints.EAST;
+		c1.anchor = GridBagConstraints.LINE_END;
 		c1.weightx = 0.25;
 		c2.gridx = 2;
-		c2.anchor = GridBagConstraints.EAST;
+		c2.anchor = GridBagConstraints.LINE_END;
 		c2.weightx = 0.5;
 
 		c0.gridy = c1.gridy = c2.gridy = 0;
@@ -282,12 +294,12 @@ public class BudgetDialog extends JDialog
 
 	private void onContinueClicked()
 	{
-		if (autoBudgetBtn.isSelected() != engine.autoBudget) {
+		if (autoBudgetBtn.isSelected() != engine.isAutoBudget()) {
 			engine.toggleAutoBudget();
 		}
-		if (pauseBtn.isSelected() && engine.simSpeed != Speed.PAUSED) {
+		if (pauseBtn.isSelected() && engine.getSimSpeed() != Speed.PAUSED) {
 			engine.setSpeed(Speed.PAUSED);
-		} else if (!pauseBtn.isSelected() && engine.simSpeed == Speed.PAUSED) {
+		} else if (!pauseBtn.isSelected() && engine.getSimSpeed() == Speed.PAUSED) {
 			engine.setSpeed(Speed.NORMAL);
 		}
 
@@ -296,10 +308,10 @@ public class BudgetDialog extends JDialog
 
 	private void onResetClicked()
 	{
-		engine.cityTax = this.origTaxRate;
-		engine.roadPercent = this.origRoadPct;
-		engine.firePercent = this.origFirePct;
-		engine.policePercent = this.origPolicePct;
+		engine.setCityTax(origTaxRate);
+		engine.setRoadPercent(origRoadPct);
+		engine.setFirePercent(origFirePct);
+		engine.setPolicePercent(origPolicePct);
 		loadBudgetNumbers(true);
 	}
 
@@ -311,7 +323,7 @@ public class BudgetDialog extends JDialog
 		GridBagConstraints c0 = new GridBagConstraints();
 		GridBagConstraints c1 = new GridBagConstraints();
 
-		c0.anchor = GridBagConstraints.WEST;
+		c0.anchor = GridBagConstraints.LINE_START;
 		c0.weightx = 0.5;
 		c0.gridx = 0;
 		c0.gridy = 0;
@@ -334,37 +346,37 @@ public class BudgetDialog extends JDialog
 		c0.gridy++;
 		balancePane.add(new JLabel(strings.getString("budgetdlg.cash_end")), c0);
 
-		c1.anchor = GridBagConstraints.EAST;
+		c1.anchor = GridBagConstraints.LINE_END;
 		c1.weightx = 0.25;
 		c1.gridx = 0;
 
 		for (int i = 0; i < 2; i++) {
 
-			if (i + 1 >= engine.financialHistory.size()) {
+			if (i + 1 >= engine.getFinancialHistory().size()) {
 				break;
 			}
 
-			Micropolis.FinancialHistory f = engine.financialHistory.get(i);
-			Micropolis.FinancialHistory fPrior = engine.financialHistory.get(i + 1);
-			int cashFlow = f.totalFunds - fPrior.totalFunds;
-			int capExpenses = -(cashFlow - f.taxIncome + f.operatingExpenses);
+			FinancialHistory f = engine.getFinancialHistory().get(i);
+			FinancialHistory fPrior = engine.getFinancialHistory().get(i + 1);
+			int cashFlow = f.getTotalFunds() - fPrior.getTotalFunds();
+			int capExpenses = -(cashFlow - f.getTaxIncome() + f.getOperatingExpenses());
 
 			c1.gridx++;
 			c1.gridy = 0;
 
-			thLbl = new JLabel(formatGameDate(f.cityTime - 1));
+			thLbl = new JLabel(formatGameDate(f.getCityTime() - 1));
 			thLbl.setFont(headFont);
 			thLbl.setForeground(Color.MAGENTA);
 			balancePane.add(thLbl, c1);
 
 			c1.gridy++;
 			JLabel previousBalanceLbl = new JLabel();
-			previousBalanceLbl.setText(formatFunds(fPrior.totalFunds));
+			previousBalanceLbl.setText(formatFunds(fPrior.getTotalFunds()));
 			balancePane.add(previousBalanceLbl, c1);
 
 			c1.gridy++;
 			JLabel taxIncomeLbl = new JLabel();
-			taxIncomeLbl.setText(formatFunds(f.taxIncome));
+			taxIncomeLbl.setText(formatFunds(f.getTaxIncome()));
 			balancePane.add(taxIncomeLbl, c1);
 
 			c1.gridy++;
@@ -374,12 +386,12 @@ public class BudgetDialog extends JDialog
 
 			c1.gridy++;
 			JLabel opExpensesLbl = new JLabel();
-			opExpensesLbl.setText(formatFunds(f.operatingExpenses));
+			opExpensesLbl.setText(formatFunds(f.getOperatingExpenses()));
 			balancePane.add(opExpensesLbl, c1);
 
 			c1.gridy++;
 			JLabel newBalanceLbl = new JLabel();
-			newBalanceLbl.setText(formatFunds(f.totalFunds));
+			newBalanceLbl.setText(formatFunds(f.getTotalFunds()));
 			balancePane.add(newBalanceLbl, c1);
 		}
 

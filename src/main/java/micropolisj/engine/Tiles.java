@@ -11,7 +11,7 @@ package micropolisj.engine;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -19,11 +19,11 @@ import java.util.Properties;
 /**
  * Provides global methods for loading tile specifications.
  */
-public class Tiles
+class Tiles
 {
-	static final Charset UTF8 = Charset.forName("UTF-8");
-	static TileSpec[] tiles;
-	static Map<String, TileSpec> tilesByName = new HashMap<>();
+	static final Map<String, TileSpec> tilesByName = new HashMap<>();
+	private static final Charset UTF8 = StandardCharsets.UTF_8;
+	private static TileSpec[] tiles;
 
 	static {
 		try {
@@ -33,7 +33,7 @@ public class Tiles
 		}
 	}
 
-	static void readTiles()
+	private static void readTiles()
 			throws IOException
 	{
 		Properties tilesRc = new Properties();
@@ -59,22 +59,22 @@ public class Tiles
 			tiles[i] = ts;
 		}
 
-		for (int i = 0; i < tiles.length; i++) {
-			tiles[i].resolveReferences(tilesByName);
+		for (TileSpec tile : tiles) {
+			tile.resolveReferences();
 
-			TileSpec.BuildingInfo bi = tiles[i].getBuildingInfo();
+			BuildingInfo bi = tile.getBuildingInfo();
 			if (bi != null) {
-				for (int j = 0; j < bi.members.length; j++) {
-					int tid = bi.members[j];
-					int offx = (bi.width >= 3 ? -1 : 0) + j % bi.width;
-					int offy = (bi.height >= 3 ? -1 : 0) + j / bi.width;
+				for (int j = 0; j < bi.getMembers().length; j++) {
+					int tid = bi.getMembers()[j];
+					int offx = (bi.getWidth() >= 3 ? -1 : 0) + j % bi.getWidth();
+					int offy = (bi.getHeight() >= 3 ? -1 : 0) + j / bi.getWidth();
 
-					if (tiles[tid].owner == null &&
+					if (tiles[tid].getOwner() == null &&
 							(offx != 0 || offy != 0)
 					) {
-						tiles[tid].owner = tiles[i];
-						tiles[tid].ownerOffsetX = offx;
-						tiles[tid].ownerOffsetY = offy;
+						tiles[tid].setOwner(tile);
+						tiles[tid].setOwnerOffsetX(offx);
+						tiles[tid].setOwnerOffsetY(offy);
 					}
 				}
 			}
@@ -89,11 +89,7 @@ public class Tiles
 	 */
 	public static TileSpec get(int tileNumber)
 	{
-		if (tileNumber >= 0 && tileNumber < tiles.length) {
-			return tiles[tileNumber];
-		} else {
-			return null;
-		}
+		return tileNumber >= 0 && tileNumber < tiles.length ? tiles[tileNumber] : null;
 	}
 
 }

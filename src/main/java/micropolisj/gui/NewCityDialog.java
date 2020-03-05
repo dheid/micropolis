@@ -12,14 +12,24 @@ import micropolisj.engine.GameLevel;
 import micropolisj.engine.MapGenerator;
 import micropolisj.engine.Micropolis;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Stack;
 
@@ -27,14 +37,13 @@ import static micropolisj.gui.MainWindow.EXTENSION;
 
 public class NewCityDialog extends JDialog
 {
-	Micropolis engine;
-	JButton previousMapBtn;
-	Stack<Micropolis> previousMaps = new Stack<>();
-	Stack<Micropolis> nextMaps = new Stack<>();
-	OverlayMapView mapPane;
-	HashMap<Integer, JRadioButton> levelBtns = new HashMap<>();
-
-	static final ResourceBundle strings = MainWindow.strings;
+	private static final ResourceBundle strings = MainWindow.strings;
+	private final JButton previousMapBtn;
+	private final Stack<Micropolis> previousMaps = new Stack<>();
+	private final Stack<Micropolis> nextMaps = new Stack<>();
+	private final OverlayMapView mapPane;
+	private final Map<Integer, JRadioButton> levelBtns = new HashMap<>();
+	private Micropolis engine;
 
 	public NewCityDialog(MainWindow owner, boolean showCancelOption)
 	{
@@ -53,19 +62,19 @@ public class NewCityDialog extends JDialog
 
 		mapPane = new OverlayMapView(engine);
 		mapPane.setBorder(BorderFactory.createLoweredBevelBorder());
-		p1.add(mapPane, BorderLayout.WEST);
+		p1.add(mapPane, BorderLayout.LINE_START);
 
 		JPanel p2 = new JPanel(new BorderLayout());
 		p1.add(p2, BorderLayout.CENTER);
 
-		Box levelBox = new Box(BoxLayout.Y_AXIS);
+		Box levelBox = new Box(BoxLayout.PAGE_AXIS);
 		levelBox.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 		p2.add(levelBox, BorderLayout.CENTER);
 
 		levelBox.add(Box.createVerticalGlue());
 		JRadioButton radioBtn;
 		for (int lev = GameLevel.MIN_LEVEL; lev <= GameLevel.MAX_LEVEL; lev++) {
-			final int x = lev;
+			int x = lev;
 			radioBtn = new JRadioButton(strings.getString("menu.difficulty." + lev));
 			radioBtn.addActionListener(evt -> setGameLevel(x));
 			levelBox.add(radioBtn);
@@ -75,7 +84,7 @@ public class NewCityDialog extends JDialog
 		setGameLevel(GameLevel.MIN_LEVEL);
 
 		JPanel buttonPane = new JPanel();
-		getContentPane().add(buttonPane, BorderLayout.SOUTH);
+		getContentPane().add(buttonPane, BorderLayout.PAGE_END);
 
 		JButton btn;
 		btn = new JButton(strings.getString("welcome.previous_map"));
@@ -100,12 +109,11 @@ public class NewCityDialog extends JDialog
 		if (showCancelOption) {
 			btn = new JButton(strings.getString("welcome.cancel"));
 			btn.addActionListener(evt -> onCancelClicked());
-			buttonPane.add(btn);
 		} else {
 			btn = new JButton(strings.getString("welcome.quit"));
 			btn.addActionListener(evt -> onQuitClicked());
-			buttonPane.add(btn);
 		}
+		buttonPane.add(btn);
 
 		pack();
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -113,6 +121,11 @@ public class NewCityDialog extends JDialog
 		getRootPane().registerKeyboardAction(evt -> dispose(),
 				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
 				JComponent.WHEN_IN_FOCUSED_WINDOW);
+	}
+
+	private static void onQuitClicked()
+	{
+		System.exit(0);
 	}
 
 	private void onPreviousMapClicked()
@@ -163,11 +176,11 @@ public class NewCityDialog extends JDialog
 		}
 	}
 
-	void startPlaying(Micropolis newEngine, File file)
+	private void startPlaying(Micropolis newEngine, File file)
 	{
 		MainWindow win = (MainWindow) getOwner();
 		win.setEngine(newEngine);
-		win.currentFile = file;
+		win.setCurrentFile(file);
 		win.makeClean();
 		dispose();
 	}
@@ -175,7 +188,7 @@ public class NewCityDialog extends JDialog
 	private void onPlayClicked()
 	{
 		engine.setGameLevel(getSelectedGameLevel());
-		engine.setFunds(GameLevel.getStartingFunds(engine.gameLevel));
+		engine.setFunds(GameLevel.getStartingFunds(engine.getGameLevel()));
 		startPlaying(engine, null);
 	}
 
@@ -184,16 +197,11 @@ public class NewCityDialog extends JDialog
 		dispose();
 	}
 
-	private void onQuitClicked()
-	{
-		System.exit(0);
-	}
-
 	private int getSelectedGameLevel()
 	{
-		for (int lev : levelBtns.keySet()) {
-			if (levelBtns.get(lev).isSelected()) {
-				return lev;
+		for (Map.Entry<Integer, JRadioButton> entry : levelBtns.entrySet()) {
+			if (entry.getValue().isSelected()) {
+				return entry.getKey();
 			}
 		}
 		return GameLevel.MIN_LEVEL;
@@ -201,8 +209,8 @@ public class NewCityDialog extends JDialog
 
 	private void setGameLevel(int level)
 	{
-		for (int lev : levelBtns.keySet()) {
-			levelBtns.get(lev).setSelected(lev == level);
+		for (Map.Entry<Integer, JRadioButton> entry : levelBtns.entrySet()) {
+			entry.getValue().setSelected(entry.getKey() == level);
 		}
 	}
 }

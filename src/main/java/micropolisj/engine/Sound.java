@@ -32,9 +32,9 @@ public enum Sound
 	HEAVYTRAFFIC("heavytraffic"),
 	MONSTER("zombie-roar-5");
 
-	String wavName;
+	private final String wavName;
 
-	private Sound(String wavName)
+	Sound(String wavName)
 	{
 		this.wavName = wavName;
 	}
@@ -42,7 +42,6 @@ public enum Sound
 	public URL getAudioFile()
 	{
 		String n2 = "/sounds/" + wavName + ".wav";
-		URL u = Sound.class.getResource(n2);
-		return u;
+		return Sound.class.getResource(n2);
 	}
 }

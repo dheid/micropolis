@@ -13,6 +13,11 @@ public class GameLevel
 	public static final int MIN_LEVEL = 0;
 	public static final int MAX_LEVEL = 2;
 
+	//prevent this class from being instantiated
+	private GameLevel()
+	{
+	}
+
 	public static boolean isValid(int lev)
 	{
 		return lev >= MIN_LEVEL && lev <= MAX_LEVEL;
@@ -28,12 +33,7 @@ public class GameLevel
 			case 2:
 				return 5000;
 			default:
-				throw new Error("unexpected game level: " + lev);
+				throw new RuntimeException("unexpected game level: " + lev);
 		}
-	}
-
-	//prevent this class from being instantiated
-	private GameLevel()
-	{
 	}
 }

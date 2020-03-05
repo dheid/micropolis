@@ -13,19 +13,9 @@ package micropolisj.engine;
  */
 public class CityLocation
 {
-	/**
-	 * The X coordinate of this location.
-	 * Increasing X coordinates correspond to East,
-	 * and decreasing X coordinates correspond to West.
-	 */
-	public int x;
+	private int x;
 
-	/**
-	 * The Y coordinate of this location.
-	 * Increasing Y coordinates correspond to South,
-	 * and decreasing Y coordinates correspond to North.
-	 */
-	public int y;
+	private int y;
 
 	/**
 	 * Constructs and initializes city coordinates.
@@ -47,7 +37,7 @@ public class CityLocation
 	{
 		if (obj instanceof CityLocation) {
 			CityLocation rhs = (CityLocation) obj;
-			return this.x == rhs.x && this.y == rhs.y;
+			return x == rhs.x && y == rhs.y;
 		} else {
 			return false;
 		}
@@ -57,5 +47,35 @@ public class CityLocation
 	public String toString()
 	{
 		return "(" + x + "," + y + ")";
+	}
+
+	/**
+	 * The X coordinate of this location.
+	 * Increasing X coordinates correspond to East,
+	 * and decreasing X coordinates correspond to West.
+	 */
+	public int getX()
+	{
+		return x;
+	}
+
+	public void setX(int x)
+	{
+		this.x = x;
+	}
+
+	/**
+	 * The Y coordinate of this location.
+	 * Increasing Y coordinates correspond to South,
+	 * and decreasing Y coordinates correspond to North.
+	 */
+	public int getY()
+	{
+		return y;
+	}
+
+	public void setY(int y)
+	{
+		this.y = y;
 	}
 }

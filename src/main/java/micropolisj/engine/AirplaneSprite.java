@@ -16,66 +16,64 @@ package micropolisj.engine;
  */
 public class AirplaneSprite extends Sprite
 {
-	int destX;
-	int destY;
-
 	// Note: frames 1-8 used for regular movement
 	//    9-11 used for Taking off
-	static int[] CDx = {0, 0, 6, 8, 6, 0, -6, -8, -6, 8, 8, 8};
-	static int[] CDy = {0, -8, -6, 0, 6, 8, 6, 0, -6, 0, 0, 0};
+	private static final int[] CDx = {0, 0, 6, 8, 6, 0, -6, -8, -6, 8, 8, 8};
+	private static final int[] CDy = {0, -8, -6, 0, 6, 8, 6, 0, -6, 0, 0, 0};
+	private int destX;
+	private int destY;
 
 	public AirplaneSprite(Micropolis engine, int xpos, int ypos)
 	{
 		super(engine, SpriteKind.AIR);
-		this.x = xpos * 16 + 8;
-		this.y = ypos * 16 + 8;
-		this.width = 48;
-		this.height = 48;
-		this.offx = -24;
-		this.offy = -24;
+		setX(xpos * 16 + 8);
+		setY(ypos * 16 + 8);
+		setWidth(48);
+		setHeight(48);
+		setOffx(-24);
+		setOffy(-24);
 
-		this.destY = this.y;
+		destY = getY();
 		if (xpos > engine.getWidth() - 20) {
 			// not enough room to east of airport for taking off
-			this.destX = x - 200;
-			this.frame = 7;
+			destX = getX() - 200;
+			setFrame(7);
 		} else {
-			this.destX = x + 200;
-			this.frame = 11;
+			destX = getX() + 200;
+			setFrame(11);
 		}
 	}
 
 	@Override
 	public void moveImpl()
 	{
-		int z = this.frame;
+		int z = getFrame();
 
-		if (city.acycle % 5 == 0) {
+		if (getCity().getAcycle() % 5 == 0) {
 			if (z > 8) { //plane is still taking off
 				z--;
 				if (z < 9) {
 					z = 3;
 				}
-				this.frame = z;
 			} else { // go to destination
-				int d = getDir(x, y, destX, destY);
+				int d = getDir(getX(), getY(), destX, destY);
 				z = turnTo(z, d);
-				this.frame = z;
 			}
+			setFrame(z);
 		}
 
-		if (getDis(x, y, destX, destY) < 50) {        // at destination
+		if (getDis(getX(), getY(), destX, destY) < 50) {        // at destination
 			//FIXME- original code allows destination to be off-the-map
-			destX = city.PRNG.nextInt(city.getWidth()) * 16 + 8;
-			destY = city.PRNG.nextInt(city.getHeight()) * 16 + 8;
+			destX = getCity().getRandom().nextInt(getCity().getWidth()) * 16 + 8;
+			destY = getCity().getRandom().nextInt(getCity().getHeight()) * 16 + 8;
 		}
 
-		if (!city.noDisasters) {
+		if (!getCity().isNoDisasters()) {
 			boolean explode = false;
 
-			for (Sprite s : city.allSprites()) {
+			for (Sprite s : getCity().allSprites()) {
 				if (s != this &&
-						(s.kind == SpriteKind.AIR || s.kind == SpriteKind.COP) &&
+						(s.getKind() == SpriteKind.AIR || s.getKind() == SpriteKind.COP) &&
 						checkSpriteCollision(s)) {
 					s.explodeSprite();
 					explode = true;
@@ -86,7 +84,7 @@ public class AirplaneSprite extends Sprite
 			}
 		}
 
-		this.x += CDx[z];
-		this.y += CDy[z];
+		setX(getX() + CDx[z]);
+		setY(getY() + CDy[z]);
 	}
 }

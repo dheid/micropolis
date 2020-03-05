@@ -15,18 +15,135 @@ package micropolisj.engine;
  */
 public class BudgetNumbers
 {
-	public int taxRate;
-	public int taxIncome;
+	private int taxRate;
 
-	public int roadRequest;
-	public int roadFunded;
-	public double roadPercent;
+	private int taxIncome;
 
-	public int fireRequest;
-	public int fireFunded;
-	public double firePercent;
+	private int roadRequest;
 
-	public int policeRequest;
-	public int policeFunded;
-	public double policePercent;
+	private int roadFunded;
+
+	private double roadPercent;
+
+	private int fireRequest;
+
+	private int fireFunded;
+
+	private double firePercent;
+
+	private int policeRequest;
+
+	private int policeFunded;
+
+	private double policePercent;
+
+	public int getTaxRate()
+	{
+		return taxRate;
+	}
+
+	public void setTaxRate(int taxRate)
+	{
+		this.taxRate = taxRate;
+	}
+
+	public int getTaxIncome()
+	{
+		return taxIncome;
+	}
+
+	public void setTaxIncome(int taxIncome)
+	{
+		this.taxIncome = taxIncome;
+	}
+
+	public int getRoadRequest()
+	{
+		return roadRequest;
+	}
+
+	public void setRoadRequest(int roadRequest)
+	{
+		this.roadRequest = roadRequest;
+	}
+
+	public int getRoadFunded()
+	{
+		return roadFunded;
+	}
+
+	public void setRoadFunded(int roadFunded)
+	{
+		this.roadFunded = roadFunded;
+	}
+
+	public double getRoadPercent()
+	{
+		return roadPercent;
+	}
+
+	public void setRoadPercent(double roadPercent)
+	{
+		this.roadPercent = roadPercent;
+	}
+
+	public int getFireRequest()
+	{
+		return fireRequest;
+	}
+
+	public void setFireRequest(int fireRequest)
+	{
+		this.fireRequest = fireRequest;
+	}
+
+	public int getFireFunded()
+	{
+		return fireFunded;
+	}
+
+	public void setFireFunded(int fireFunded)
+	{
+		this.fireFunded = fireFunded;
+	}
+
+	public double getFirePercent()
+	{
+		return firePercent;
+	}
+
+	public void setFirePercent(double firePercent)
+	{
+		this.firePercent = firePercent;
+	}
+
+	public int getPoliceRequest()
+	{
+		return policeRequest;
+	}
+
+	public void setPoliceRequest(int policeRequest)
+	{
+		this.policeRequest = policeRequest;
+	}
+
+	public int getPoliceFunded()
+	{
+		return policeFunded;
+	}
+
+	public void setPoliceFunded(int policeFunded)
+	{
+		this.policeFunded = policeFunded;
+	}
+
+	public double getPolicePercent()
+	{
+		return policePercent;
+	}
+
+	public void setPolicePercent(double policePercent)
+	{
+		this.policePercent = policePercent;
+	}
 }

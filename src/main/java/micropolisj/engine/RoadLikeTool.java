@@ -8,7 +8,31 @@
 
 package micropolisj.engine;
 
-import static micropolisj.engine.TileConstants.*;
+import static micropolisj.engine.TileConstants.CHANNEL;
+import static micropolisj.engine.TileConstants.DIRT;
+import static micropolisj.engine.TileConstants.HBRIDGE;
+import static micropolisj.engine.TileConstants.HPOWER;
+import static micropolisj.engine.TileConstants.HRAIL;
+import static micropolisj.engine.TileConstants.HRAILROAD;
+import static micropolisj.engine.TileConstants.HROADPOWER;
+import static micropolisj.engine.TileConstants.INTERSECTION;
+import static micropolisj.engine.TileConstants.LHPOWER;
+import static micropolisj.engine.TileConstants.LHRAIL;
+import static micropolisj.engine.TileConstants.LVPOWER;
+import static micropolisj.engine.TileConstants.LVRAIL;
+import static micropolisj.engine.TileConstants.RAILHPOWERV;
+import static micropolisj.engine.TileConstants.RAILVPOWERH;
+import static micropolisj.engine.TileConstants.REDGE;
+import static micropolisj.engine.TileConstants.RIVER;
+import static micropolisj.engine.TileConstants.ROADS2;
+import static micropolisj.engine.TileConstants.VBRIDGE;
+import static micropolisj.engine.TileConstants.VPOWER;
+import static micropolisj.engine.TileConstants.VRAIL;
+import static micropolisj.engine.TileConstants.VRAILROAD;
+import static micropolisj.engine.TileConstants.VROADPOWER;
+import static micropolisj.engine.TileConstants.canAutoBulldozeRRW;
+import static micropolisj.engine.TileConstants.isConductive;
+import static micropolisj.engine.TileConstants.neutralizeRoad;
 
 class RoadLikeTool extends ToolStroke
 {
@@ -20,7 +44,7 @@ class RoadLikeTool extends ToolStroke
 	@Override
 	protected void applyArea(ToolEffectIfc eff)
 	{
-		for (; ; ) {
+		while (true) {
 			if (!applyForward(eff)) {
 				break;
 			}
@@ -30,28 +54,28 @@ class RoadLikeTool extends ToolStroke
 		}
 	}
 
-	boolean applyBackward(ToolEffectIfc eff)
+	private boolean applyBackward(ToolEffectIfc eff)
 	{
 		boolean anyChange = false;
 
 		CityRect b = getBounds();
-		for (int i = b.height - 1; i >= 0; i--) {
-			for (int j = b.width - 1; j >= 0; j--) {
-				TranslatedToolEffect tte = new TranslatedToolEffect(eff, b.x + j, b.y + i);
+		for (int i = b.getHeight() - 1; i >= 0; i--) {
+			for (int j = b.getWidth() - 1; j >= 0; j--) {
+				ToolEffectIfc tte = new TranslatedToolEffect(eff, b.getX() + j, b.getY() + i);
 				anyChange = anyChange || applySingle(tte);
 			}
 		}
 		return anyChange;
 	}
 
-	boolean applyForward(ToolEffectIfc eff)
+	private boolean applyForward(ToolEffectIfc eff)
 	{
 		boolean anyChange = false;
 
 		CityRect b = getBounds();
-		for (int i = 0; i < b.height; i++) {
-			for (int j = 0; j < b.width; j++) {
-				TranslatedToolEffect tte = new TranslatedToolEffect(eff, b.x + j, b.y + i);
+		for (int i = 0; i < b.getHeight(); i++) {
+			for (int j = 0; j < b.getWidth(); j++) {
+				ToolEffectIfc tte = new TranslatedToolEffect(eff, b.getX() + j, b.getY() + i);
 				anyChange = anyChange || applySingle(tte);
 			}
 		}
@@ -64,31 +88,29 @@ class RoadLikeTool extends ToolStroke
 		// constrain bounds to be a rectangle with
 		// either width or height equal to one.
 
-		assert tool.getWidth() == 1;
-		assert tool.getHeight() == 1;
-
-		if (Math.abs(xdest - xpos) >= Math.abs(ydest - ypos)) {
+		assert getTool().getSize() == 1;
+		if (Math.abs(getXdest() - getXpos()) >= Math.abs(getYdest() - getYpos())) {
 			// horizontal line
 			CityRect r = new CityRect();
-			r.x = Math.min(xpos, xdest);
-			r.width = Math.abs(xdest - xpos) + 1;
-			r.y = ypos;
-			r.height = 1;
+			r.setX(Math.min(getXpos(), getXdest()));
+			r.setWidth(Math.abs(getXdest() - getXpos()) + 1);
+			r.setY(getYpos());
+			r.setHeight(1);
 			return r;
 		} else {
 			// vertical line
 			CityRect r = new CityRect();
-			r.x = xpos;
-			r.width = 1;
-			r.y = Math.min(ypos, ydest);
-			r.height = Math.abs(ydest - ypos) + 1;
+			r.setX(getXpos());
+			r.setWidth(1);
+			r.setY(Math.min(getYpos(), getYdest()));
+			r.setHeight(Math.abs(getYdest() - getYpos()) + 1);
 			return r;
 		}
 	}
 
-	boolean applySingle(ToolEffectIfc eff)
+	private boolean applySingle(ToolEffectIfc eff)
 	{
-		switch (tool) {
+		switch (getTool()) {
 			case RAIL:
 				return applyRailTool(eff);
 
@@ -99,11 +121,11 @@ class RoadLikeTool extends ToolStroke
 				return applyWireTool(eff);
 
 			default:
-				throw new Error("Unexpected tool: " + tool);
+				throw new RuntimeException("Unexpected tool: " + getTool());
 		}
 	}
 
-	boolean applyRailTool(ToolEffectIfc eff)
+	private boolean applyRailTool(ToolEffectIfc eff)
 	{
 		if (layRail(eff)) {
 			fixZone(eff);
@@ -113,7 +135,7 @@ class RoadLikeTool extends ToolStroke
 		}
 	}
 
-	boolean applyRoadTool(ToolEffectIfc eff)
+	private boolean applyRoadTool(ToolEffectIfc eff)
 	{
 		if (layRoad(eff)) {
 			fixZone(eff);
@@ -123,7 +145,7 @@ class RoadLikeTool extends ToolStroke
 		}
 	}
 
-	boolean applyWireTool(ToolEffectIfc eff)
+	private boolean applyWireTool(ToolEffectIfc eff)
 	{
 		if (layWire(eff)) {
 			fixZone(eff);
@@ -135,10 +157,10 @@ class RoadLikeTool extends ToolStroke
 
 	private boolean layRail(ToolEffectIfc eff)
 	{
-		final int RAIL_COST = 20;
-		final int TUNNEL_COST = 100;
+		final int railCost = 20;
+		final int tunnelCost = 100;
 
-		int cost = RAIL_COST;
+		int cost = railCost;
 
 		char tile = (char) eff.getTile(0, 0);
 		tile = neutralizeRoad(tile);
@@ -148,7 +170,7 @@ class RoadLikeTool extends ToolStroke
 			case REDGE:
 			case CHANNEL:
 
-				cost = TUNNEL_COST;
+				cost = tunnelCost;
 
 				// check east
 			{
@@ -215,7 +237,7 @@ class RoadLikeTool extends ToolStroke
 
 			default:
 				if (tile != DIRT) {
-					if (city.autoBulldoze && canAutoBulldozeRRW(tile)) {
+					if (getCity().isAutoBulldoze() && canAutoBulldozeRRW(tile)) {
 						cost += 1; //autodoze cost
 					} else {
 						// cannot do rail here
@@ -234,10 +256,10 @@ class RoadLikeTool extends ToolStroke
 
 	private boolean layRoad(ToolEffectIfc eff)
 	{
-		final int ROAD_COST = 10;
-		final int BRIDGE_COST = 50;
+		final int roadCost = 10;
+		final int bridgeCost = 50;
 
-		int cost = ROAD_COST;
+		int cost = roadCost;
 
 		char tile = (char) eff.getTile(0, 0);
 		switch (tile) {
@@ -245,7 +267,7 @@ class RoadLikeTool extends ToolStroke
 			case REDGE:
 			case CHANNEL:    // check how to build bridges, if possible.
 
-				cost = BRIDGE_COST;
+				cost = bridgeCost;
 
 				// check east
 			{
@@ -312,7 +334,7 @@ class RoadLikeTool extends ToolStroke
 
 			default:
 				if (tile != DIRT) {
-					if (city.autoBulldoze && canAutoBulldozeRRW(tile)) {
+					if (getCity().isAutoBulldoze() && canAutoBulldozeRRW(tile)) {
 						cost += 1; //autodoze cost
 					} else {
 						// cannot do road here
@@ -332,10 +354,10 @@ class RoadLikeTool extends ToolStroke
 
 	private boolean layWire(ToolEffectIfc eff)
 	{
-		final int WIRE_COST = 5;
-		final int UNDERWATER_WIRE_COST = 25;
+		final int wireCost = 5;
+		final int underwaterWireCost = 25;
 
-		int cost = WIRE_COST;
+		int cost = wireCost;
 
 		char tile = (char) eff.getTile(0, 0);
 		tile = neutralizeRoad(tile);
@@ -345,7 +367,7 @@ class RoadLikeTool extends ToolStroke
 			case REDGE:
 			case CHANNEL:
 
-				cost = UNDERWATER_WIRE_COST;
+				cost = underwaterWireCost;
 
 				// check east
 			{
@@ -424,7 +446,7 @@ class RoadLikeTool extends ToolStroke
 
 			default:
 				if (tile != DIRT) {
-					if (city.autoBulldoze && canAutoBulldozeRRW(tile)) {
+					if (getCity().isAutoBulldoze() && canAutoBulldozeRRW(tile)) {
 						cost += 1; //autodoze cost
 					} else {
 						//cannot do wire here

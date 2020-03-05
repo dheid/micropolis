@@ -8,7 +8,12 @@
 
 package micropolisj.engine;
 
-import static micropolisj.engine.TileConstants.*;
+import static micropolisj.engine.TileConstants.BRWH;
+import static micropolisj.engine.TileConstants.BRWV;
+import static micropolisj.engine.TileConstants.CHANNEL;
+import static micropolisj.engine.TileConstants.POWERBASE;
+import static micropolisj.engine.TileConstants.RAILBASE;
+import static micropolisj.engine.TileConstants.RIVER;
 
 /**
  * Implements the cargo ship.
@@ -18,113 +23,32 @@ import static micropolisj.engine.TileConstants.*;
  */
 public class ShipSprite extends Sprite
 {
-	static int[] BDx = {0, 0, 1, 1, 1, 0, -1, -1, -1};
-	static int[] BDy = {0, -1, -1, 0, 1, 1, 1, 0, -1};
-	static int[] BPx = {0, 0, 2, 2, 2, 0, -2, -2, -2};
-	static int[] BPy = {0, -2, -2, 0, 2, 2, 2, 0, -2};
-	static int[] BtClrTab = {RIVER, CHANNEL, POWERBASE, POWERBASE + 1,
+	private static final int[] BDx = {0, 0, 1, 1, 1, 0, -1, -1, -1};
+	private static final int[] BDy = {0, -1, -1, 0, 1, 1, 1, 0, -1};
+	private static final int[] BPx = {0, 0, 2, 2, 2, 0, -2, -2, -2};
+	private static final int[] BPy = {0, -2, -2, 0, 2, 2, 2, 0, -2};
+	private static final int[] BtClrTab = {RIVER, CHANNEL, POWERBASE, POWERBASE + 1,
 			RAILBASE, RAILBASE + 1, BRWH, BRWV};
-
-	int newDir;
-	int count;
-	int soundCount;
-
-	public static final int NORTH_EDGE = 5;
-	public static final int EAST_EDGE = 7;
-	public static final int SOUTH_EDGE = 1;
+	private int newDir;
+	private int count;
+	private int soundCount;
 
 	public ShipSprite(Micropolis engine, int xpos, int ypos, int edge)
 	{
 		super(engine, SpriteKind.SHI);
-		this.x = xpos * 16 + 8;
-		this.y = ypos * 16 + 8;
-		this.width = 48;
-		this.height = 48;
-		this.offx = -24;
-		this.offy = -24;
-		this.frame = edge;
-		this.newDir = edge;
-		this.dir = 10;
-		this.count = 1;
+		setX(xpos * 16 + 8);
+		setY(ypos * 16 + 8);
+		setWidth(48);
+		setHeight(48);
+		setOffx(-24);
+		setOffy(-24);
+		setFrame(edge);
+		newDir = edge;
+		setDir(10);
+		count = 1;
 	}
 
-	@Override
-	public void moveImpl()
-	{
-		int t = RIVER;
-
-		this.soundCount--;
-		if (this.soundCount <= 0) {
-			if (city.PRNG.nextInt(4) == 0) {
-				city.makeSound(x / 16, y / 16, Sound.HONKHONK_LOW);
-			}
-			this.soundCount = 200;
-		}
-
-		this.count--;
-		if (this.count <= 0) {
-			this.count = 9;
-			if (this.newDir != this.frame) {
-				this.frame = turnTo(this.frame, this.newDir);
-				return;
-			}
-			int tem = city.PRNG.nextInt(8);
-			int pem;
-			for (pem = tem; pem < tem + 8; pem++) {
-				int z = pem % 8 + 1;
-				if (z == this.dir)
-					continue;
-
-				int xpos = this.x / 16 + BDx[z];
-				int ypos = this.y / 16 + BDy[z];
-
-				if (city.testBounds(xpos, ypos)) {
-					t = city.getTile(xpos, ypos);
-					if (t == CHANNEL || t == BRWH || t == BRWV ||
-							tryOther(t, this.dir, z)) {
-						this.newDir = z;
-						this.frame = turnTo(this.frame, this.newDir);
-						this.dir = z + 4;
-						if (this.dir > 8) {
-							this.dir -= 8;
-						}
-						break;
-					}
-				}
-			}
-
-			if (pem == tem + 8) {
-				this.dir = 10;
-				this.newDir = city.PRNG.nextInt(8) + 1;
-			}
-		} else {
-			int z = this.frame;
-			if (z == this.newDir) {
-				this.x += BPx[z];
-				this.y += BPy[z];
-			}
-		}
-
-		if (!spriteInBounds()) {
-			this.frame = 0;
-			return;
-		}
-
-		boolean found = false;
-		for (int z : BtClrTab) {
-			if (t == z) {
-				found = true;
-			}
-		}
-		if (!found) {
-			if (!city.noDisasters) {
-				explodeSprite();
-				destroyTile(x / 16, y / 16);
-			}
-		}
-	}
-
-	boolean tryOther(int tile, int oldDir, int newDir)
+	private static boolean tryOther(int tile, int oldDir, int newDir)
 	{
 		int z = oldDir + 4;
 		if (z > 8) z -= 8;
@@ -134,10 +58,87 @@ public class ShipSprite extends Sprite
 				tile == RAILBASE || tile == RAILBASE + 1;
 	}
 
-	boolean spriteInBounds()
+	@Override
+	public void moveImpl()
 	{
-		int xpos = x / 16;
-		int ypos = y / 16;
-		return city.testBounds(xpos, ypos);
+		int t = RIVER;
+
+		soundCount--;
+		if (soundCount <= 0) {
+			if (getCity().getRandom().nextInt(4) == 0) {
+				getCity().makeSound(getX() / 16, getY() / 16, Sound.HONKHONK_LOW);
+			}
+			soundCount = 200;
+		}
+
+		count--;
+		if (count <= 0) {
+			count = 9;
+			if (newDir != getFrame()) {
+				setFrame(turnTo(getFrame(), newDir));
+				return;
+			}
+			int tem = getCity().getRandom().nextInt(8);
+			int pem;
+			for (pem = tem; pem < tem + 8; pem++) {
+				int z = pem % 8 + 1;
+				if (z == getDir())
+					continue;
+
+				int xpos = getX() / 16 + BDx[z];
+				int ypos = getY() / 16 + BDy[z];
+
+				if (getCity().testBounds(xpos, ypos)) {
+					t = getCity().getTile(xpos, ypos);
+					if (t == CHANNEL || t == BRWH || t == BRWV ||
+							tryOther(t, getDir(), z)) {
+						newDir = z;
+						setFrame(turnTo(getFrame(), newDir));
+						setDir(z + 4);
+						if (getDir() > 8) {
+							setDir(getDir() - 8);
+						}
+						break;
+					}
+				}
+			}
+
+			if (pem == tem + 8) {
+				setDir(10);
+				newDir = getCity().getRandom().nextInt(8) + 1;
+			}
+		} else {
+			int z = getFrame();
+			if (z == newDir) {
+				setX(getX() + BPx[z]);
+				setY(getY() + BPy[z]);
+			}
+		}
+
+		if (!spriteInBounds()) {
+			setFrame(0);
+			return;
+		}
+
+		boolean found = false;
+		for (int z : BtClrTab) {
+			if (t == z) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			if (!getCity().isNoDisasters()) {
+				explodeSprite();
+				destroyTile(getX() / 16, getY() / 16);
+			}
+		}
+	}
+
+	private boolean spriteInBounds()
+	{
+		int xpos = getX() / 16;
+		int ypos = getY() / 16;
+		return getCity().testBounds(xpos, ypos);
 	}
 }

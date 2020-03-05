@@ -13,106 +13,101 @@ import micropolisj.engine.MapState;
 import micropolisj.engine.Micropolis;
 import micropolisj.engine.Sprite;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import static micropolisj.engine.TileConstants.*;
+import static micropolisj.engine.TileConstants.CLEAR;
+import static micropolisj.engine.TileConstants.DIRT;
+import static micropolisj.engine.TileConstants.LOMASK;
+import static micropolisj.engine.TileConstants.PWRBIT;
+import static micropolisj.engine.TileConstants.isCommercialZone;
+import static micropolisj.engine.TileConstants.isConductive;
+import static micropolisj.engine.TileConstants.isConstructed;
+import static micropolisj.engine.TileConstants.isIndustrialZone;
+import static micropolisj.engine.TileConstants.isRailAny;
+import static micropolisj.engine.TileConstants.isResidentialZoneAny;
+import static micropolisj.engine.TileConstants.isRoadAny;
+import static micropolisj.engine.TileConstants.isZoneAny;
+import static micropolisj.engine.TileConstants.isZoneCenter;
 
 public class OverlayMapView extends JComponent
 		implements Scrollable, MapListener
 {
-	TileImages tileImages;
-	Micropolis engine;
-	ArrayList<ConnectedView> views = new ArrayList<>();
-	MapState mapState = MapState.ALL;
-
-	public OverlayMapView(Micropolis _engine)
+	private static final int TILE_WIDTH = 3;
+	private static final int TILE_HEIGHT = 3;
+	private static final Color VAL_LOW = new Color(0xbfbfbf);
+	private static final Color VAL_MEDIUM = new Color(0xffff00);
+	private static final Color VAL_HIGH = new Color(0xff7f00);
+	private static final Color VAL_VERYHIGH = new Color(0xff0000);
+	private static final Color VAL_PLUS = new Color(0x007f00);
+	private static final Color VAL_VERYPLUS = new Color(0x00e600);
+	private static final Color VAL_MINUS = new Color(0xff7f00);
+	private static final Color VAL_VERYMINUS = new Color(0xffff00);
+	private static final int UNPOWERED = 0x6666e6;   //lightblue
+	private static final int POWERED = 0xff0000;   //red
+	private static final int CONDUCTIVE = 0xbfbfbf;   //lightgray
+	private final TileImages tileImages;
+	private final ArrayList<ConnectedView> views = new ArrayList<>();
+	private Micropolis engine;
+	private MapState mapState = MapState.ALL;
+	public OverlayMapView(Micropolis engine)
 	{
-		assert _engine != null;
+		assert engine != null;
 
 		MouseAdapter mouse = new MouseAdapter()
 		{
 			@Override
-			public void mousePressed(MouseEvent ev)
+			public void mousePressed(MouseEvent e)
 			{
-				onMousePressed(ev);
+				onMousePressed(e);
 			}
 
 			@Override
-			public void mouseDragged(MouseEvent ev)
+			public void mouseDragged(MouseEvent e)
 			{
-				onMouseDragged(ev);
+				onMouseDragged(e);
 			}
+
+			private void onMousePressed(MouseEvent ev)
+			{
+				if (ev.getButton() == MouseEvent.BUTTON1)
+					dragViewTo(ev.getPoint());
+			}
+
+			private void onMouseDragged(MouseEvent ev)
+			{
+				if ((ev.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) == 0)
+					return;
+
+				dragViewTo(ev.getPoint());
+			}
+
 		};
 		addMouseListener(mouse);
 		addMouseMotionListener(mouse);
 
-		setEngine(_engine);
+		setEngine(engine);
 
 		tileImages = TileImages.getInstance(TILE_WIDTH);
 
 	}
 
-	public void setEngine(Micropolis newEngine)
-	{
-		assert newEngine != null;
-
-		if (engine != null) { //old engine
-			engine.removeMapListener(this);
-		}
-		engine = newEngine;
-		if (engine != null) { //new engine
-			engine.addMapListener(this);
-		}
-
-		invalidate();  //map size may have changed
-		repaint();
-		engine.calculateCenterMass();
-		dragViewToCityCenter();
-	}
-
-	public MapState getMapState()
-	{
-		return mapState;
-	}
-
-	@Override
-	public Dimension getPreferredSize()
-	{
-		return new Dimension(
-				getInsets().left + getInsets().right + TILE_WIDTH * engine.getWidth(),
-				getInsets().top + getInsets().bottom + TILE_HEIGHT * engine.getHeight()
-		);
-	}
-
-	public void setMapState(MapState newState)
-	{
-		if (mapState == newState)
-			return;
-
-		mapState = newState;
-		repaint();
-	}
-
-	static final int TILE_WIDTH = 3;
-	static final int TILE_HEIGHT = 3;
-
-	static final Color VAL_LOW = new Color(0xbfbfbf);
-	static final Color VAL_MEDIUM = new Color(0xffff00);
-	static final Color VAL_HIGH = new Color(0xff7f00);
-	static final Color VAL_VERYHIGH = new Color(0xff0000);
-	static final Color VAL_PLUS = new Color(0x007f00);
-	static final Color VAL_VERYPLUS = new Color(0x00e600);
-	static final Color VAL_MINUS = new Color(0xff7f00);
-	static final Color VAL_VERYMINUS = new Color(0xffff00);
-
-	private Color getCI(int x)
+	private static Color getCI(int x)
 	{
 		if (x < 50)
 			return null;
@@ -126,7 +121,7 @@ public class OverlayMapView extends JComponent
 			return VAL_VERYHIGH;
 	}
 
-	private Color getCI_rog(int x)
+	private static Color getCI_rog(int x)
 	{
 		if (x > 100)
 			return VAL_VERYPLUS;
@@ -140,73 +135,7 @@ public class OverlayMapView extends JComponent
 			return null;
 	}
 
-	private void drawPollutionMap(Graphics gr)
-	{
-		int[][] A = engine.pollutionMem;
-
-		for (int y = 0; y < A.length; y++) {
-			for (int x = 0; x < A[y].length; x++) {
-				maybeDrawRect(gr, getCI(10 + A[y][x]), x * 6, y * 6, 6, 6);
-			}
-		}
-	}
-
-	private void drawCrimeMap(Graphics gr)
-	{
-		int[][] A = engine.crimeMem;
-
-		for (int y = 0; y < A.length; y++) {
-			for (int x = 0; x < A[y].length; x++) {
-				maybeDrawRect(gr, getCI(A[y][x]), x * 6, y * 6, 6, 6);
-			}
-		}
-	}
-
-	private void drawPopDensity(Graphics gr)
-	{
-		int[][] A = engine.popDensity;
-
-		for (int y = 0; y < A.length; y++) {
-			for (int x = 0; x < A[y].length; x++) {
-				maybeDrawRect(gr, getCI(A[y][x]), x * 6, y * 6, 6, 6);
-			}
-		}
-	}
-
-	private void drawRateOfGrowth(Graphics gr)
-	{
-		int[][] A = engine.rateOGMem;
-
-		for (int y = 0; y < A.length; y++) {
-			for (int x = 0; x < A[y].length; x++) {
-				maybeDrawRect(gr, getCI_rog(A[y][x]), x * 24, y * 24, 24, 24);
-			}
-		}
-	}
-
-	private void drawFireRadius(Graphics gr)
-	{
-		int[][] A = engine.fireRate;
-
-		for (int y = 0; y < A.length; y++) {
-			for (int x = 0; x < A[y].length; x++) {
-				maybeDrawRect(gr, getCI(A[y][x]), x * 24, y * 24, 24, 24);
-			}
-		}
-	}
-
-	private void drawPoliceRadius(Graphics gr)
-	{
-		int[][] A = engine.policeMapEffect;
-
-		for (int y = 0; y < A.length; y++) {
-			for (int x = 0; x < A[y].length; x++) {
-				maybeDrawRect(gr, getCI(A[y][x]), x * 24, y * 24, 24, 24);
-			}
-		}
-	}
-
-	private void maybeDrawRect(Graphics gr, Color col, int x, int y, int width, int height)
+	private static void maybeDrawRect(Graphics gr, Color col, int x, int y, int width, int height)
 	{
 		if (col != null) {
 			gr.setColor(col);
@@ -214,11 +143,7 @@ public class OverlayMapView extends JComponent
 		}
 	}
 
-	static final int UNPOWERED = 0x6666e6;   //lightblue
-	static final int POWERED = 0xff0000;   //red
-	static final int CONDUCTIVE = 0xbfbfbf;   //lightgray
-
-	private int checkPower(BufferedImage img, int x, int y, int rawTile)
+	private static int checkPower(BufferedImage img, int x, int y, int rawTile)
 	{
 		int pix;
 
@@ -240,6 +165,112 @@ public class OverlayMapView extends JComponent
 		}
 		return -1; //this special value tells caller to skip the tile bitblt,
 		//since it was performed here
+	}
+
+	public void setEngine(Micropolis newEngine)
+	{
+		assert newEngine != null;
+
+		if (engine != null) { //old engine
+			engine.removeMapListener(this);
+		}
+		engine = newEngine;
+		//new engine
+		engine.addMapListener(this);
+
+		invalidate();  //map size may have changed
+		repaint();
+		engine.calculateCenterMass();
+		dragViewToCityCenter();
+	}
+
+	public MapState getMapState()
+	{
+		return mapState;
+	}
+
+	public void setMapState(MapState newState)
+	{
+		if (mapState == newState)
+			return;
+
+		mapState = newState;
+		repaint();
+	}
+
+	@Override
+	public Dimension getPreferredSize()
+	{
+		return new Dimension(
+				getInsets().left + getInsets().right + TILE_WIDTH * engine.getWidth(),
+				getInsets().top + getInsets().bottom + TILE_HEIGHT * engine.getHeight()
+		);
+	}
+
+	private void drawPollutionMap(Graphics gr)
+	{
+		int[][] a = engine.getPollutionMem();
+
+		for (int y = 0; y < a.length; y++) {
+			for (int x = 0; x < a[y].length; x++) {
+				maybeDrawRect(gr, getCI(10 + a[y][x]), x * 6, y * 6, 6, 6);
+			}
+		}
+	}
+
+	private void drawCrimeMap(Graphics gr)
+	{
+		int[][] a = engine.getCrimeMem();
+
+		for (int y = 0; y < a.length; y++) {
+			for (int x = 0; x < a[y].length; x++) {
+				maybeDrawRect(gr, getCI(a[y][x]), x * 6, y * 6, 6, 6);
+			}
+		}
+	}
+
+	private void drawPopDensity(Graphics gr)
+	{
+		int[][] a = engine.getPopDensity();
+
+		for (int y = 0; y < a.length; y++) {
+			for (int x = 0; x < a[y].length; x++) {
+				maybeDrawRect(gr, getCI(a[y][x]), x * 6, y * 6, 6, 6);
+			}
+		}
+	}
+
+	private void drawRateOfGrowth(Graphics gr)
+	{
+		int[][] a = engine.getRateOGMem();
+
+		for (int y = 0; y < a.length; y++) {
+			for (int x = 0; x < a[y].length; x++) {
+				maybeDrawRect(gr, getCI_rog(a[y][x]), x * 24, y * 24, 24, 24);
+			}
+		}
+	}
+
+	private void drawFireRadius(Graphics gr)
+	{
+		int[][] a = engine.getFireRate();
+
+		for (int y = 0; y < a.length; y++) {
+			for (int x = 0; x < a[y].length; x++) {
+				maybeDrawRect(gr, getCI(a[y][x]), x * 24, y * 24, 24, 24);
+			}
+		}
+	}
+
+	private void drawPoliceRadius(Graphics gr)
+	{
+		int[][] a = engine.getPoliceMapEffect();
+
+		for (int y = 0; y < a.length; y++) {
+			for (int x = 0; x < a[y].length; x++) {
+				maybeDrawRect(gr, getCI(a[y][x]), x * 24, y * 24, 24, 24);
+			}
+		}
 	}
 
 	private int checkLandValueOverlay(BufferedImage img, int xpos, int ypos, int tile)
@@ -283,20 +314,20 @@ public class OverlayMapView extends JComponent
 	}
 
 	@Override
-	public void paintComponent(Graphics gr)
+	public void paintComponent(Graphics g)
 	{
-		final int width = engine.getWidth();
-		final int height = engine.getHeight();
+		int width = engine.getWidth();
+		int height = engine.getHeight();
 
 		BufferedImage img = new BufferedImage(width * TILE_WIDTH, height * TILE_HEIGHT,
 				BufferedImage.TYPE_INT_RGB);
 
-		final Insets INSETS = getInsets();
-		Rectangle clipRect = gr.getClipBounds();
-		int minX = Math.max(0, (clipRect.x - INSETS.left) / TILE_WIDTH);
-		int minY = Math.max(0, (clipRect.y - INSETS.top) / TILE_HEIGHT);
-		int maxX = Math.min(width, 1 + (clipRect.x - INSETS.left + clipRect.width - 1) / TILE_WIDTH);
-		int maxY = Math.min(height, 1 + (clipRect.y - INSETS.top + clipRect.height - 1) / TILE_HEIGHT);
+		Insets insets = getInsets();
+		Rectangle clipRect = g.getClipBounds();
+		int minX = Math.max(0, (clipRect.x - insets.left) / TILE_WIDTH);
+		int minY = Math.max(0, (clipRect.y - insets.top) / TILE_HEIGHT);
+		int maxX = Math.min(width, 1 + (clipRect.x - insets.left + clipRect.width - 1) / TILE_WIDTH);
+		int maxY = Math.min(height, 1 + (clipRect.y - insets.top + clipRect.height - 1) / TILE_HEIGHT);
 
 		for (int y = minY; y < maxY; y++) {
 			for (int x = minX; x < maxX; x++) {
@@ -351,47 +382,47 @@ public class OverlayMapView extends JComponent
 			}
 		}
 
-		gr.drawImage(img, INSETS.left, INSETS.top, null);
+		g.drawImage(img, insets.left, insets.top, null);
 
-		gr = gr.create();
-		gr.translate(INSETS.left, INSETS.top);
+		g = g.create();
+		g.translate(insets.left, insets.top);
 
 		switch (mapState) {
 			case POLICE_OVERLAY:
-				drawPoliceRadius(gr);
+				drawPoliceRadius(g);
 				break;
 			case FIRE_OVERLAY:
-				drawFireRadius(gr);
+				drawFireRadius(g);
 				break;
 			case CRIME_OVERLAY:
-				drawCrimeMap(gr);
+				drawCrimeMap(g);
 				break;
 			case POLLUTE_OVERLAY:
-				drawPollutionMap(gr);
+				drawPollutionMap(g);
 				break;
 			case GROWTHRATE_OVERLAY:
-				drawRateOfGrowth(gr);
+				drawRateOfGrowth(g);
 				break;
 			case POPDEN_OVERLAY:
-				drawPopDensity(gr);
+				drawPopDensity(g);
 				break;
 			default:
 		}
 
 		for (ConnectedView cv : views) {
 			Rectangle rect = getViewRect(cv);
-			gr.setColor(Color.WHITE);
-			gr.drawRect(rect.x - 2, rect.y - 2, rect.width + 2, rect.height + 2);
+			g.setColor(Color.WHITE);
+			g.drawRect(rect.x - 2, rect.y - 2, rect.width + 2, rect.height + 2);
 
-			gr.setColor(Color.BLACK);
-			gr.drawRect(rect.x - 0, rect.y - 0, rect.width + 2, rect.height + 2);
+			g.setColor(Color.BLACK);
+			g.drawRect(rect.x, rect.y, rect.width + 2, rect.height + 2);
 
-			gr.setColor(Color.YELLOW);
-			gr.drawRect(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);
+			g.setColor(Color.YELLOW);
+			g.drawRect(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);
 		}
 	}
 
-	void paintTile(BufferedImage img, int x, int y, int tile)
+	private void paintTile(BufferedImage img, int x, int y, int tile)
 	{
 		assert tile >= 0;
 		BufferedImage tileImage = tileImages.getTileImage(tile);
@@ -404,14 +435,14 @@ public class OverlayMapView extends JComponent
 		}
 	}
 
-	Rectangle getViewRect(ConnectedView cv)
+	private Rectangle getViewRect(ConnectedView cv)
 	{
 		Rectangle rawRect = cv.scrollPane.getViewport().getViewRect();
 		return new Rectangle(
-				rawRect.x * 3 / cv.view.getTileSize(),
-				rawRect.y * 3 / cv.view.getTileSize(),
-				rawRect.width * 3 / cv.view.getTileSize(),
-				rawRect.height * 3 / cv.view.getTileSize()
+				rawRect.x * 3 / cv.view.getTileWidth(),
+				rawRect.y * 3 / cv.view.getTileWidth(),
+				rawRect.width * 3 / cv.view.getTileWidth(),
+				rawRect.height * 3 / cv.view.getTileWidth()
 		);
 	}
 
@@ -425,8 +456,8 @@ public class OverlayMapView extends JComponent
 		Dimension mapSize = cv.scrollPane.getViewport().getViewSize();
 
 		Point np = new Point(
-				p.x * cv.view.getTileSize() / 3 - d.width / 2,
-				p.y * cv.view.getTileSize() / 3 - d.height / 2
+				p.x * cv.view.getTileWidth() / 3 - d.width / 2,
+				p.y * cv.view.getTileWidth() / 3 - d.height / 2
 		);
 		np.x = Math.max(0, Math.min(np.x, mapSize.width - d.width));
 		np.y = Math.max(0, Math.min(np.y, mapSize.height - d.height));
@@ -443,10 +474,7 @@ public class OverlayMapView extends JComponent
 	@Override
 	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction)
 	{
-		if (orientation == SwingConstants.VERTICAL)
-			return visibleRect.height;
-		else
-			return visibleRect.width;
+		return orientation == SwingConstants.VERTICAL ? visibleRect.height : visibleRect.width;
 	}
 
 	@Override
@@ -464,10 +492,7 @@ public class OverlayMapView extends JComponent
 	@Override
 	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction)
 	{
-		if (orientation == SwingConstants.VERTICAL)
-			return TILE_HEIGHT;
-		else
-			return TILE_WIDTH;
+		return orientation == SwingConstants.VERTICAL ? TILE_HEIGHT : TILE_WIDTH;
 	}
 
 	@Override
@@ -496,29 +521,10 @@ public class OverlayMapView extends JComponent
 		dragViewToCityCenter();
 	}
 
-	public void dragViewToCityCenter()
+	private void dragViewToCityCenter()
 	{
-		dragViewTo(new Point(TILE_WIDTH * engine.centerMassX + 1,
-				TILE_HEIGHT * engine.centerMassY + 1));
-	}
-
-	class ConnectedView implements ChangeListener
-	{
-		MicropolisDrawingArea view;
-		JScrollPane scrollPane;
-
-		ConnectedView(MicropolisDrawingArea view, JScrollPane scrollPane)
-		{
-			this.view = view;
-			this.scrollPane = scrollPane;
-			scrollPane.getViewport().addChangeListener(this);
-		}
-
-		@Override
-		public void stateChanged(ChangeEvent ev)
-		{
-			repaint();
-		}
+		dragViewTo(new Point(TILE_WIDTH * engine.getCenterMassX() + 1,
+				TILE_HEIGHT * engine.getCenterMassY() + 1));
 	}
 
 	public void connectView(MicropolisDrawingArea view, JScrollPane scrollPane)
@@ -528,17 +534,22 @@ public class OverlayMapView extends JComponent
 		repaint();
 	}
 
-	private void onMousePressed(MouseEvent ev)
+	private class ConnectedView implements ChangeListener
 	{
-		if (ev.getButton() == MouseEvent.BUTTON1)
-			dragViewTo(ev.getPoint());
-	}
+		private final MicropolisDrawingArea view;
+		private final JScrollPane scrollPane;
 
-	private void onMouseDragged(MouseEvent ev)
-	{
-		if ((ev.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) == 0)
-			return;
+		private ConnectedView(MicropolisDrawingArea view, JScrollPane scrollPane)
+		{
+			this.view = view;
+			this.scrollPane = scrollPane;
+			scrollPane.getViewport().addChangeListener(this);
+		}
 
-		dragViewTo(ev.getPoint());
+		@Override
+		public void stateChanged(ChangeEvent e)
+		{
+			repaint();
+		}
 	}
 }

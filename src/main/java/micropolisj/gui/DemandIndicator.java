@@ -8,23 +8,52 @@
 
 package micropolisj.gui;
 
+import micropolisj.engine.CityListener;
 import micropolisj.engine.CityLocation;
 import micropolisj.engine.Micropolis;
 import micropolisj.engine.MicropolisMessage;
 import micropolisj.engine.Sound;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
 public class DemandIndicator extends JComponent
-		implements Micropolis.Listener
+		implements CityListener
 {
-	Micropolis engine;
+	private static final BufferedImage backgroundImage = loadImage();
+	private static final Dimension MY_SIZE = new Dimension(
+			backgroundImage.getWidth(),
+			backgroundImage.getHeight()
+	);
+	private static final int UPPER_EDGE = 19;
+	private static final int LOWER_EDGE = 28;
+	private static final int MAX_LENGTH = 16;
+	private static final int RES_LEFT = 8;
+	private static final int COM_LEFT = 17;
+	private static final int IND_LEFT = 26;
+	private static final int BAR_WIDTH = 6;
+	private Micropolis engine;
 
-	public DemandIndicator()
+	private static BufferedImage loadImage()
 	{
+		URL iconUrl = MicropolisDrawingArea.class.getResource("/demandg.png");
+		Image refImage = new ImageIcon(iconUrl).getImage();
+
+		BufferedImage bi = new BufferedImage(refImage.getWidth(null), refImage.getHeight(null),
+				BufferedImage.TYPE_INT_RGB);
+		Graphics2D gr = bi.createGraphics();
+		gr.drawImage(refImage, 0, 0, null);
+
+		return bi;
 	}
 
 	public void setEngine(Micropolis newEngine)
@@ -40,26 +69,6 @@ public class DemandIndicator extends JComponent
 		}
 		repaint();
 	}
-
-	static final BufferedImage backgroundImage = loadImage("/demandg.png");
-
-	static BufferedImage loadImage(String resourceName)
-	{
-		URL iconUrl = MicropolisDrawingArea.class.getResource(resourceName);
-		Image refImage = new ImageIcon(iconUrl).getImage();
-
-		BufferedImage bi = new BufferedImage(refImage.getWidth(null), refImage.getHeight(null),
-				BufferedImage.TYPE_INT_RGB);
-		Graphics2D gr = bi.createGraphics();
-		gr.drawImage(refImage, 0, 0, null);
-
-		return bi;
-	}
-
-	static final Dimension MY_SIZE = new Dimension(
-			backgroundImage.getWidth(),
-			backgroundImage.getHeight()
-	);
 
 	@Override
 	public Dimension getMinimumSize()
@@ -79,18 +88,10 @@ public class DemandIndicator extends JComponent
 		return MY_SIZE;
 	}
 
-	static final int UPPER_EDGE = 19;
-	static final int LOWER_EDGE = 28;
-	static final int MAX_LENGTH = 16;
-	static final int RES_LEFT = 8;
-	static final int COM_LEFT = 17;
-	static final int IND_LEFT = 26;
-	static final int BAR_WIDTH = 6;
-
 	@Override
-	public void paintComponent(Graphics gr1)
+	public void paintComponent(Graphics g)
 	{
-		Graphics2D gr = (Graphics2D) gr1;
+		Graphics2D gr = (Graphics2D) g;
 		gr.drawImage(backgroundImage, 0, 0, null);
 
 		if (engine == null)
@@ -116,7 +117,7 @@ public class DemandIndicator extends JComponent
 		int iy1 = iy0 - indValve / 100;
 
 		if (ry0 != ry1) {
-			Rectangle resRect = new Rectangle(RES_LEFT, Math.min(ry0, ry1), BAR_WIDTH, Math.abs(ry1 - ry0));
+			Shape resRect = new Rectangle(RES_LEFT, Math.min(ry0, ry1), BAR_WIDTH, Math.abs(ry1 - ry0));
 			gr.setColor(Color.GREEN);
 			gr.fill(resRect);
 			gr.setColor(Color.BLACK);
@@ -124,7 +125,7 @@ public class DemandIndicator extends JComponent
 		}
 
 		if (cy0 != cy1) {
-			Rectangle comRect = new Rectangle(COM_LEFT, Math.min(cy0, cy1), BAR_WIDTH, Math.abs(cy1 - cy0));
+			Shape comRect = new Rectangle(COM_LEFT, Math.min(cy0, cy1), BAR_WIDTH, Math.abs(cy1 - cy0));
 			gr.setColor(Color.BLUE);
 			gr.fill(comRect);
 			gr.setColor(Color.BLACK);
@@ -132,7 +133,7 @@ public class DemandIndicator extends JComponent
 		}
 
 		if (iy0 != iy1) {
-			Rectangle indRect = new Rectangle(IND_LEFT, Math.min(iy0, iy1), BAR_WIDTH, Math.abs(iy1 - iy0));
+			Shape indRect = new Rectangle(IND_LEFT, Math.min(iy0, iy1), BAR_WIDTH, Math.abs(iy1 - iy0));
 			gr.setColor(Color.YELLOW);
 			gr.fill(indRect);
 			gr.setColor(Color.BLACK);
@@ -147,32 +148,22 @@ public class DemandIndicator extends JComponent
 	}
 
 	@Override
-    public void cityMessage(MicropolisMessage m, CityLocation p)
+	public void cityMessage(MicropolisMessage message, CityLocation loc)
 	{
 	}
 
 	@Override
-    public void citySound(Sound sound, CityLocation p)
+	public void citySound(Sound sound, CityLocation loc)
 	{
 	}
 
 	@Override
-    public void censusChanged()
+	public void fundsChanged()
 	{
 	}
 
 	@Override
-    public void evaluationChanged()
-	{
-	}
-
-	@Override
-    public void fundsChanged()
-	{
-	}
-
-	@Override
-    public void optionsChanged()
+	public void optionsChanged()
 	{
 	}
 }

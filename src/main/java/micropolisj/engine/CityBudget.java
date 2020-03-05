@@ -11,33 +11,79 @@ package micropolisj.engine;
 public class CityBudget
 {
 
+	private int totalFunds;
+
+	private int taxFund;
+
+	private int roadFundEscrow;
+
+	private int fireFundEscrow;
+
+	private int policeFundEscrow;
+
 	/**
 	 * The amount of cash on hand.
 	 */
-	public int totalFunds;
+	public int getTotalFunds()
+	{
+		return totalFunds;
+	}
+
+	public void setTotalFunds(int totalFunds)
+	{
+		this.totalFunds = totalFunds;
+	}
 
 	/**
 	 * Amount of taxes collected so far in the current financial
 	 * period (in 1/TAXFREQ's).
 	 */
-	int taxFund;
+	public int getTaxFund()
+	{
+		return taxFund;
+	}
+
+	public void setTaxFund(int taxFund)
+	{
+		this.taxFund = taxFund;
+	}
 
 	/**
 	 * Amount of prepaid road maintenance (in 1/TAXFREQ's).
 	 */
-	int roadFundEscrow;
+	public int getRoadFundEscrow()
+	{
+		return roadFundEscrow;
+	}
+
+	public void setRoadFundEscrow(int roadFundEscrow)
+	{
+		this.roadFundEscrow = roadFundEscrow;
+	}
 
 	/**
 	 * Amount of prepaid fire station maintenance (in 1/TAXFREQ's).
 	 */
-	int fireFundEscrow;
+	public int getFireFundEscrow()
+	{
+		return fireFundEscrow;
+	}
+
+	public void setFireFundEscrow(int fireFundEscrow)
+	{
+		this.fireFundEscrow = fireFundEscrow;
+	}
 
 	/**
 	 * Amount of prepaid police station maintenance (in 1/TAXFREQ's).
 	 */
-	int policeFundEscrow;
-
-	CityBudget()
+	public int getPoliceFundEscrow()
 	{
+		return policeFundEscrow;
+	}
+
+	public void setPoliceFundEscrow(int policeFundEscrow)
+	{
+		this.policeFundEscrow = policeFundEscrow;
 	}
 }

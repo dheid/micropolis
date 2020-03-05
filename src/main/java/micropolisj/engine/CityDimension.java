@@ -13,8 +13,8 @@ package micropolisj.engine;
  */
 public class CityDimension
 {
-	public int width;
-	public int height;
+	public final int width;
+	public final int height;
 
 	public CityDimension(int width, int height)
 	{
@@ -33,7 +33,7 @@ public class CityDimension
 	{
 		if (obj instanceof CityDimension) {
 			CityDimension rhs = (CityDimension) obj;
-			return this.width == rhs.width && this.height == rhs.height;
+			return width == rhs.width && height == rhs.height;
 		} else {
 			return false;
 		}

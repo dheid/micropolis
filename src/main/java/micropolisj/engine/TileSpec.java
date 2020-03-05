@@ -8,34 +8,54 @@
 
 package micropolisj.engine;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class TileSpec
 {
-	int tileNumber;
-	String name;
-	TileSpec animNext;
-	TileSpec onPower;
-	TileSpec onShutdown;
-	boolean canBulldoze;
-	boolean canBurn;
-	boolean canConduct;
-	boolean overWater;
-	boolean zone;
-	public TileSpec owner;
-	public int ownerOffsetX;
-	public int ownerOffsetY;
-	BuildingInfo buildingInfo;
+	private static final String[] IMAGES = new String[0];
 
-	Map<String, String> attributes;
-	List<String> images;
+	private final int tileNumber;
 
-	protected TileSpec(int tileNumber, String tileName)
+	private final String name;
+
+	private final Map<String, String> attributes;
+
+	private final List<String> images;
+
+	private TileSpec owner;
+
+	private int ownerOffsetX;
+
+	private int ownerOffsetY;
+
+	private TileSpec animNext;
+
+	private TileSpec onPower;
+
+	private TileSpec onShutdown;
+
+	private boolean canBulldoze;
+
+	private boolean canBurn;
+
+	private boolean canConduct;
+
+	private boolean overWater;
+
+	private boolean zone;
+
+	private BuildingInfo buildingInfo;
+
+	private TileSpec(int tileNumber, String tileName)
 	{
 		this.tileNumber = tileNumber;
-		this.name = tileName;
-		this.attributes = new HashMap<>();
-		this.images = new ArrayList<>();
+		name = tileName;
+		attributes = new HashMap<>();
+		images = new ArrayList<>();
 	}
 
 	public static TileSpec parse(int tileNumber, String tileName, String inStr, Properties tilesRc)
@@ -43,6 +63,32 @@ public class TileSpec
 		TileSpec ts = new TileSpec(tileNumber, tileName);
 		ts.load(inStr, tilesRc);
 		return ts;
+	}
+
+	public static String[] generateTileNames(Map recipe)
+	{
+		int ntiles = recipe.size();
+		String[] tileNames = new String[ntiles];
+		ntiles = 0;
+		for (int i = 0; recipe.containsKey(Integer.toString(i)); i++) {
+			tileNames[ntiles++] = Integer.toString(i);
+		}
+		int naturalNumberTiles = ntiles;
+
+		for (Object key : recipe.keySet()) {
+			String n = (String) key;
+			if (n.matches("^\\d+$")) {
+				int x = Integer.parseInt(n);
+				if (x >= 0 && x < naturalNumberTiles) {
+					assert tileNames[x].equals(n);
+					continue;
+				}
+			}
+			assert ntiles < tileNames.length;
+			tileNames[ntiles++] = n;
+		}
+		assert ntiles == tileNames.length;
+		return tileNames;
 	}
 
 	public String getAttribute(String key)
@@ -53,14 +99,7 @@ public class TileSpec
 	public boolean getBooleanAttribute(String key)
 	{
 		String v = getAttribute(key);
-		return v != null && v.equals("true");
-	}
-
-	public static class BuildingInfo
-	{
-		int width;
-		int height;
-		short[] members;
+		return "true".equals(v);
 	}
 
 	public BuildingInfo getBuildingInfo()
@@ -78,44 +117,40 @@ public class TileSpec
 		BuildingInfo bi = new BuildingInfo();
 
 		String[] p2 = tmp.split("x");
-		bi.width = Integer.parseInt(p2[0]);
-		bi.height = Integer.parseInt(p2[1]);
+		bi.setWidth(Integer.parseInt(p2[0]));
+		bi.setHeight(Integer.parseInt(p2[1]));
 
-		bi.members = new short[bi.width * bi.height];
+		bi.setMembers(new short[bi.getWidth() * bi.getHeight()]);
 		int startTile = tileNumber;
-		if (bi.width >= 3) {
+		if (bi.getWidth() >= 3) {
 			startTile--;
 		}
-		if (bi.height >= 3) {
-			startTile -= bi.width;
+		if (bi.getHeight() >= 3) {
+			startTile -= bi.getWidth();
 		}
 
-		for (int row = 0; row < bi.height; row++) {
-			for (int col = 0; col < bi.width; col++) {
-				bi.members[row * bi.width + col] = (short) startTile;
+		for (int row = 0; row < bi.getHeight(); row++) {
+			for (int col = 0; col < bi.getWidth(); col++) {
+				bi.getMembers()[row * bi.getWidth() + col] = (short) startTile;
 				startTile++;
 			}
 		}
 
-		this.buildingInfo = bi;
+		buildingInfo = bi;
 	}
 
 	public CityDimension getBuildingSize()
 	{
-		if (buildingInfo != null) {
-			return new CityDimension(
-					buildingInfo.width,
-					buildingInfo.height
-			);
-		} else {
-			return null;
-		}
+		return buildingInfo != null ? new CityDimension(
+				buildingInfo.getWidth(),
+				buildingInfo.getHeight()
+		) : null;
 	}
 
 	public int getDescriptionNumber()
 	{
 		String v = getAttribute("description");
-		if (v != null && v.startsWith("#")) {
+		if (v != null && !v.isEmpty() && v.charAt(0) == '#') {
 			return Integer.parseInt(v.substring(1));
 		}
 		if (owner != null) {
@@ -126,7 +161,7 @@ public class TileSpec
 
 	public String[] getImages()
 	{
-		return images.toArray(new String[0]);
+		return images.toArray(IMAGES);
 	}
 
 	public int getPollutionValue()
@@ -145,14 +180,10 @@ public class TileSpec
 	public int getPopulation()
 	{
 		String v = getAttribute("population");
-		if (v != null) {
-			return Integer.parseInt(v);
-		} else {
-			return 0;
-		}
+		return v != null ? Integer.parseInt(v) : 0;
 	}
 
-	protected void load(String inStr, Properties tilesRc)
+	private void load(String inStr, Properties tilesRc)
 	{
 		Scanner in = new Scanner(inStr);
 
@@ -168,14 +199,14 @@ public class TileSpec
 				}
 				in.eatChar(')');
 
-				if (!attributes.containsKey(k)) {
+				if (attributes.containsKey(k)) {
+					attributes.put(k, v);
+				} else {
 					attributes.put(k, v);
 					String sup = tilesRc.getProperty(k);
 					if (sup != null) {
 						load(sup, tilesRc);
 					}
-				} else {
-					attributes.put(k, v);
 				}
 			} else if (in.peekChar() == '|' || in.peekChar() == ',') {
 				in.eatChar(in.peekChar());
@@ -185,19 +216,137 @@ public class TileSpec
 			}
 		}
 
-		this.canBulldoze = getBooleanAttribute("bulldozable");
-		this.canBurn = !getBooleanAttribute("noburn");
-		this.canConduct = getBooleanAttribute("conducts");
-		this.overWater = getBooleanAttribute("overwater");
-		this.zone = getBooleanAttribute("zone");
+		canBulldoze = getBooleanAttribute("bulldozable");
+		canBurn = !getBooleanAttribute("noburn");
+		canConduct = getBooleanAttribute("conducts");
+		overWater = getBooleanAttribute("overwater");
+		zone = getBooleanAttribute("zone");
 	}
 
-	static class Scanner
+	public String toString()
 	{
-		String str;
-		int off = 0;
+		return "{tile:" + name + "}";
+	}
 
-		Scanner(String str)
+	void resolveReferences()
+	{
+		String tmp = getAttribute("becomes");
+		if (tmp != null) {
+			animNext = Tiles.tilesByName.get(tmp);
+		}
+		tmp = getAttribute("onpower");
+		if (tmp != null) {
+			onPower = Tiles.tilesByName.get(tmp);
+		}
+		tmp = getAttribute("onshutdown");
+		if (tmp != null) {
+			onShutdown = Tiles.tilesByName.get(tmp);
+		}
+		tmp = getAttribute("building-part");
+		if (tmp != null) {
+			handleBuildingPart(tmp);
+		}
+
+		resolveBuildingInfo();
+	}
+
+	private void handleBuildingPart(String text)
+	{
+		String[] parts = text.split(",");
+		if (parts.length != 3) {
+			throw new RuntimeException("Invalid building-part specification");
+		}
+
+		owner = Tiles.tilesByName.get(parts[0]);
+		ownerOffsetX = Integer.parseInt(parts[1]);
+		ownerOffsetY = Integer.parseInt(parts[2]);
+
+		assert owner != null;
+		assert ownerOffsetX != 0 || ownerOffsetY != 0;
+	}
+
+	public int getTileNumber()
+	{
+		return tileNumber;
+	}
+
+	public TileSpec getOwner()
+	{
+		return owner;
+	}
+
+	public void setOwner(TileSpec owner)
+	{
+		this.owner = owner;
+	}
+
+	public int getOwnerOffsetX()
+	{
+		return ownerOffsetX;
+	}
+
+	public void setOwnerOffsetX(int ownerOffsetX)
+	{
+		this.ownerOffsetX = ownerOffsetX;
+	}
+
+	public int getOwnerOffsetY()
+	{
+		return ownerOffsetY;
+	}
+
+	public void setOwnerOffsetY(int ownerOffsetY)
+	{
+		this.ownerOffsetY = ownerOffsetY;
+	}
+
+	public TileSpec getAnimNext()
+	{
+		return animNext;
+	}
+
+	public TileSpec getOnPower()
+	{
+		return onPower;
+	}
+
+	public TileSpec getOnShutdown()
+	{
+		return onShutdown;
+	}
+
+	public boolean isCanBulldoze()
+	{
+		return canBulldoze;
+	}
+
+	public boolean isCanBurn()
+	{
+		return canBurn;
+	}
+
+	public boolean isCanConduct()
+	{
+		return canConduct;
+	}
+
+	public boolean isOverWater()
+	{
+		return overWater;
+	}
+
+	public boolean isZone()
+	{
+		return zone;
+	}
+
+	private static class Scanner
+	{
+		private final String str;
+
+		private int off;
+
+		private Scanner(String str)
 		{
 			this.str = str;
 		}
@@ -209,24 +358,20 @@ public class TileSpec
 			}
 		}
 
-		public int peekChar()
+		private int peekChar()
 		{
 			skipWhitespace();
-			if (off < str.length()) {
-				return str.charAt(off);
-			} else {
-				return -1;
-			}
+			return off < str.length() ? str.charAt(off) : -1;
 		}
 
-		public void eatChar(int ch)
+		private void eatChar(int ch)
 		{
 			skipWhitespace();
 			assert str.charAt(off) == ch;
 			off++;
 		}
 
-		public String readAttributeKey()
+		private String readAttributeKey()
 		{
 			skipWhitespace();
 
@@ -235,24 +380,20 @@ public class TileSpec
 				off++;
 			}
 
-			if (off != start) {
-				return str.substring(start, off);
-			} else {
-				return null;
-			}
+			return off != start ? str.substring(start, off) : null;
 		}
 
-		public String readAttributeValue()
+		private String readAttributeValue()
 		{
 			return readString();
 		}
 
-		public String readImageSpec()
+		private String readImageSpec()
 		{
 			return readString();
 		}
 
-		protected String readString()
+		private String readString()
 		{
 			skipWhitespace();
 
@@ -278,77 +419,9 @@ public class TileSpec
 			return str.substring(start);
 		}
 
-		public boolean hasMore()
+		private boolean hasMore()
 		{
 			return peekChar() != -1;
 		}
-	}
-
-	public String toString()
-	{
-		return "{tile:" + name + "}";
-	}
-
-	void resolveReferences(Map<String, TileSpec> tileMap)
-	{
-		String tmp = this.getAttribute("becomes");
-		if (tmp != null) {
-			this.animNext = tileMap.get(tmp);
-		}
-		tmp = this.getAttribute("onpower");
-		if (tmp != null) {
-			this.onPower = tileMap.get(tmp);
-		}
-		tmp = this.getAttribute("onshutdown");
-		if (tmp != null) {
-			this.onShutdown = tileMap.get(tmp);
-		}
-		tmp = this.getAttribute("building-part");
-		if (tmp != null) {
-			this.handleBuildingPart(tmp, tileMap);
-		}
-
-		resolveBuildingInfo();
-	}
-
-	private void handleBuildingPart(String text, Map<String, TileSpec> tileMap)
-	{
-		String[] parts = text.split(",");
-		if (parts.length != 3) {
-			throw new Error("Invalid building-part specification");
-		}
-
-		this.owner = tileMap.get(parts[0]);
-		this.ownerOffsetX = Integer.parseInt(parts[1]);
-		this.ownerOffsetY = Integer.parseInt(parts[2]);
-
-		assert this.owner != null;
-		assert this.ownerOffsetX != 0 || this.ownerOffsetY != 0;
-	}
-
-	public static String[] generateTileNames(Properties recipe)
-	{
-		int ntiles = recipe.size();
-		String[] tileNames = new String[ntiles];
-		ntiles = 0;
-		for (int i = 0; recipe.containsKey(Integer.toString(i)); i++) {
-			tileNames[ntiles++] = Integer.toString(i);
-		}
-		int naturalNumberTiles = ntiles;
-
-		for (Object n_obj : recipe.keySet()) {
-			String n = (String) n_obj;
-			if (n.matches("^\\d+$")) {
-				int x = Integer.parseInt(n);
-				if (x >= 0 && x < naturalNumberTiles) {
-					assert tileNames[x].equals(n);
-					continue;
-				}
-			}
-			assert ntiles < tileNames.length;
-			tileNames[ntiles++] = n;
-		}
-		assert ntiles == tileNames.length;
-		return tileNames;
 	}
 }

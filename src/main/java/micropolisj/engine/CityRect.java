@@ -15,25 +15,13 @@ package micropolisj.engine;
  */
 public class CityRect
 {
-	/**
-	 * The X coordinate of the upper-left corner of the rectangle.
-	 */
-	public int x;
+	private int x;
 
-	/**
-	 * The Y coordinate of the upper-left corner of the rectangle.
-	 */
-	public int y;
+	private int y;
 
-	/**
-	 * The width of the rectangle.
-	 */
-	public int width;
+	private int width;
 
-	/**
-	 * The height of the rectangle.
-	 */
-	public int height;
+	private int height;
 
 	public CityRect()
 	{
@@ -52,10 +40,10 @@ public class CityRect
 	{
 		if (obj instanceof CityRect) {
 			CityRect rhs = (CityRect) obj;
-			return this.x == rhs.x &&
-					this.y == rhs.y &&
-					this.width == rhs.width &&
-					this.height == rhs.height;
+			return x == rhs.x &&
+					y == rhs.y &&
+					width == rhs.width &&
+					height == rhs.height;
 		} else {
 			return false;
 		}
@@ -65,5 +53,57 @@ public class CityRect
 	public String toString()
 	{
 		return "[" + x + "," + y + "," + width + "x" + height + "]";
+	}
+
+	/**
+	 * The X coordinate of the upper-left corner of the rectangle.
+	 */
+	public int getX()
+	{
+		return x;
+	}
+
+	public void setX(int x)
+	{
+		this.x = x;
+	}
+
+	/**
+	 * The Y coordinate of the upper-left corner of the rectangle.
+	 */
+	public int getY()
+	{
+		return y;
+	}
+
+	public void setY(int y)
+	{
+		this.y = y;
+	}
+
+	/**
+	 * The width of the rectangle.
+	 */
+	public int getWidth()
+	{
+		return width;
+	}
+
+	public void setWidth(int width)
+	{
+		this.width = width;
+	}
+
+	/**
+	 * The height of the rectangle.
+	 */
+	public int getHeight()
+	{
+		return height;
+	}
+
+	public void setHeight(int height)
+	{
+		this.height = height;
 	}
 }

@@ -8,52 +8,76 @@
 
 package micropolisj.gui;
 
-import micropolisj.engine.*;
+import micropolisj.engine.CityListener;
+import micropolisj.engine.CityLocation;
+import micropolisj.engine.CityProblem;
+import micropolisj.engine.Micropolis;
+import micropolisj.engine.MicropolisMessage;
+import micropolisj.engine.Sound;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
 import static micropolisj.gui.MainWindow.formatFunds;
 
 public class EvaluationPane extends JPanel
-		implements Micropolis.Listener
+		implements CityListener
 {
-	Micropolis engine;
+	private static final ResourceBundle cstrings = ResourceBundle.getBundle("strings.CityStrings");
+	private static final ResourceBundle gstrings = MainWindow.strings;
+	private Micropolis engine;
+	private JLabel yesLbl;
+	private JLabel noLbl;
+	private JLabel[] voterProblemLbl;
+	private JLabel[] voterCountLbl;
+	private JLabel popLbl;
+	private JLabel deltaLbl;
+	private JLabel assessLbl;
+	private JLabel cityClassLbl;
+	private JLabel gameLevelLbl;
+	private JLabel scoreLbl;
+	private JLabel scoreDeltaLbl;
 
-	JLabel yesLbl;
-	JLabel noLbl;
-	JLabel[] voterProblemLbl;
-	JLabel[] voterCountLbl;
-	JLabel popLbl;
-	JLabel deltaLbl;
-	JLabel assessLbl;
-	JLabel cityClassLbl;
-	JLabel gameLevelLbl;
-	JLabel scoreLbl;
-	JLabel scoreDeltaLbl;
-
-	static ResourceBundle cstrings = ResourceBundle.getBundle("strings.CityStrings");
-	static ResourceBundle gstrings = MainWindow.strings;
-
-	public EvaluationPane(Micropolis _engine)
+	public EvaluationPane(Micropolis engine)
 	{
 		super(new BorderLayout());
 
 		JButton dismissBtn = new JButton(gstrings.getString("dismiss-evaluation"));
 		dismissBtn.addActionListener(evt -> onDismissClicked());
-		add(dismissBtn, BorderLayout.SOUTH);
+		add(dismissBtn, BorderLayout.PAGE_END);
 
-		Box b1 = new Box(BoxLayout.X_AXIS);
+		Box b1 = new Box(BoxLayout.LINE_AXIS);
 		add(b1, BorderLayout.CENTER);
 
 		b1.add(makePublicOpinionPane());
 		b1.add(new JSeparator(SwingConstants.VERTICAL));
 		b1.add(makeStatisticsPane());
 
-		assert _engine != null;
-		setEngine(_engine);
+		assert engine != null;
+		setEngine(engine);
+	}
+
+	private static String getCityClassName(int cityClass)
+	{
+		return cstrings.getString("class." + cityClass);
+	}
+
+	private static String getGameLevelName(int gameLevel)
+	{
+		return cstrings.getString("level." + gameLevel);
 	}
 
 	public void setEngine(Micropolis newEngine)
@@ -86,7 +110,7 @@ public class EvaluationPane extends JPanel
 		c1.gridheight = 1;
 		c1.weightx = 1.0;
 		c1.fill = GridBagConstraints.NONE;
-		c1.anchor = GridBagConstraints.NORTH;
+		c1.anchor = GridBagConstraints.PAGE_START;
 
 		JLabel headerLbl = new JLabel(gstrings.getString("public-opinion"));
 		Font curFont = headerLbl.getFont();
@@ -106,7 +130,7 @@ public class EvaluationPane extends JPanel
 		c2.gridy = 2;
 		c2.gridwidth = c2.gridheight = 1;
 		c2.weightx = 1.0;
-		c2.anchor = GridBagConstraints.EAST;
+		c2.anchor = GridBagConstraints.LINE_END;
 		c2.insets = new Insets(0, 0, 0, 4);
 
 		me.add(new JLabel(gstrings.getString("public-opinion-yes")), c2);
@@ -117,7 +141,7 @@ public class EvaluationPane extends JPanel
 		c3.gridx = 1;
 		c3.gridwidth = c3.gridheight = 1;
 		c3.weightx = 1.0;
-		c3.anchor = GridBagConstraints.WEST;
+		c3.anchor = GridBagConstraints.LINE_START;
 		c3.insets = new Insets(0, 4, 0, 0);
 
 		c3.gridy = 2;
@@ -130,10 +154,10 @@ public class EvaluationPane extends JPanel
 
 		c2.gridy = c3.gridy = 5;
 
-		final int NUM_PROBS = 4;
-		voterProblemLbl = new JLabel[NUM_PROBS];
-		voterCountLbl = new JLabel[NUM_PROBS];
-		for (int i = 0; i < NUM_PROBS; i++) {
+		int numProblems = 4;
+		voterProblemLbl = new JLabel[numProblems];
+		voterCountLbl = new JLabel[numProblems];
+		for (int i = 0; i < numProblems; i++) {
 			voterProblemLbl[i] = new JLabel();
 			me.add(voterProblemLbl[i], c2);
 
@@ -163,7 +187,7 @@ public class EvaluationPane extends JPanel
 		c1.gridheight = 1;
 		c1.weightx = 1.0;
 		c1.fill = GridBagConstraints.NONE;
-		c1.anchor = GridBagConstraints.NORTH;
+		c1.anchor = GridBagConstraints.PAGE_START;
 		c1.insets = new Insets(0, 0, 3, 0);
 
 		JLabel headerLbl = new JLabel(gstrings.getString("statistics-head"));
@@ -182,13 +206,13 @@ public class EvaluationPane extends JPanel
 		c2.gridx = 0;
 		c2.gridwidth = c2.gridheight = 1;
 		c2.weightx = 0.5;
-		c2.anchor = GridBagConstraints.EAST;
+		c2.anchor = GridBagConstraints.LINE_END;
 		c2.insets = new Insets(0, 0, 0, 4);
 
 		c3.gridx = 1;
 		c3.gridwidth = c3.gridheight = 1;
 		c3.weightx = 0.5;
-		c3.anchor = GridBagConstraints.WEST;
+		c3.anchor = GridBagConstraints.LINE_START;
 		c3.insets = new Insets(0, 4, 0, 0);
 
 		c2.gridy = c3.gridy = 1;
@@ -249,16 +273,6 @@ public class EvaluationPane extends JPanel
 	}
 
 	@Override
-	public void censusChanged()
-	{
-	}
-
-	@Override
-	public void demandChanged()
-	{
-	}
-
-	@Override
 	public void fundsChanged()
 	{
 	}
@@ -277,41 +291,31 @@ public class EvaluationPane extends JPanel
 	private void loadEvaluation()
 	{
 		NumberFormat pctFmt = NumberFormat.getPercentInstance();
-		yesLbl.setText(pctFmt.format(0.01 * engine.evaluation.cityYes));
-		noLbl.setText(pctFmt.format(0.01 * engine.evaluation.cityNo));
+		yesLbl.setText(pctFmt.format(0.01 * engine.getEvaluation().getCityYes()));
+		noLbl.setText(pctFmt.format(0.01 * engine.getEvaluation().getCityNo()));
 
 		for (int i = 0; i < voterProblemLbl.length; i++) {
-			CityProblem p = i < engine.evaluation.problemOrder.length ? engine.evaluation.problemOrder[i] : null;
-			int numVotes = p != null ? engine.evaluation.problemVotes.get(p) : 0;
+			CityProblem p = i < engine.getEvaluation().getProblemOrder().length ? engine.getEvaluation().getProblemOrder()[i] : null;
+			int numVotes = p != null ? engine.getEvaluation().getProblemVotes().get(p) : 0;
 
-			if (numVotes != 0) {
+			if (numVotes == 0) {
+				voterProblemLbl[i].setVisible(false);
+				voterCountLbl[i].setVisible(false);
+			} else {
 				voterProblemLbl[i].setText(cstrings.getString("problem." + p.name()));
 				voterCountLbl[i].setText(pctFmt.format(0.01 * numVotes));
 				voterProblemLbl[i].setVisible(true);
 				voterCountLbl[i].setVisible(true);
-			} else {
-				voterProblemLbl[i].setVisible(false);
-				voterCountLbl[i].setVisible(false);
 			}
 		}
 
 		NumberFormat nf = NumberFormat.getInstance();
-		popLbl.setText(nf.format(engine.evaluation.cityPop));
-		deltaLbl.setText(nf.format(engine.evaluation.deltaCityPop));
-		assessLbl.setText(formatFunds(engine.evaluation.cityAssValue));
-		cityClassLbl.setText(getCityClassName(engine.evaluation.cityClass));
-		gameLevelLbl.setText(getGameLevelName(engine.gameLevel));
-		scoreLbl.setText(nf.format(engine.evaluation.cityScore));
-		scoreDeltaLbl.setText(nf.format(engine.evaluation.deltaCityScore));
-	}
-
-	static String getCityClassName(int cityClass)
-	{
-		return cstrings.getString("class." + cityClass);
-	}
-
-	static String getGameLevelName(int gameLevel)
-	{
-		return cstrings.getString("level." + gameLevel);
+		popLbl.setText(nf.format(engine.getEvaluation().getCityPop()));
+		deltaLbl.setText(nf.format(engine.getEvaluation().getDeltaCityPop()));
+		assessLbl.setText(formatFunds(engine.getEvaluation().getCityAssValue()));
+		cityClassLbl.setText(getCityClassName(engine.getEvaluation().getCityClass()));
+		gameLevelLbl.setText(getGameLevelName(engine.getGameLevel()));
+		scoreLbl.setText(nf.format(engine.getEvaluation().getCityScore()));
+		scoreDeltaLbl.setText(nf.format(engine.getEvaluation().getDeltaCityScore()));
 	}
 }

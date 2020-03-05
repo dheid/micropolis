@@ -10,9 +10,9 @@ package micropolisj.engine;
 
 class TranslatedToolEffect implements ToolEffectIfc
 {
-	final ToolEffectIfc base;
-	final int dx;
-	final int dy;
+	private final ToolEffectIfc base;
+	private final int dx;
+	private final int dy;
 
 	TranslatedToolEffect(ToolEffectIfc base, int dx, int dy)
 	{
@@ -22,31 +22,31 @@ class TranslatedToolEffect implements ToolEffectIfc
 	}
 
 	@Override
-	public int getTile(int x, int y)
+	public int getTile(int dx, int dy)
 	{
-		return base.getTile(x + dx, y + dy);
+		return base.getTile(dx + this.dx, dy + this.dy);
 	}
 
 	@Override
-    public void makeSound(int x, int y, Sound sound)
+	public void makeSound(int dx, int dy, Sound sound)
 	{
-		base.makeSound(x + dx, y + dy, sound);
+		base.makeSound(dx + this.dx, dy + this.dy, sound);
 	}
 
 	@Override
-    public void setTile(int x, int y, int tileValue)
+	public void setTile(int dx, int dy, int tileValue)
 	{
-		base.setTile(x + dx, y + dy, tileValue);
+		base.setTile(dx + this.dx, dy + this.dy, tileValue);
 	}
 
 	@Override
-    public void spend(int amount)
+	public void spend(int amount)
 	{
 		base.spend(amount);
 	}
 
 	@Override
-    public void toolResult(ToolResult tr)
+	public void toolResult(ToolResult tr)
 	{
 		base.toolResult(tr);
 	}

@@ -1,15 +1,18 @@
 package micropolisj.gui;
 
-import java.awt.*;
+import java.awt.Image;
 
-public class SourceImage
+class SourceImage
 {
-    Image image;
-    int basisSize;
+	private final Image image;
 
-    SourceImage(Image image, int basisSize)
-    {
-        this.image = image;
-        this.basisSize = basisSize;
-    }
+	SourceImage(Image image)
+	{
+		this.image = image;
+	}
+
+	public Image getImage()
+	{
+		return image;
+	}
 }

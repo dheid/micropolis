@@ -8,21 +8,20 @@
 
 package micropolisj.engine;
 
-import static micropolisj.engine.TileConstants.RIVER;
-
 /**
  * Implements a monster (one of the Micropolis disasters).
  */
 public class MonsterSprite extends Sprite
 {
-	int count;
-	int soundCount;
-	int destX;
-	int destY;
-	int origX;
-	int origY;
-	int step;
-	boolean flag; //true if the monster wants to return home
+	// movement deltas
+	private static final int[] Gx = {2, 2, -2, -2, 0};
+	private static final int[] Gy = {-2, 2, 2, -2, 0};
+	private static final int[] ND1 = {0, 1, 2, 3};
+	private static final int[] ND2 = {1, 2, 3, 0};
+	private static final int[] nn1 = {2, 5, 8, 11};
+	private static final int[] nn2 = {11, 2, 5, 8};
+	private final int origX;
+	private final int origY;
 
 	//GODZILLA FRAMES
 	//   1...3 : northeast
@@ -33,45 +32,42 @@ public class MonsterSprite extends Sprite
 	//      14 : east
 	//      15 : south
 	//      16 : west
-
-	// movement deltas
-	static int[] Gx = {2, 2, -2, -2, 0};
-	static int[] Gy = {-2, 2, 2, -2, 0};
-
-	static int[] ND1 = {0, 1, 2, 3};
-	static int[] ND2 = {1, 2, 3, 0};
-	static int[] nn1 = {2, 5, 8, 11};
-	static int[] nn2 = {11, 2, 5, 8};
+	private int count;
+	private int soundCount;
+	private int destX;
+	private int destY;
+	private boolean flag; //true if the monster wants to return home
+	private int step;
 
 	public MonsterSprite(Micropolis engine, int xpos, int ypos)
 	{
 		super(engine, SpriteKind.GOD);
-		this.x = xpos * 16 + 8;
-		this.y = ypos * 16 + 8;
-		this.width = 48;
-		this.height = 48;
-		this.offx = -24;
-		this.offy = -24;
+		setX(xpos * 16 + 8);
+		setY(ypos * 16 + 8);
+		setWidth(48);
+		setHeight(48);
+		setOffx(-24);
+		setOffy(-24);
 
-		this.origX = x;
-		this.origY = y;
+		origX = getX();
+		origY = getY();
 
-		this.frame = xpos > city.getWidth() / 2 ?
-                ypos > city.getHeight() / 2 ? 10 : 7 :
-                ypos > city.getHeight() / 2 ? 1 : 4;
+		setFrame(xpos > getCity().getWidth() / 2 ?
+				ypos > getCity().getHeight() / 2 ? 10 : 7 :
+				ypos > getCity().getHeight() / 2 ? 1 : 4);
 
-		this.count = 1000;
-		CityLocation p = city.getLocationOfMaxPollution();
-		this.destX = p.x * 16 + 8;
-		this.destY = p.y * 16 + 8;
-		this.flag = false;
-		this.step = 1;
+		count = 1000;
+		CityLocation p = getCity().getLocationOfMaxPollution();
+		destX = p.getX() * 16 + 8;
+		destY = p.getY() * 16 + 8;
+		flag = false;
+		step = 1;
 	}
 
 	@Override
 	public void moveImpl()
 	{
-		if (this.frame == 0) {
+		if (getFrame() == 0) {
 			return;
 		}
 
@@ -79,8 +75,8 @@ public class MonsterSprite extends Sprite
 			soundCount--;
 		}
 
-		int d = (this.frame - 1) / 3;   // basic direction
-		int z = (this.frame - 1) % 3;   // step index (only valid for d<4)
+		int d = (getFrame() - 1) / 3;   // basic direction
+		int z = (getFrame() - 1) % 3;   // step index (only valid for d<4)
 
 		if (d < 4) { //turn n s e w
 			assert step == -1 || step == 1;
@@ -88,54 +84,46 @@ public class MonsterSprite extends Sprite
 			if (z == 0) step = 1;
 			z += step;
 
-			if (getDis(x, y, destX, destY) < 60) {
+			if (getDis(getX(), getY(), destX, destY) < 60) {
 
 				// reached destination
 
-				if (!flag) {
+				if (flag) {
+					// destination was origX, origY;
+					// hide the sprite
+					setFrame(0);
+					return;
+				} else {
 					// destination was the pollution center;
 					// now head for home
 					flag = true;
 					destX = origX;
 					destY = origY;
-				} else {
-					// destination was origX, origY;
-					// hide the sprite
-					this.frame = 0;
-					return;
 				}
 			}
 
-			int c = getDir(x, y, destX, destY);
+			int c = getDir(getX(), getY(), destX, destY);
 			c = (c - 1) / 2;   //convert to one of four basic headings
 			assert c >= 0 && c < 4;
 
-			if (c != d && city.PRNG.nextInt(11) == 0) {
+			if (c != d && getCity().getRandom().nextInt(11) == 0) {
 				// randomly determine direction to turn
-				if (city.PRNG.nextInt(2) == 0) {
-					z = ND1[d];
-				} else {
-					z = ND2[d];
-				}
+				z = getCity().getRandom().nextInt(2) == 0 ? ND1[d] : ND2[d];
 				d = 4;  //transition heading
 
 				if (soundCount == 0) {
-					city.makeSound(x / 16, y / 16, Sound.MONSTER);
-					soundCount = 50 + city.PRNG.nextInt(101);
+					getCity().makeSound(getX() / 16, getY() / 16, Sound.MONSTER);
+					soundCount = 50 + getCity().getRandom().nextInt(101);
 				}
 			}
 		} else {
-			assert this.frame >= 13 && this.frame <= 16;
+			assert getFrame() >= 13 && getFrame() <= 16;
 
-			int z2 = (this.frame - 13) % 4;
+			int z2 = (getFrame() - 13) % 4;
 
-			if (city.PRNG.nextInt(4) == 0) {
+			if (getCity().getRandom().nextInt(4) == 0) {
 				int newFrame;
-				if (city.PRNG.nextInt(2) == 0) {
-					newFrame = nn1[z2];
-				} else {
-					newFrame = nn2[z2];
-				}
+				newFrame = getCity().getRandom().nextInt(2) == 0 ? nn1[z2] : nn2[z2];
 				d = (newFrame - 1) / 3;
 				z = (newFrame - 1) % 3;
 
@@ -145,35 +133,58 @@ public class MonsterSprite extends Sprite
 			}
 		}
 
-		this.frame = d * 3 + z + 1;
+		setFrame(d * 3 + z + 1);
 
-		assert this.frame >= 1 && this.frame <= 16;
+		assert getFrame() >= 1 && getFrame() <= 16;
 
-		this.x += Gx[d];
-		this.y += Gy[d];
+		setX(getX() + Gx[d]);
+		setY(getY() + Gy[d]);
 
-		if (this.count > 0) {
-			this.count--;
+		if (count > 0) {
+			count--;
 		}
 
-		int c = getChar(x, y);
-		if (c == -1 ||
-                c == RIVER && this.count != 0 && false
-		) {
-			this.frame = 0; //kill zilla
+		int c = getChar(getX(), getY());
+		if (c == -1) {
+			setFrame(0); //kill zilla
 		}
 
-		for (Sprite s : city.allSprites()) {
+		for (Sprite s : getCity().allSprites()) {
 			if (checkSpriteCollision(s) &&
-					(s.kind == SpriteKind.AIR ||
-							s.kind == SpriteKind.COP ||
-							s.kind == SpriteKind.SHI ||
-							s.kind == SpriteKind.TRA)
+					(s.getKind() == SpriteKind.AIR ||
+							s.getKind() == SpriteKind.COP ||
+							s.getKind() == SpriteKind.SHI ||
+							s.getKind() == SpriteKind.TRA)
 			) {
 				s.explodeSprite();
 			}
 		}
 
-		destroyTile(x / 16, y / 16);
+		destroyTile(getX() / 16, getY() / 16);
+	}
+
+	public void setCount(int count)
+	{
+		this.count = count;
+	}
+
+	public void setSoundCount(int soundCount)
+	{
+		this.soundCount = soundCount;
+	}
+
+	public void setDestX(int destX)
+	{
+		this.destX = destX;
+	}
+
+	public void setDestY(int destY)
+	{
+		this.destY = destY;
+	}
+
+	public void setFlag(boolean flag)
+	{
+		this.flag = flag;
 	}
 }

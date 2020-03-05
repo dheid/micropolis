@@ -16,42 +16,31 @@ import static micropolisj.engine.TileConstants.CLEAR;
 
 public class ToolPreview implements ToolEffectIfc
 {
-	public int offsetX;
-	public int offsetY;
-	public short[][] tiles;
-	public int cost;
-	public ToolResult toolResult;
-	public List<SoundInfo> sounds;
+	private static final short[][] NO_TILES = new short[0][0];
 
-	public static class SoundInfo
-	{
-		public int x;
-		public int y;
-		public Sound sound;
+	private final List<SoundInfo> sounds;
 
-		SoundInfo(int x, int y, Sound sound)
-		{
-			this.x = x;
-			this.y = y;
-			this.sound = sound;
-		}
-	}
+	private int offsetX;
+
+	private int offsetY;
+
+	private short[][] tiles;
+
+	private int cost;
+
+	private ToolResult toolResult;
 
 	ToolPreview()
 	{
-		this.tiles = new short[0][0];
-		this.sounds = new ArrayList<>();
-		this.toolResult = ToolResult.NONE;
+		tiles = NO_TILES;
+		sounds = new ArrayList<>();
+		toolResult = ToolResult.NONE;
 	}
 
 	@Override
 	public int getTile(int dx, int dy)
 	{
-		if (inRange(dx, dy)) {
-			return tiles[offsetY + dy][offsetX + dx];
-		} else {
-			return CLEAR;
-		}
+		return inRange(dx, dy) ? tiles[offsetY + dy][offsetX + dx] : CLEAR;
 	}
 
 	public CityRect getBounds()
@@ -74,7 +63,7 @@ public class ToolPreview implements ToolEffectIfc
 		return tiles.length;
 	}
 
-	boolean inRange(int dx, int dy)
+	private boolean inRange(int dx, int dy)
 	{
 		return offsetY + dy >= 0 &&
 				offsetY + dy < getHeight() &&
@@ -82,7 +71,7 @@ public class ToolPreview implements ToolEffectIfc
 				offsetX + dx < getWidth();
 	}
 
-	void expandTo(int dx, int dy)
+	private void expandTo(int dx, int dy)
 	{
 		if (tiles == null || tiles.length == 0) {
 			tiles = new short[1][1];
@@ -94,20 +83,20 @@ public class ToolPreview implements ToolEffectIfc
 
 		// expand each existing row as needed
 		for (int i = 0; i < tiles.length; i++) {
-			short[] A = tiles[i];
-			if (offsetX + dx >= A.length) {
+			short[] a = tiles[i];
+			if (offsetX + dx >= a.length) {
 				int newLen = offsetX + dx + 1;
-				short[] AA = new short[newLen];
-				System.arraycopy(A, 0, AA, 0, A.length);
-				Arrays.fill(AA, A.length, newLen, CLEAR);
-				tiles[i] = AA;
+				short[] aa = new short[newLen];
+				System.arraycopy(a, 0, aa, 0, a.length);
+				Arrays.fill(aa, a.length, newLen, CLEAR);
+				tiles[i] = aa;
 			} else if (offsetX + dx < 0) {
 				int addl = -(offsetX + dx);
-				int newLen = A.length + addl;
-				short[] AA = new short[newLen];
-				System.arraycopy(A, 0, AA, addl, A.length);
-				Arrays.fill(AA, 0, addl, CLEAR);
-				tiles[i] = AA;
+				int newLen = a.length + addl;
+				short[] aa = new short[newLen];
+				System.arraycopy(a, 0, aa, addl, a.length);
+				Arrays.fill(aa, 0, addl, CLEAR);
+				tiles[i] = aa;
 			}
 		}
 
@@ -161,6 +150,37 @@ public class ToolPreview implements ToolEffectIfc
 	@Override
 	public void toolResult(ToolResult tr)
 	{
-		this.toolResult = tr;
+		toolResult = tr;
 	}
+
+	public List<SoundInfo> getSounds()
+	{
+		return sounds;
+	}
+
+	public int getOffsetX()
+	{
+		return offsetX;
+	}
+
+	public int getOffsetY()
+	{
+		return offsetY;
+	}
+
+	public short[][] getTiles()
+	{
+		return tiles;
+	}
+
+	public int getCost()
+	{
+		return cost;
+	}
+
+	public ToolResult getToolResult()
+	{
+		return toolResult;
+	}
+
 }

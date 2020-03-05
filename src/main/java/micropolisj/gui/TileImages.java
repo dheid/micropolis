@@ -11,8 +11,13 @@ package micropolisj.gui;
 import micropolisj.engine.SpriteKind;
 import micropolisj.engine.TileSpec;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,22 +37,20 @@ public class TileImages
 {
 
 	private static final int STD_SIZE = 16;
-
-	final int tileWidth;
-	final int tileHeight;
-	BufferedImage[] images;
-	Map<SpriteKind, Map<Integer, Image>> spriteImages;
+	private static final Map<Integer, TileImages> savedInstances = new HashMap<>();
+	private final int tileWidth;
+	private final int tileHeight;
+	private final BufferedImage[] images;
+	private Map<SpriteKind, Map<Integer, Image>> spriteImages;
 
 	private TileImages(int size)
 	{
-		this.tileWidth = size;
-		this.tileHeight = size;
+		tileWidth = size;
+		tileHeight = size;
 
-		this.images = loadTileImages();
+		images = loadTileImages();
 		loadSpriteImages();
 	}
-
-	static Map<Integer, TileImages> savedInstances = new HashMap<>();
 
 	public static TileImages getInstance(int size)
 	{
@@ -55,6 +58,41 @@ public class TileImages
 			savedInstances.put(size, new TileImages(size));
 		}
 		return savedInstances.get(size);
+	}
+
+	private static FrameSpec parseFrameSpec(TileSpec spec)
+	{
+		FrameSpec result = null;
+
+		for (String layerStr : spec.getImages()) {
+
+			FrameSpec rv = new FrameSpec();
+			result = rv;
+
+			String[] parts = layerStr.split("@", 2);
+			rv.setImage(loadImage(parts[0]));
+
+			if (parts.length >= 2) {
+				String offsetInfo = parts[1];
+				parts = offsetInfo.split(",");
+				if (parts.length >= 1) {
+					rv.setOffsetX(Integer.parseInt(parts[0]));
+				}
+				if (parts.length >= 2) {
+					rv.setOffsetY(Integer.parseInt(parts[1]));
+				}
+			}//endif something given after '@' in image specifier
+
+		}//end foreach layer in image specification
+
+		return result;
+	}
+
+	private static SourceImage loadImage(String fileName)
+	{
+		URL pngFile = TileImages.class.getResource("/graphics/" + fileName + ".png");
+		ImageIcon ii = new ImageIcon(pngFile);
+		return new SourceImage(ii.getImage());
 	}
 
 	public BufferedImage getTileImage(int cell)
@@ -66,10 +104,8 @@ public class TileImages
 	private BufferedImage[] loadTileImages()
 	{
 
-		InputStream recipeFile = TileImages.class.getResourceAsStream("/graphics/tiles.rc");
-
 		Properties recipe = new Properties();
-		try {
+		try (InputStream recipeFile = TileImages.class.getResourceAsStream("/graphics/tiles.rc")){
 			recipe.load(new InputStreamReader(recipeFile, StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException("Could not load tiles recipe file tiles.rc", e);
@@ -99,52 +135,17 @@ public class TileImages
 				continue;
 			}
 
-			SourceImage sourceImg = ref.image;
-			gr.drawImage(sourceImg.image, 0, 0, tileWidth, tileHeight,
-					ref.offsetX * sourceImg.basisSize / STD_SIZE,
-					ref.offsetY * sourceImg.basisSize / STD_SIZE,
-					(ref.offsetX + STD_SIZE) * sourceImg.basisSize / STD_SIZE,
-					(ref.offsetY + STD_SIZE) * sourceImg.basisSize / STD_SIZE,
+			SourceImage sourceImg = ref.getImage();
+			gr.drawImage(sourceImg.getImage(), 0, 0, tileWidth, tileHeight,
+					ref.getOffsetX(),
+					ref.getOffsetY(),
+					(ref.getOffsetX() + STD_SIZE),
+					(ref.getOffsetY() + STD_SIZE),
 					null);
 
 			images[tileNumber] = bi;
 		}
 		return images;
-	}
-
-	private static FrameSpec parseFrameSpec(TileSpec spec)
-	{
-		FrameSpec result = null;
-
-		for (String layerStr : spec.getImages()) {
-
-			FrameSpec rv = new FrameSpec();
-			result = rv;
-
-			String[] parts = layerStr.split("@", 2);
-			rv.image = loadImage(parts[0]);
-
-			if (parts.length >= 2) {
-				String offsetInfo = parts[1];
-				parts = offsetInfo.split(",");
-				if (parts.length >= 1) {
-					rv.offsetX = Integer.parseInt(parts[0]);
-				}
-				if (parts.length >= 2) {
-					rv.offsetY = Integer.parseInt(parts[1]);
-				}
-			}//endif something given after '@' in image specifier
-
-		}//end foreach layer in image specification
-
-		return result;
-	}
-
-	private static SourceImage loadImage(String fileName)
-	{
-		URL pngFile = TileImages.class.getResource("/graphics/" + fileName + ".png");
-		ImageIcon ii = new ImageIcon(pngFile);
-		return new SourceImage(ii.getImage(), STD_SIZE);
 	}
 
 	public Image getSpriteImage(SpriteKind kind, int frameNumber)
@@ -156,7 +157,7 @@ public class TileImages
 	{
 		spriteImages = new EnumMap<>(SpriteKind.class);
 		for (SpriteKind kind : SpriteKind.values()) {
-			HashMap<Integer, Image> imgs = new HashMap<>();
+			Map<Integer, Image> imgs = new HashMap<>();
 			for (int i = 0; i < kind.numFrames; i++) {
 				Image img = loadSpriteImage(kind, i);
 				if (img != null) {
@@ -167,7 +168,7 @@ public class TileImages
 		}
 	}
 
-	Image loadSpriteImage(SpriteKind kind, int frameNo)
+	private Image loadSpriteImage(SpriteKind kind, int frameNo)
 	{
 		String resourceName = "/obj" + kind.objectId + "-" + frameNo;
 
@@ -204,4 +205,13 @@ public class TileImages
 		return bi;
 	}
 
+	public int getTileWidth()
+	{
+		return tileWidth;
+	}
+
+	public int getTileHeight()
+	{
+		return tileHeight;
+	}
 }

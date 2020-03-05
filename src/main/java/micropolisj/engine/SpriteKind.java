@@ -25,7 +25,7 @@ public enum SpriteKind
 	public final int objectId;
 	public final int numFrames;
 
-	private SpriteKind(int objectId, int numFrames)
+	SpriteKind(int objectId, int numFrames)
 	{
 		this.objectId = objectId;
 		this.numFrames = numFrames;

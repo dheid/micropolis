@@ -39,12 +39,17 @@ public class TileConstants
 	//
 	public static final short CLEAR = -1;
 	public static final char DIRT = 0;
+	public static final char LIGHTNINGBOLT = 827;
+	//
+	// status bits
+	//
+	public static final char PWRBIT = 32768;  // bit 15 ... currently powered
+	public static final char ALLBITS = 64512;   // mask for upper 6 bits
+	public static final char LOMASK = 1023; //mask for low 10 bits
 	static final char RIVER = 2;
 	static final char REDGE = 3;
 	static final char CHANNEL = 4;
 	static final char RIVEDGE = 5;
-	static final char FIRSTRIVEDGE = 5;
-	static final char LASTRIVEDGE = 20;
 	static final char TREEBASE = 21;
 	static final char WOODS_LOW = TREEBASE;
 	static final char WOODS = 37;
@@ -52,7 +57,6 @@ public class TileConstants
 	static final char WOODS2 = 40;
 	static final char WOODS5 = 43;
 	static final char RUBBLE = 44;
-	static final char LASTRUBBLE = 47;
 	static final char FLOOD = 48;
 	static final char RADTILE = 52;
 	static final char FIRE = 56;
@@ -61,14 +65,6 @@ public class TileConstants
 	static final char VBRIDGE = 65;
 	static final char ROADS = 66;
 	static final char ROADS2 = 67;
-	private static final char ROADS3 = 68;
-	private static final char ROADS4 = 69;
-	private static final char ROADS5 = 70;
-	private static final char ROADS6 = 71;
-	private static final char ROADS7 = 72;
-	private static final char ROADS8 = 73;
-	private static final char ROADS9 = 74;
-	private static final char ROADS10 = 75;
 	static final char INTERSECTION = 76;
 	static final char HROADPOWER = 77;
 	static final char VROADPOWER = 78;
@@ -76,21 +72,11 @@ public class TileConstants
 	static final char LTRFBASE = 80;
 	static final char BRWV = 95;       //vert bridge, open
 	static final char HTRFBASE = 144;
-	private static final char LASTROAD = 206;
 	static final char POWERBASE = 208;
 	static final char HPOWER = 208;    //underwater power-line
 	static final char VPOWER = 209;
 	static final char LHPOWER = 210;
 	static final char LVPOWER = 211;
-	static final char LVPOWER2 = 212;
-	private static final char LVPOWER3 = 213;
-	private static final char LVPOWER4 = 214;
-	private static final char LVPOWER5 = 215;
-	private static final char LVPOWER6 = 216;
-	private static final char LVPOWER7 = 217;
-	private static final char LVPOWER8 = 218;
-	private static final char LVPOWER9 = 219;
-	private static final char LVPOWER10 = 220;
 	static final char RAILHPOWERV = 221;
 	static final char RAILVPOWERH = 222;
 	static final char LASTPOWER = 222;
@@ -99,19 +85,9 @@ public class TileConstants
 	static final char VRAIL = 225;     //underwater rail (vert)
 	static final char LHRAIL = 226;
 	static final char LVRAIL = 227;
-	static final char LVRAIL2 = 228;
-	private static final char LVRAIL3 = 229;
-	private static final char LVRAIL4 = 230;
-	private static final char LVRAIL5 = 231;
-	private static final char LVRAIL6 = 232;
-	private static final char LVRAIL7 = 233;
-	private static final char LVRAIL8 = 234;
-	private static final char LVRAIL9 = 235;
-	private static final char LVRAIL10 = 236;
 	static final char HRAILROAD = 237;
 	static final char VRAILROAD = 238;
 	static final char LASTRAIL = 238;
-	static final char RESBASE = 240;
 	static final char RESCLR = 244;
 	static final char HOUSE = 249;
 	static final char LHTHR = 249;  //12 house tiles
@@ -135,54 +111,73 @@ public class TileConstants
 	static final char FULLSTADIUM = 800;
 	static final char NUCLEAR = 816;
 	static final char LASTZONE = 826;
-	public static final char LIGHTNINGBOLT = 827;
 	static final char HBRDG0 = 828;   //draw bridge tiles (horz)
 	static final char HBRDG1 = 829;
 	static final char HBRDG2 = 830;
 	static final char HBRDG3 = 831;
 	static final char FOUNTAIN = 840;
 	static final char TINYEXP = 860;
-	private static final char LASTTINYEXP = 867;
 	static final char FOOTBALLGAME1 = 932;
 	static final char FOOTBALLGAME2 = 940;
 	static final char VBRDG0 = 948;   //draw bridge tiles (vert)
 	static final char VBRDG1 = 949;
 	static final char VBRDG2 = 950;
 	static final char VBRDG3 = 951;
-
-	static final char[] RoadTable = new char[]{
+	private static final char FIRSTRIVEDGE = 5;
+	private static final char LASTRIVEDGE = 20;
+	private static final char LASTRUBBLE = 47;
+	private static final char ROADS3 = 68;
+	private static final char ROADS4 = 69;
+	private static final char ROADS5 = 70;
+	private static final char ROADS6 = 71;
+	private static final char ROADS7 = 72;
+	private static final char ROADS8 = 73;
+	private static final char ROADS9 = 74;
+	private static final char ROADS10 = 75;
+	static final char[] RoadTable = {
 			ROADS, ROADS2, ROADS, ROADS3,
 			ROADS2, ROADS2, ROADS4, ROADS8,
 			ROADS, ROADS6, ROADS, ROADS7,
 			ROADS5, ROADS10, ROADS9, INTERSECTION
 	};
-
-	static final char[] RailTable = new char[]{
-			LHRAIL, LVRAIL, LHRAIL, LVRAIL2,
-			LVRAIL, LVRAIL, LVRAIL3, LVRAIL7,
-			LHRAIL, LVRAIL5, LHRAIL, LVRAIL6,
-			LVRAIL4, LVRAIL9, LVRAIL8, LVRAIL10
-	};
-
-	static final char[] WireTable = new char[]{
+	private static final char LASTROAD = 206;
+	private static final char LVPOWER2 = 212;
+	private static final char LVPOWER3 = 213;
+	private static final char LVPOWER4 = 214;
+	private static final char LVPOWER5 = 215;
+	private static final char LVPOWER6 = 216;
+	private static final char LVPOWER7 = 217;
+	private static final char LVPOWER8 = 218;
+	private static final char LVPOWER9 = 219;
+	private static final char LVPOWER10 = 220;
+	static final char[] WireTable = {
 			LHPOWER, LVPOWER, LHPOWER, LVPOWER2,
 			LVPOWER, LVPOWER, LVPOWER3, LVPOWER7,
 			LHPOWER, LVPOWER5, LHPOWER, LVPOWER6,
 			LVPOWER4, LVPOWER9, LVPOWER8, LVPOWER10
 	};
-
-	//
-	// status bits
-	//
-	public static final char PWRBIT = 32768;  // bit 15 ... currently powered
+	private static final char LVRAIL2 = 228;
+	private static final char LVRAIL3 = 229;
+	private static final char LVRAIL4 = 230;
+	private static final char LVRAIL5 = 231;
+	private static final char LVRAIL6 = 232;
+	private static final char LVRAIL7 = 233;
+	private static final char LVRAIL8 = 234;
+	private static final char LVRAIL9 = 235;
+	private static final char LVRAIL10 = 236;
+	static final char[] RailTable = {
+			LHRAIL, LVRAIL, LHRAIL, LVRAIL2,
+			LVRAIL, LVRAIL, LVRAIL3, LVRAIL7,
+			LHRAIL, LVRAIL5, LHRAIL, LVRAIL6,
+			LVRAIL4, LVRAIL9, LVRAIL8, LVRAIL10
+	};
 	// bit 14 ... unused
 	// bit 13 ... unused
 	// bit 12 ... unused
 	// bit 11 ... unused
 	// bit 10 ... unused
-
-	public static final char ALLBITS = 64512;   // mask for upper 6 bits
-	public static final char LOMASK = 1023; //mask for low 10 bits
+	private static final char RESBASE = 240;
+	private static final char LASTTINYEXP = 867;
 
 	private TileConstants()
 	{
@@ -208,13 +203,9 @@ public class TileConstants
 		//FIXME- what is significance of POWERBASE+2 and POWERBASE+12 ?
 
 		// can we autobulldoze this tile?
-		if (tileValue >= FIRSTRIVEDGE && tileValue <= LASTRUBBLE ||
+		return tileValue >= FIRSTRIVEDGE && tileValue <= LASTRUBBLE ||
 				tileValue >= POWERBASE + 2 && tileValue <= POWERBASE + 12 ||
-				tileValue >= TINYEXP && tileValue <= LASTTINYEXP) {
-			return true;
-		} else {
-			return false;
-		}
+				tileValue >= TINYEXP && tileValue <= LASTTINYEXP;
 	}
 
 	//used by scanTile
@@ -232,11 +223,7 @@ public class TileConstants
 		assert (tile & LOMASK) == tile;
 
 		TileSpec ts = Tiles.get(tile);
-		if (ts != null) {
-			return ts.getDescriptionNumber();
-		} else {
-			return -1;
-		}
+		return ts != null ? ts.getDescriptionNumber() : -1;
 	}
 
 	public static int getPollutionValue(int tile)
@@ -252,7 +239,7 @@ public class TileConstants
 		assert (tile & LOMASK) == tile;
 
 		TileSpec spec = Tiles.get(tile);
-		return spec != null && spec.animNext != null;
+		return spec != null && spec.getAnimNext() != null;
 	}
 
 	//used by setFire()
@@ -276,7 +263,7 @@ public class TileConstants
 		assert (tile & LOMASK) == tile;
 
 		TileSpec spec = Tiles.get(tile);
-		return spec != null && spec.canBurn;
+		return spec != null && spec.isCanBurn();
 	}
 
 	public static boolean isConductive(int tile)
@@ -284,7 +271,7 @@ public class TileConstants
 		assert (tile & LOMASK) == tile;
 
 		TileSpec spec = Tiles.get(tile);
-		return spec != null && spec.canConduct;
+		return spec != null && spec.isCanConduct();
 	}
 
 	/**
@@ -312,7 +299,7 @@ public class TileConstants
 		assert (tile & LOMASK) == tile;
 
 		TileSpec spec = Tiles.get(tile);
-		return spec != null && spec.overWater;
+		return spec != null && spec.isOverWater();
 	}
 
 	public static boolean isRubble(int tile)
@@ -336,14 +323,9 @@ public class TileConstants
 	{
 		assert (tile & LOMASK) == tile;
 
-		if (tile < RESBASE ||
-				tile > LASTZONE ||
-				isZoneCenter(tile)
-		) {
-			return false;
-		} else {
-			return true;
-		}
+		return tile >= RESBASE &&
+				tile <= LASTZONE &&
+				!isZoneCenter(tile);
 	}
 
 	public static boolean checkWet(int tile)
@@ -371,7 +353,7 @@ public class TileConstants
 	{
 		assert (tile & LOMASK) == tile;
 
-		return tile >= 0 && tile >= ROADBASE;
+		return tile >= ROADBASE;
 	}
 
 	static boolean isRiverEdge(int tile)
@@ -381,12 +363,12 @@ public class TileConstants
 		return tile >= FIRSTRIVEDGE && tile <= LASTRIVEDGE;
 	}
 
-	public static boolean isDozeable(int tile)
+	private static boolean isDozeable(int tile)
 	{
 		assert (tile & LOMASK) == tile;
 
 		TileSpec spec = Tiles.get(tile);
-		return spec != null && spec.canBulldoze;
+		return spec != null && spec.isCanBulldoze();
 	}
 
 	static boolean isFloodable(int tile)
@@ -401,7 +383,7 @@ public class TileConstants
 	 *
 	 * @see #isRoadAny
 	 */
-	public static boolean isRoad(int tile)
+	private static boolean isRoad(int tile)
 	{
 		assert (tile & LOMASK) == tile;
 
@@ -430,45 +412,29 @@ public class TileConstants
 	public static boolean roadConnectsEast(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (tile == VRAILROAD ||
-				tile >= ROADBASE && tile <= VROADPOWER
-		) &&
-				tile != VROADPOWER &&
-				tile != HRAILROAD &&
-				tile != VBRIDGE;
+		return (tile == VRAILROAD || tile >= ROADBASE && tile <= VROADPOWER
+		) && tile != VROADPOWER && tile != VBRIDGE;
 	}
 
 	public static boolean roadConnectsNorth(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (tile == HRAILROAD ||
-				tile >= ROADBASE && tile <= VROADPOWER
-		) &&
-				tile != HROADPOWER &&
-				tile != VRAILROAD &&
-				tile != ROADBASE;
+		return (tile == HRAILROAD || tile >= ROADBASE && tile <= VROADPOWER
+		) && tile != HROADPOWER && tile != ROADBASE;
 	}
 
 	public static boolean roadConnectsSouth(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (tile == HRAILROAD ||
-				tile >= ROADBASE && tile <= VROADPOWER
-		) &&
-				tile != HROADPOWER &&
-				tile != VRAILROAD &&
-				tile != ROADBASE;
+		return (tile == HRAILROAD || tile >= ROADBASE && tile <= VROADPOWER
+		) && tile != HROADPOWER && tile != ROADBASE;
 	}
 
 	public static boolean roadConnectsWest(int tile)
 	{
 		tile = neutralizeRoad(tile);
-		return (tile == VRAILROAD ||
-				tile >= ROADBASE && tile <= VROADPOWER
-		) &&
-				tile != VROADPOWER &&
-				tile != HRAILROAD &&
-				tile != VBRIDGE;
+		return (tile == VRAILROAD || tile >= ROADBASE && tile <= VROADPOWER
+		) && tile != VROADPOWER && tile != VBRIDGE;
 	}
 
 	public static boolean isRail(int tile)
@@ -579,8 +545,8 @@ public class TileConstants
 
 		TileSpec ts = Tiles.get(tile);
 		if (ts != null) {
-			if (ts.owner != null) {
-				ts = ts.owner;
+			if (ts.getOwner() != null) {
+				ts = ts.getOwner();
 			}
 			return ts.getBooleanAttribute("commercial-zone");
 		}
@@ -598,8 +564,8 @@ public class TileConstants
 
 		TileSpec ts = Tiles.get(tile);
 		if (ts != null) {
-			if (ts.owner != null) {
-				ts = ts.owner;
+			if (ts.getOwner() != null) {
+				ts = ts.getOwner();
 			}
 			return ts.getBooleanAttribute("industrial-zone");
 		}
@@ -620,8 +586,8 @@ public class TileConstants
 
 		TileSpec ts = Tiles.get(tile);
 		if (ts != null) {
-			if (ts.owner != null) {
-				ts = ts.owner;
+			if (ts.getOwner() != null) {
+				ts = ts.getOwner();
 			}
 			return ts.getBooleanAttribute("residential-zone");
 		}
@@ -643,7 +609,7 @@ public class TileConstants
 		assert (tile & LOMASK) == tile;
 
 		TileSpec spec = Tiles.get(tile);
-		return spec != null && spec.zone;
+		return spec != null && spec.isZone();
 	}
 
 	/**

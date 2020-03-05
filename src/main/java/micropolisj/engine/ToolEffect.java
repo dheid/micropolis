@@ -12,10 +12,10 @@ import static micropolisj.engine.TileConstants.CLEAR;
 
 class ToolEffect implements ToolEffectIfc
 {
-	final Micropolis city;
-	final ToolPreview preview;
-	final int originX;
-	final int originY;
+	private final ToolPreview preview;
+	private final Micropolis city;
+	private final int originX;
+	private final int originY;
 
 	ToolEffect(Micropolis city)
 	{
@@ -25,9 +25,9 @@ class ToolEffect implements ToolEffectIfc
 	ToolEffect(Micropolis city, int xpos, int ypos)
 	{
 		this.city = city;
-		this.preview = new ToolPreview();
-		this.originX = xpos;
-		this.originY = ypos;
+		preview = new ToolPreview();
+		originX = xpos;
+		originY = ypos;
 	}
 
 	@Override
@@ -38,72 +38,73 @@ class ToolEffect implements ToolEffectIfc
 			return c;
 		}
 
-		if (city.testBounds(originX + dx, originY + dy)) {
-			return city.getTile(originX + dx, originY + dy);
-		} else {
-			// tiles outside city's boundary assumed to be
-			// tile #0 (dirt).
-			return 0;
-		}
+		// tiles outside city's boundary assumed to be
+		// tile #0 (dirt).
+		return city.testBounds(originX + dx, originY + dy) ? city.getTile(originX + dx, originY + dy) : 0;
 	}
 
 	@Override
-    public void makeSound(int dx, int dy, Sound sound)
+	public void makeSound(int dx, int dy, Sound sound)
 	{
 		preview.makeSound(dx, dy, sound);
 	}
 
 	@Override
-    public void setTile(int dx, int dy, int tileValue)
+	public void setTile(int dx, int dy, int tileValue)
 	{
 		preview.setTile(dx, dy, tileValue);
 	}
 
 	@Override
-    public void spend(int amount)
+	public void spend(int amount)
 	{
 		preview.spend(amount);
 	}
 
 	@Override
-    public void toolResult(ToolResult tr)
+	public void toolResult(ToolResult tr)
 	{
 		preview.toolResult(tr);
 	}
 
 	ToolResult apply()
 	{
-		if (originX - preview.offsetX < 0 ||
-				originX - preview.offsetX + preview.getWidth() > city.getWidth() ||
-				originY - preview.offsetY < 0 ||
-				originY - preview.offsetY + preview.getHeight() > city.getHeight()) {
+		if (originX - preview.getOffsetX() < 0 ||
+				originX - preview.getOffsetX() + preview.getWidth() > city.getWidth() ||
+				originY - preview.getOffsetY() < 0 ||
+				originY - preview.getOffsetY() + preview.getHeight() > city.getHeight()) {
 			return ToolResult.UH_OH;
 		}
 
-		if (city.budget.totalFunds < preview.cost) {
+		if (city.getBudget().getTotalFunds() < preview.getCost()) {
 			return ToolResult.INSUFFICIENT_FUNDS;
 		}
 
 		boolean anyFound = false;
-		for (int y = 0; y < preview.tiles.length; y++) {
-			for (int x = 0; x < preview.tiles[y].length; x++) {
-				int c = preview.tiles[y][x];
+		for (int y = 0; y < preview.getTiles().length; y++) {
+			for (int x = 0; x < preview.getTiles()[y].length; x++) {
+				int c = preview.getTiles()[y][x];
 				if (c != CLEAR) {
-					city.setTile(originX + x - preview.offsetX, originY + y - preview.offsetY, (char) c);
+					city.setTile(originX + x - preview.getOffsetX(), originY + y - preview.getOffsetY(), (char) c);
 					anyFound = true;
 				}
 			}
 		}
 
-		for (ToolPreview.SoundInfo si : preview.sounds) {
-			city.makeSound(si.x, si.y, si.sound);
+		for (SoundInfo si : preview.getSounds()) {
+			city.makeSound(si.getX(), si.getY(), si.getSound());
 		}
 
-		if (anyFound && preview.cost != 0) {
-			city.spend(preview.cost);
+		if (anyFound && preview.getCost() != 0) {
+			city.spend(preview.getCost());
 			return ToolResult.SUCCESS;
 		} else {
-			return preview.toolResult;
+			return preview.getToolResult();
 		}
+	}
+
+	public ToolPreview getPreview()
+	{
+		return preview;
 	}
 }

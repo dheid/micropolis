@@ -31,23 +31,18 @@ public enum MicropolisTool
 	AIRPORT(6, 10000),
 	QUERY(1, 0);
 
-	int size;
-	int cost;
+	private final int size;
+	private final int cost;
 
-	private MicropolisTool(int size, int cost)
+	MicropolisTool(int size, int cost)
 	{
 		this.size = size;
 		this.cost = cost;
 	}
 
-	public int getWidth()
+	public int getSize()
 	{
 		return size;
-	}
-
-	public int getHeight()
-	{
-		return getWidth();
 	}
 
 	public ToolStroke beginStroke(Micropolis engine, int xpos, int ypos)
@@ -81,7 +76,7 @@ public enum MicropolisTool
 	 * applied, as extra may be charged for clearing land or building
 	 * over or through water.
 	 */
-	public int getToolCost()
+	public int getCost()
 	{
 		return cost;
 	}

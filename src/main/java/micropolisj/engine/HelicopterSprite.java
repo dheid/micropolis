@@ -16,89 +16,105 @@ package micropolisj.engine;
  */
 public class HelicopterSprite extends Sprite
 {
-	int count;
-	int destX;
-	int destY;
-	int origX;
-	int origY;
+	private static final int[] CDx = {0, 0, 3, 5, 3, 0, -3, -5, -3};
 
-	static int[] CDx = {0, 0, 3, 5, 3, 0, -3, -5, -3};
-	static int[] CDy = {0, -5, -3, 0, 3, 5, 3, 0, -3};
-	static final int SOUND_FREQ = 200;
+	private static final int[] CDy = {0, -5, -3, 0, 3, 5, 3, 0, -3};
+
+	private static final int SOUND_FREQ = 200;
+
+	private final int origX;
+
+	private final int origY;
+
+	private int destX;
+
+	private int destY;
+
+	private int count;
 
 	public HelicopterSprite(Micropolis engine, int xpos, int ypos)
 	{
 		super(engine, SpriteKind.COP);
-		this.x = xpos * 16 + 8;
-		this.y = ypos * 16 + 8;
-		this.width = 32;
-		this.height = 32;
-		this.offx = -16;
-		this.offy = -16;
+		setX(xpos * 16 + 8);
+		setY(ypos * 16 + 8);
+		setWidth(32);
+		setHeight(32);
+		setOffx(-16);
+		setOffy(-16);
 
-		this.destX = city.PRNG.nextInt(city.getWidth()) * 16 + 8;
-		this.destY = city.PRNG.nextInt(city.getHeight()) * 16 + 8;
+		destX = getCity().getRandom().nextInt(getCity().getWidth()) * 16 + 8;
+		destY = getCity().getRandom().nextInt(getCity().getHeight()) * 16 + 8;
 
-		this.origX = x;
-		this.origY = y;
-		this.count = 1500;
-		this.frame = 5;
+		origX = getX();
+		origY = getY();
+		count = 1500;
+		setFrame(5);
 	}
 
 	@Override
 	public void moveImpl()
 	{
-		if (this.count > 0) {
-			this.count--;
+		if (count > 0) {
+			count--;
 		}
 
-		if (this.count == 0) {
+		if (count == 0) {
 
 			// attract copter to monster and tornado so it blows up more often
-			if (city.hasSprite(SpriteKind.GOD)) {
+			if (getCity().hasSprite(SpriteKind.GOD)) {
 
-				MonsterSprite monster = (MonsterSprite) city.getSprite(SpriteKind.GOD);
-				this.destX = monster.x;
-				this.destY = monster.y;
+				MonsterSprite monster = (MonsterSprite) getCity().getSprite(SpriteKind.GOD);
+				destX = monster.getX();
+				destY = monster.getY();
 
-			} else if (city.hasSprite(SpriteKind.TOR)) {
+			} else if (getCity().hasSprite(SpriteKind.TOR)) {
 
-				TornadoSprite tornado = (TornadoSprite) city.getSprite(SpriteKind.TOR);
-				this.destX = tornado.x;
-				this.destY = tornado.y;
+				TornadoSprite tornado = (TornadoSprite) getCity().getSprite(SpriteKind.TOR);
+				destX = tornado.getX();
+				destY = tornado.getY();
 
 			} else {
-				this.destX = origX;
-				this.destY = origY;
+				destX = origX;
+				destY = origY;
 			}
 
-			if (getDis(x, y, origX, origY) < 30) {
+			if (getDis(getX(), getY(), origX, origY) < 30) {
 				// made it back to airport, go ahead and land.
-				this.frame = 0;
+				setFrame(0);
 				return;
 			}
 		}
 
-		if (city.acycle % SOUND_FREQ == 0) {
+		if (getCity().getAcycle() % SOUND_FREQ == 0) {
 			// send report, if hovering over high traffic area
-			int xpos = this.x / 16;
-			int ypos = this.y / 16;
+			int xpos = getX() / 16;
+			int ypos = getY() / 16;
 
-			if (city.getTrafficDensity(xpos, ypos) > 170 &&
-					city.PRNG.nextInt(8) == 0) {
-				city.sendMessageAt(MicropolisMessage.HEAVY_TRAFFIC_REPORT,
+			if (getCity().getTrafficDensity(xpos, ypos) > 170 &&
+					getCity().getRandom().nextInt(8) == 0) {
+				getCity().sendMessageAt(MicropolisMessage.HEAVY_TRAFFIC_REPORT,
 						xpos, ypos);
-				city.makeSound(xpos, ypos, Sound.HEAVYTRAFFIC);
+				getCity().makeSound(xpos, ypos, Sound.HEAVYTRAFFIC);
 			}
 		}
 
-		int z = this.frame;
-		if (city.acycle % 3 == 0) {
-			int d = getDir(x, y, destX, destY);
+		int z = getFrame();
+		if (getCity().getAcycle() % 3 == 0) {
+			int d = getDir(getX(), getY(), destX, destY);
 			z = turnTo(z, d);
-			this.frame = z;
+			setFrame(z);
 		}
-		x += CDx[z];
-		y += CDy[z];
+		setX(getX() + CDx[z]);
+		setY(getY() + CDy[z]);
+	}
+
+	public void setDestX(int destX)
+	{
+		this.destX = destX;
+	}
+
+	public void setDestY(int destY)
+	{
+		this.destY = destY;
 	}
 }

@@ -8,54 +8,53 @@
 
 package micropolisj.gui;
 
+import micropolisj.engine.CityListener;
 import micropolisj.engine.CityLocation;
 import micropolisj.engine.Micropolis;
 import micropolisj.engine.MicropolisMessage;
 import micropolisj.engine.Sound;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import static micropolisj.gui.ColorParser.parseColor;
 
 public class GraphsPane extends JPanel
-		implements Micropolis.Listener
+		implements CityListener
 {
-	Micropolis engine;
-
-	JToggleButton tenYearsBtn;
-	JToggleButton onetwentyYearsBtn;
-	GraphArea graphArea;
-
-	static enum TimePeriod
-	{
-		TEN_YEARS,
-		ONETWENTY_YEARS;
-	}
-
-	static enum GraphData
-	{
-		RESPOP,
-		COMPOP,
-		INDPOP,
-		MONEY,
-		CRIME,
-		POLLUTION;
-	}
-
-	EnumMap<GraphData, JToggleButton> dataBtns = new EnumMap<>(GraphData.class);
-
-	static ResourceBundle strings = MainWindow.strings;
-	static final int LEFT_MARGIN = 4;
-	static final int RIGHT_MARGIN = 4;
-	static final int TOP_MARGIN = 2;
-	static final int BOTTOM_MARGIN = 2;
-	static final int LEGEND_PADDING = 6;
-
+	private static final ResourceBundle strings = MainWindow.strings;
+	private static final int LEFT_MARGIN = 4;
+	private static final int RIGHT_MARGIN = 4;
+	private static final int TOP_MARGIN = 2;
+	private static final int BOTTOM_MARGIN = 2;
+	private static final int LEGEND_PADDING = 6;
+	private static final GraphData[] NO_GRAPH_DATA = new GraphData[0];
+	private final JToggleButton tenYearsBtn;
+	private final JToggleButton onetwentyYearsBtn;
+	private final GraphArea graphArea;
+	private final Map<GraphData, JToggleButton> dataBtns = new EnumMap<>(GraphData.class);
+	private Micropolis engine;
 	public GraphsPane(Micropolis engine)
 	{
 		super(new BorderLayout());
@@ -66,13 +65,13 @@ public class GraphsPane extends JPanel
 
 		JButton dismissBtn = new JButton(strings.getString("dismiss_graph"));
 		dismissBtn.addActionListener(evt -> onDismissClicked());
-		add(dismissBtn, BorderLayout.SOUTH);
+		add(dismissBtn, BorderLayout.PAGE_END);
 
 		JPanel b1 = new JPanel(new BorderLayout());
 		add(b1, BorderLayout.CENTER);
 
 		JPanel toolsPane = new JPanel(new GridBagLayout());
-		b1.add(toolsPane, BorderLayout.WEST);
+		b1.add(toolsPane, BorderLayout.LINE_START);
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = c.gridy = 0;
@@ -93,7 +92,7 @@ public class GraphsPane extends JPanel
 		c.gridx = 0;
 		c.gridy = 2;
 		c.gridwidth = 1;
-		c.anchor = GridBagConstraints.NORTH;
+		c.anchor = GridBagConstraints.PAGE_START;
 		c.weightx = 0.5;
 		toolsPane.add(makeDataBtn(GraphData.RESPOP), c);
 
@@ -149,16 +148,6 @@ public class GraphsPane extends JPanel
 	}
 
 	@Override
-	public void demandChanged()
-	{
-	}
-
-	@Override
-	public void evaluationChanged()
-	{
-	}
-
-	@Override
 	public void fundsChanged()
 	{
 	}
@@ -179,8 +168,8 @@ public class GraphsPane extends JPanel
 		String icon1name = strings.getString("graph_button." + graph.name());
 		String icon2name = strings.getString("graph_button." + graph.name() + ".selected");
 
-		ImageIcon icon1 = new ImageIcon(getClass().getResource("/" + icon1name));
-		ImageIcon icon2 = new ImageIcon(getClass().getResource("/" + icon2name));
+		Icon icon1 = new ImageIcon(getClass().getResource("/" + icon1name));
+		Icon icon2 = new ImageIcon(getClass().getResource("/" + icon2name));
 
 		JToggleButton btn = new JToggleButton();
 		btn.setIcon(icon1);
@@ -197,56 +186,40 @@ public class GraphsPane extends JPanel
 		return btn;
 	}
 
-	int getHistoryMax()
-	{
-		int max = 0;
-		for (GraphData g : GraphData.values()) {
-			for (int pos = 0; pos < 240; pos++) {
-				max = Math.max(max, getHistoryValue(g, pos));
-			}
-		}
-		return max;
-	}
-
-	int getHistoryValue(GraphData graph, int pos)
-	{
-		assert pos >= 0 && pos < 240;
-		switch (graph) {
-			case RESPOP:
-				return engine.history.res[pos];
-			case COMPOP:
-				return engine.history.com[pos];
-			case INDPOP:
-				return engine.history.ind[pos];
-			case MONEY:
-				return engine.history.money[pos];
-			case CRIME:
-				return engine.history.crime[pos];
-			case POLLUTION:
-				return engine.history.pollution[pos];
-			default:
-				throw new Error("unexpected");
-		}
-	}
-
-	void setTimePeriod(TimePeriod period)
+	private void setTimePeriod(TimePeriod period)
 	{
 		tenYearsBtn.setSelected(period == TimePeriod.TEN_YEARS);
 		onetwentyYearsBtn.setSelected(period == TimePeriod.ONETWENTY_YEARS);
 		graphArea.repaint();
 	}
 
-	class GraphArea extends JComponent
+	enum TimePeriod
 	{
-		GraphArea()
+		TEN_YEARS,
+		ONETWENTY_YEARS
+	}
+
+	enum GraphData
+	{
+		RESPOP,
+		COMPOP,
+		INDPOP,
+		MONEY,
+		CRIME,
+		POLLUTION
+	}
+
+	private class GraphArea extends JComponent
+	{
+		private GraphArea()
 		{
 			setBorder(BorderFactory.createLoweredBevelBorder());
 		}
 
 		@Override
-		public void paintComponent(Graphics gr1)
+		public void paintComponent(Graphics g)
 		{
-			Graphics2D gr = (Graphics2D) gr1;
+			Graphics2D gr = (Graphics2D) g;
 			FontMetrics fm = gr.getFontMetrics();
 
 			gr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -277,16 +250,16 @@ public class GraphsPane extends JPanel
 			boolean isOneTwenty = onetwentyYearsBtn.isSelected();
 			int unitPeriod = isOneTwenty ? 12 * Micropolis.CENSUSRATE : Micropolis.CENSUSRATE;
 			int hashPeriod = isOneTwenty ? 10 * unitPeriod : 12 * unitPeriod;
-			int startTime = (engine.history.cityTime / unitPeriod - 119) * unitPeriod;
+			int startTime = (engine.getHistory().getCityTime() / unitPeriod - 119) * unitPeriod;
 
-			double x_interval = (rightEdge - leftEdge) / 120.0;
+			double xInterval = (rightEdge - leftEdge) / 120.0;
 			for (int i = 0; i < 120; i++) {
 				int t = startTime + i * unitPeriod;  // t might be negative
 				if (t % hashPeriod == 0) {
 					// year
 					int year = 1900 + t / (12 * Micropolis.CENSUSRATE);
 					int numHashes = t / hashPeriod;
-					int x = (int) Math.round(leftEdge + i * x_interval);
+					int x = (int) Math.round(leftEdge + i * xInterval);
 					int y = getInsets().top + TOP_MARGIN +
 							(numHashes % 2 == 0 ? fm.getHeight() : 0) +
 							fm.getAscent();
@@ -295,16 +268,16 @@ public class GraphsPane extends JPanel
 				}
 			}
 
-			int H = isOneTwenty ? 239 : 119;
-			final HashMap<GraphData, Path2D.Double> paths = new HashMap<>();
+			int history = isOneTwenty ? 239 : 119;
+			Map<GraphData, Path2D.Double> paths = new EnumMap(GraphData.class);
 			double scale = Math.max(256.0, getHistoryMax());
 			for (GraphData gd : GraphData.values()) {
 				if (dataBtns.get(gd).isSelected()) {
 
 					Path2D.Double path = new Path2D.Double();
 					for (int i = 0; i < 120; i++) {
-						double xp = leftEdge + i * x_interval;
-						double yp = bottomEdge - getHistoryValue(gd, H - i) * (bottomEdge - topEdge) / scale;
+						double xp = leftEdge + i * xInterval;
+						double yp = bottomEdge - getHistoryValue(gd, history - i) * (bottomEdge - topEdge) / scale;
 						if (i == 0) {
 							path.moveTo(xp, yp);
 						} else {
@@ -315,7 +288,7 @@ public class GraphsPane extends JPanel
 				}
 			}
 
-			GraphData[] myGraphs = paths.keySet().toArray(new GraphData[0]);
+			GraphData[] myGraphs = paths.keySet().toArray(NO_GRAPH_DATA);
 			Arrays.sort(myGraphs, (a, b) -> {
 				double y0 = paths.get(a).getCurrentPoint().getY();
 				double y1 = paths.get(b).getCurrentPoint().getY();
@@ -334,7 +307,7 @@ public class GraphsPane extends JPanel
 				gr.draw(path);
 
 				int x = rightEdge + LEGEND_PADDING;
-				int y = (int) Math.round(path.getCurrentPoint().getY() + fm.getAscent() / 2);
+				int y = (int) Math.round(path.getCurrentPoint().getY() + fm.getAscent() / 2.0);
 				y = Math.min(lbottom, y);
 				lbottom = y - fm.getAscent();
 
@@ -346,5 +319,39 @@ public class GraphsPane extends JPanel
 				gr.drawString(labelStr, x, y);
 			}
 		}
+
+		private int getHistoryMax()
+		{
+			int max = 0;
+			for (GraphData g : GraphData.values()) {
+				for (int pos = 0; pos < 240; pos++) {
+					max = Math.max(max, getHistoryValue(g, pos));
+				}
+			}
+			return max;
+		}
+
+
+		private int getHistoryValue(GraphData graph, int pos)
+		{
+			assert pos >= 0 && pos < 240;
+			switch (graph) {
+				case RESPOP:
+					return engine.getHistory().getRes()[pos];
+				case COMPOP:
+					return engine.getHistory().getCom()[pos];
+				case INDPOP:
+					return engine.getHistory().getInd()[pos];
+				case MONEY:
+					return engine.getHistory().getMoney()[pos];
+				case CRIME:
+					return engine.getHistory().getCrime()[pos];
+				case POLLUTION:
+					return engine.getHistory().getPollution()[pos];
+				default:
+					throw new Error("unexpected");
+			}
+		}
+
 	}
 }

@@ -19,5 +19,5 @@ public enum CityProblem
 	TAXES,
 	TRAFFIC,
 	UNEMPLOYMENT,
-	FIRE;
+	FIRE
 }

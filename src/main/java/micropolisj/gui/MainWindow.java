@@ -8,15 +8,69 @@
 
 package micropolisj.gui;
 
-import micropolisj.engine.*;
+import micropolisj.engine.CityListener;
+import micropolisj.engine.CityLocation;
+import micropolisj.engine.CityRect;
+import micropolisj.engine.Disaster;
+import micropolisj.engine.EarthquakeListener;
+import micropolisj.engine.GameLevel;
+import micropolisj.engine.MapState;
+import micropolisj.engine.Micropolis;
+import micropolisj.engine.MicropolisMessage;
+import micropolisj.engine.MicropolisTool;
+import micropolisj.engine.Sound;
+import micropolisj.engine.Speed;
+import micropolisj.engine.ToolResult;
+import micropolisj.engine.ToolStroke;
+import micropolisj.engine.ZoneStatus;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
-import javax.swing.*;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,52 +78,70 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class MainWindow extends JFrame
-		implements Micropolis.Listener, EarthquakeListener
+		implements CityListener, EarthquakeListener
 {
-	Micropolis engine;
-	MicropolisDrawingArea drawingArea;
-	JScrollPane drawingAreaScroll;
-	DemandIndicator demandInd;
-	MessagesPane messagesPane;
-	JLabel mapLegendLbl;
-	OverlayMapView mapView;
-	NotificationPane notificationPane;
-	EvaluationPane evaluationPane;
-	GraphsPane graphsPane;
-	JLabel dateLbl;
-	JLabel fundsLbl;
-	JLabel popLbl;
-	JLabel currentToolLbl;
-	JLabel currentToolCostLbl;
-	Map<MicropolisTool, JToggleButton> toolBtns;
-	EnumMap<MapState, JMenuItem> mapStateMenuItems = new EnumMap<>(MapState.class);
-	MicropolisTool currentTool;
-	File currentFile;
-	boolean doSounds;
-	boolean dirty1 = false;  //indicates if a tool was successfully applied since last save
-	boolean dirty2 = false;  //indicates if simulator took a step since last save
-	long lastSavedTime = 0;  //real-time clock of when file was last saved
-	boolean autoBudgetPending;
-
-	static ImageIcon appIcon;
+	static final ResourceBundle strings = ResourceBundle.getBundle("strings.GuiStrings");
+	static final String EXTENSION = "cty";
+	private static final ImageIcon appIcon;
+	private static final String PRODUCT_NAME = strings.getString("PRODUCT");
+	private static final String SOUNDS_PREF = "enable_sounds";
 
 	static {
 		appIcon = new ImageIcon(MainWindow.class.getResource("/micropolism.png"));
 	}
 
-	static ResourceBundle strings = ResourceBundle.getBundle("strings.GuiStrings");
-	static final String PRODUCT_NAME = strings.getString("PRODUCT");
-
+	private final MicropolisDrawingArea drawingArea;
+	private final JScrollPane drawingAreaScroll;
+	private final DemandIndicator demandInd;
+	private final MessagesPane messagesPane;
+	private final JLabel mapLegendLbl;
+	private final OverlayMapView mapView;
+	private final NotificationPane notificationPane;
+	private final EvaluationPane evaluationPane;
+	private final GraphsPane graphsPane;
+	private final Map<MapState, JMenuItem> mapStateMenuItems = new EnumMap<>(MapState.class);
+	private File currentFile;
+	private Micropolis engine;
+	private JLabel dateLbl;
+	private JLabel fundsLbl;
+	private JLabel popLbl;
+	private JLabel currentToolLbl;
+	private JLabel currentToolCostLbl;
+	private Map<MicropolisTool, JToggleButton> toolButtons;
+	private MicropolisTool currentTool;
+	private boolean doSounds;
+	private boolean dirty1;  //indicates if a tool was successfully applied since last save
+	private boolean dirty2;  //indicates if simulator took a step since last save
+	private long lastSavedTime;  //real-time clock of when file was last saved
+	private boolean autoBudgetPending;
+	private JMenuItem autoBudgetMenuItem;
+	private JMenuItem autoBulldozeMenuItem;
+	private JMenuItem disastersMenuItem;
+	private JMenuItem soundsMenuItem;
+	private Map<Speed, JMenuItem> priorityMenuItems;
+	private Map<Integer, JMenuItem> difficultyMenuItems;
+	// used when a tool is being pressed
+	private ToolStroke toolStroke;
+	// where the tool was last applied during the current drag
+	private int lastX;
+	private int lastY;
+	private Timer simTimer;
+	private Timer shakeTimer;
+	private EarthquakeStepper currentEarthquake;
 	public MainWindow()
 	{
 		this(new Micropolis());
 	}
-
-	public MainWindow(Micropolis engine)
+	private MainWindow(Micropolis engine)
 	{
 		setIconImage(appIcon.getImage());
 
@@ -84,10 +156,10 @@ public class MainWindow extends JFrame
 
 		makeMenu();
 		JToolBar tb = makeToolbar();
-		mainArea.add(tb, BorderLayout.WEST);
+		mainArea.add(tb, BorderLayout.LINE_START);
 
-		Box evalGraphsBox = new Box(BoxLayout.Y_AXIS);
-		mainArea.add(evalGraphsBox, BorderLayout.SOUTH);
+		Box evalGraphsBox = new Box(BoxLayout.PAGE_AXIS);
+		mainArea.add(evalGraphsBox, BorderLayout.PAGE_END);
 
 		graphsPane = new GraphsPane(engine);
 		graphsPane.setVisible(false);
@@ -95,40 +167,40 @@ public class MainWindow extends JFrame
 
 		evaluationPane = new EvaluationPane(engine);
 		evaluationPane.setVisible(false);
-		evalGraphsBox.add(evaluationPane, BorderLayout.SOUTH);
+		evalGraphsBox.add(evaluationPane, BorderLayout.PAGE_END);
 
 		JPanel leftPane = new JPanel(new GridBagLayout());
-		add(leftPane, BorderLayout.WEST);
+		add(leftPane, BorderLayout.LINE_START);
 
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = c.gridy = 0;
-		c.anchor = GridBagConstraints.SOUTHWEST;
-		c.insets = new Insets(4, 4, 4, 4);
-		c.weightx = 1.0;
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = constraints.gridy = 0;
+		constraints.anchor = GridBagConstraints.LAST_LINE_START;
+		constraints.insets = new Insets(4, 4, 4, 4);
+		constraints.weightx = 1.0;
 
 		demandInd = new DemandIndicator();
-		leftPane.add(demandInd, c);
+		leftPane.add(demandInd, constraints);
 
-		c.gridx = 1;
-		c.weightx = 0.0;
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(4, 20, 4, 4);
+		constraints.gridx = 1;
+		constraints.weightx = 0.0;
+		constraints.fill = GridBagConstraints.BOTH;
+		constraints.insets = new Insets(4, 20, 4, 4);
 
-		leftPane.add(makeDateFunds(), c);
+		leftPane.add(makeDateFunds(), constraints);
 
-		c.gridx = 0;
-		c.gridy = 1;
-		c.gridwidth = 2;
-		c.weighty = 0.0;
-		c.anchor = GridBagConstraints.NORTH;
-		c.insets = new Insets(0, 0, 0, 0);
+		constraints.gridx = 0;
+		constraints.gridy = 1;
+		constraints.gridwidth = 2;
+		constraints.weighty = 0.0;
+		constraints.anchor = GridBagConstraints.PAGE_START;
+		constraints.insets = new Insets(0, 0, 0, 0);
 
 		JPanel mapViewContainer = new JPanel(new BorderLayout());
 		mapViewContainer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		leftPane.add(mapViewContainer, c);
+		leftPane.add(mapViewContainer, constraints);
 
 		JMenuBar mapMenu = new JMenuBar();
-		mapViewContainer.add(mapMenu, BorderLayout.NORTH);
+		mapViewContainer.add(mapMenu, BorderLayout.PAGE_START);
 
 		JMenu zonesMenu = new JMenu(strings.getString("menu.zones"));
 		setupKeys(zonesMenu, "menu.zones");
@@ -164,24 +236,24 @@ public class MainWindow extends JFrame
 
 		setMapState(MapState.ALL);
 
-		c.gridx = 0;
-		c.gridy = 2;
-		c.gridwidth = 2;
-		c.weighty = 1.0;
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(0, 0, 0, 0);
+		constraints.gridx = 0;
+		constraints.gridy = 2;
+		constraints.gridwidth = 2;
+		constraints.weighty = 1.0;
+		constraints.fill = GridBagConstraints.BOTH;
+		constraints.insets = new Insets(0, 0, 0, 0);
 
 		messagesPane = new MessagesPane();
 		JScrollPane scroll2 = new JScrollPane(messagesPane);
-		scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll2.setPreferredSize(new Dimension(0, 0));
 		scroll2.setMinimumSize(new Dimension(0, 0));
-		leftPane.add(scroll2, c);
+		leftPane.add(scroll2, constraints);
 
-		c.gridy = 3;
-		c.weighty = 0.0;
+		constraints.gridy = 3;
+		constraints.weighty = 0.0;
 		notificationPane = new NotificationPane(engine);
-		leftPane.add(notificationPane, c);
+		leftPane.add(notificationPane, constraints);
 
 		pack();
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -195,111 +267,16 @@ public class MainWindow extends JFrame
 		inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "escape");
 
 		ActionMap actionMap = ((JComponent) getContentPane()).getActionMap();
-		actionMap.put("zoomIn", new AbstractAction()
-		{
-			@Override
-			public void actionPerformed(ActionEvent evt)
-			{
-				doZoom(1);
-			}
-		});
-		actionMap.put("zoomOut", new AbstractAction()
-		{
-			@Override
-			public void actionPerformed(ActionEvent evt)
-			{
-				doZoom(-1);
-			}
-		});
-		actionMap.put("escape", new AbstractAction()
-		{
-			@Override
-			public void actionPerformed(ActionEvent evt)
-			{
-				onEscapePressed();
-			}
-		});
+		actionMap.put("zoomIn", new ZoomInAction());
+		actionMap.put("zoomOut", new ZoomOutAction());
+		actionMap.put("escape", new EscapeAction());
 
-		MouseAdapter mouse = new MouseAdapter()
-		{
-			@Override
-			public void mousePressed(MouseEvent ev)
-			{
-				try {
-					onToolDown(ev);
-				} catch (Throwable e) {
-					showErrorMessage(e);
-				}
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent ev)
-			{
-				try {
-					onToolUp(ev);
-				} catch (Throwable e) {
-					showErrorMessage(e);
-				}
-			}
-
-			@Override
-			public void mouseDragged(MouseEvent ev)
-			{
-				try {
-					onToolDrag(ev);
-				} catch (Throwable e) {
-					showErrorMessage(e);
-				}
-			}
-
-			@Override
-			public void mouseMoved(MouseEvent ev)
-			{
-				try {
-					onToolHover(ev);
-				} catch (Throwable e) {
-					showErrorMessage(e);
-				}
-			}
-
-			@Override
-			public void mouseExited(MouseEvent ev)
-			{
-				try {
-					onToolExited();
-				} catch (Throwable e) {
-					showErrorMessage(e);
-				}
-			}
-
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent evt)
-			{
-				try {
-					onMouseWheelMoved(evt);
-				} catch (Throwable e) {
-					showErrorMessage(e);
-				}
-			}
-		};
+		MouseAdapter mouse = new DrawingAreaMouseAdapter();
 		drawingArea.addMouseListener(mouse);
 		drawingArea.addMouseMotionListener(mouse);
 		drawingArea.addMouseWheelListener(mouse);
 
-		addWindowListener(new WindowAdapter()
-		{
-			@Override
-			public void windowClosing(WindowEvent ev)
-			{
-				closeWindow();
-			}
-
-			@Override
-			public void windowClosed(WindowEvent ev)
-			{
-				onWindowClosed();
-			}
-		});
+		addWindowListener(new MainWindowAdapter());
 
 		Preferences prefs = Preferences.userNodeForPackage(MainWindow.class);
 		doSounds = prefs.getBoolean(SOUNDS_PREF, true);
@@ -312,6 +289,53 @@ public class MainWindow extends JFrame
 		reloadOptions();
 		startTimer();
 		makeClean();
+	}
+
+	private static void setupKeys(JMenu menu, String prefix)
+	{
+		if (strings.containsKey(prefix + ".key")) {
+			String mnemonic = strings.getString(prefix + ".key");
+			menu.setMnemonic(
+					KeyStroke.getKeyStroke(mnemonic).getKeyCode()
+			);
+		}
+	}
+
+	private static void setupKeys(JMenuItem menuItem, String prefix)
+	{
+		if (strings.containsKey(prefix + ".key")) {
+			String mnemonic = strings.getString(prefix + ".key");
+			menuItem.setMnemonic(
+					KeyStroke.getKeyStroke(mnemonic).getKeyCode()
+			);
+		}
+		if (strings.containsKey(prefix + ".shortcut")) {
+			String shortcut = strings.getString(prefix + ".shortcut");
+			menuItem.setAccelerator(
+					KeyStroke.getKeyStroke(shortcut)
+			);
+		}
+	}
+
+	static String formatFunds(int funds)
+	{
+		return MessageFormat.format(
+				strings.getString("funds"), funds
+		);
+	}
+
+	static String formatGameDate(int cityTime)
+	{
+		Calendar c = Calendar.getInstance();
+		c.set(1900 + cityTime / 48,
+				cityTime % 48 / 4,
+				cityTime % 4 * 7 + 1
+		);
+
+		return MessageFormat.format(
+				strings.getString("citytime"),
+				c.getTime()
+		);
 	}
 
 	public void setEngine(Micropolis newEngine)
@@ -348,7 +372,7 @@ public class MainWindow extends JFrame
 		}
 	}
 
-	boolean needsSaved()
+	private boolean needsSaved()
 	{
 		if (dirty1)    //player has built something since last save
 			return true;
@@ -361,10 +385,10 @@ public class MainWindow extends JFrame
 		// will depend on how much real time has elapsed.
 		// The threshold is 30 seconds.
 
-		return System.currentTimeMillis() - lastSavedTime > 30000;
+		return System.currentTimeMillis() - lastSavedTime > 30000L;
 	}
 
-	boolean maybeSaveCity()
+	private boolean maybeSaveCity()
 	{
 		if (needsSaved()) {
 			boolean timerEnabled = isTimerActive();
@@ -397,14 +421,14 @@ public class MainWindow extends JFrame
 		return true;
 	}
 
-	void closeWindow()
+	private void closeWindow()
 	{
 		if (maybeSaveCity()) {
 			dispose();
 		}
 	}
 
-	JComponent makeDateFunds()
+	private JComponent makeDateFunds()
 	{
 		JPanel pane = new JPanel(new GridBagLayout());
 		GridBagConstraints c0 = new GridBagConstraints();
@@ -415,8 +439,8 @@ public class MainWindow extends JFrame
 		c0.gridy = c1.gridy = 0;
 		c0.weightx = 1.0;
 		c0.weighty = c1.weighty = 1.0;
-		c0.anchor = GridBagConstraints.WEST;
-		c1.anchor = GridBagConstraints.EAST;
+		c0.anchor = GridBagConstraints.LINE_START;
+		c1.anchor = GridBagConstraints.LINE_END;
 
 		pane.add(new JLabel(strings.getString("main.date_label")), c0);
 		dateLbl = new JLabel();
@@ -435,32 +459,6 @@ public class MainWindow extends JFrame
 		pane.add(popLbl, c1);
 
 		return pane;
-	}
-
-	private void setupKeys(JMenu menu, String prefix)
-	{
-		if (strings.containsKey(prefix + ".key")) {
-			String mnemonic = strings.getString(prefix + ".key");
-			menu.setMnemonic(
-					KeyStroke.getKeyStroke(mnemonic).getKeyCode()
-			);
-		}
-	}
-
-	private void setupKeys(JMenuItem menuItem, String prefix)
-	{
-		if (strings.containsKey(prefix + ".key")) {
-			String mnemonic = strings.getString(prefix + ".key");
-			menuItem.setMnemonic(
-					KeyStroke.getKeyStroke(mnemonic).getKeyCode()
-			);
-		}
-		if (strings.containsKey(prefix + ".shortcut")) {
-			String shortcut = strings.getString(prefix + ".shortcut");
-			menuItem.setAccelerator(
-					KeyStroke.getKeyStroke(shortcut)
-			);
-		}
 	}
 
 	private void makeMenu()
@@ -512,7 +510,7 @@ public class MainWindow extends JFrame
 
 		difficultyMenuItems = new HashMap<>();
 		for (int i = GameLevel.MIN_LEVEL; i <= GameLevel.MAX_LEVEL; i++) {
-			final int level = i;
+			int level = i;
 			menuItem = new JRadioButtonMenuItem(strings.getString("menu.difficulty." + level));
 			setupKeys(menuItem, "menu.difficulty." + level);
 			menuItem.addActionListener(wrapActionListener(
@@ -672,37 +670,23 @@ public class MainWindow extends JFrame
 		setJMenuBar(menuBar);
 	}
 
-	private Micropolis getEngine()
-	{
-		return engine;
-	}
-
-	JMenuItem autoBudgetMenuItem;
-	JMenuItem autoBulldozeMenuItem;
-	JMenuItem disastersMenuItem;
-	JMenuItem soundsMenuItem;
-	Map<Speed, JMenuItem> priorityMenuItems;
-	Map<Integer, JMenuItem> difficultyMenuItems;
-
 	private void onAutoBudgetClicked()
 	{
 		dirty1 = true;
-		getEngine().toggleAutoBudget();
+		engine.toggleAutoBudget();
 	}
 
 	private void onAutoBulldozeClicked()
 	{
 		dirty1 = true;
-		getEngine().toggleAutoBulldoze();
+		engine.toggleAutoBulldoze();
 	}
 
 	private void onDisastersClicked()
 	{
 		dirty1 = true;
-		getEngine().toggleDisasters();
+		engine.toggleDisasters();
 	}
-
-	static final String SOUNDS_PREF = "enable_sounds";
 
 	private void onSoundClicked()
 	{
@@ -735,7 +719,7 @@ public class MainWindow extends JFrame
 		}
 
 		try {
-			getEngine().save(currentFile);
+			engine.save(currentFile);
 			makeClean();
 			return true;
 		} catch (IOException e) {
@@ -745,8 +729,6 @@ public class MainWindow extends JFrame
 			return false;
 		}
 	}
-
-	static final String EXTENSION = "cty";
 
 	private boolean onSaveCityAsClicked()
 	{
@@ -764,7 +746,7 @@ public class MainWindow extends JFrame
 				if (!currentFile.getName().endsWith("." + EXTENSION)) {
 					currentFile = new File(currentFile.getPath() + "." + EXTENSION);
 				}
-				getEngine().save(currentFile);
+				engine.save(currentFile);
 				makeClean();
 				return true;
 			}
@@ -819,11 +801,11 @@ public class MainWindow extends JFrame
 		}
 	}
 
-	private JToggleButton makeToolBtn(final MicropolisTool tool)
+	private JToggleButton makeToolBtn(MicropolisTool tool)
 	{
 		String iconName = strings.containsKey("tool." + tool.name() + ".icon") ?
 				strings.getString("tool." + tool.name() + ".icon") :
-				"/graphics/tools/" + tool.name().toLowerCase() + ".png";
+				"/graphics/tools/" + tool.name().toLowerCase(Locale.ENGLISH) + ".png";
 		String iconSelectedName = strings.containsKey("tool." + tool.name() + ".selected_icon") ?
 				strings.getString("tool." + tool.name() + ".selected_icon") :
 				iconName;
@@ -838,104 +820,104 @@ public class MainWindow extends JFrame
 		btn.setMargin(new Insets(0, 0, 0, 0));
 		btn.setBorderPainted(false);
 		btn.addActionListener(ev -> selectTool(tool));
-		toolBtns.put(tool, btn);
+		toolButtons.put(tool, btn);
 		return btn;
 	}
 
 	private JToolBar makeToolbar()
 	{
-		toolBtns = new EnumMap<>(MicropolisTool.class);
+		toolButtons = new EnumMap<>(MicropolisTool.class);
 
-		JToolBar toolBar = new JToolBar(strings.getString("main.tools_caption"), JToolBar.VERTICAL);
+		JToolBar toolBar = new JToolBar(strings.getString("main.tools_caption"), SwingConstants.VERTICAL);
 		toolBar.setFloatable(false);
 		toolBar.setRollover(false);
 
 		JPanel gridBox = new JPanel(new GridBagLayout());
 		toolBar.add(gridBox);
 
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = c.gridy = 0;
-		c.anchor = GridBagConstraints.NORTH;
-		c.insets = new Insets(8, 0, 0, 0);
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = constraints.gridy = 0;
+		constraints.anchor = GridBagConstraints.PAGE_START;
+		constraints.insets = new Insets(8, 0, 0, 0);
 		currentToolLbl = new JLabel(" ");
-		gridBox.add(currentToolLbl, c);
+		gridBox.add(currentToolLbl, constraints);
 
-		c.gridy = 1;
-		c.insets = new Insets(0, 0, 12, 0);
+		constraints.gridy = 1;
+		constraints.insets = new Insets(0, 0, 12, 0);
 		currentToolCostLbl = new JLabel(" ");
-		gridBox.add(currentToolCostLbl, c);
+		gridBox.add(currentToolCostLbl, constraints);
 
-		c.gridy++;
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = 1.0;
-		c.insets = new Insets(0, 0, 0, 0);
-		Box b0 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b0, c);
+		constraints.gridy++;
+		constraints.fill = GridBagConstraints.NONE;
+		constraints.weightx = 1.0;
+		constraints.insets = new Insets(0, 0, 0, 0);
+		Box b0 = new Box(BoxLayout.LINE_AXIS);
+		gridBox.add(b0, constraints);
 
 		b0.add(makeToolBtn(MicropolisTool.BULLDOZER));
 		b0.add(makeToolBtn(MicropolisTool.WIRE));
 		b0.add(makeToolBtn(MicropolisTool.PARK));
 
-		c.gridy++;
-		Box b1 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b1, c);
+		constraints.gridy++;
+		Box b1 = new Box(BoxLayout.LINE_AXIS);
+		gridBox.add(b1, constraints);
 
 		b1.add(makeToolBtn(MicropolisTool.ROADS));
 		b1.add(makeToolBtn(MicropolisTool.RAIL));
 
-		c.gridy++;
-		Box b2 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b2, c);
+		constraints.gridy++;
+		Box b2 = new Box(BoxLayout.LINE_AXIS);
+		gridBox.add(b2, constraints);
 
 		b2.add(makeToolBtn(MicropolisTool.RESIDENTIAL));
 		b2.add(makeToolBtn(MicropolisTool.COMMERCIAL));
 		b2.add(makeToolBtn(MicropolisTool.INDUSTRIAL));
 
-		c.gridy++;
-		Box b3 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b3, c);
+		constraints.gridy++;
+		Box b3 = new Box(BoxLayout.LINE_AXIS);
+		gridBox.add(b3, constraints);
 
 		b3.add(makeToolBtn(MicropolisTool.FIRE));
 		b3.add(makeToolBtn(MicropolisTool.QUERY));
 		b3.add(makeToolBtn(MicropolisTool.POLICE));
 
-		c.gridy++;
-		Box b4 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b4, c);
+		constraints.gridy++;
+		Box b4 = new Box(BoxLayout.LINE_AXIS);
+		gridBox.add(b4, constraints);
 
 		b4.add(makeToolBtn(MicropolisTool.POWERPLANT));
 		b4.add(makeToolBtn(MicropolisTool.NUCLEAR));
 
-		c.gridy++;
-		Box b5 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b5, c);
+		constraints.gridy++;
+		Box b5 = new Box(BoxLayout.LINE_AXIS);
+		gridBox.add(b5, constraints);
 
 		b5.add(makeToolBtn(MicropolisTool.STADIUM));
 		b5.add(makeToolBtn(MicropolisTool.SEAPORT));
 
-		c.gridy++;
-		Box b6 = new Box(BoxLayout.X_AXIS);
-		gridBox.add(b6, c);
+		constraints.gridy++;
+		Box b6 = new Box(BoxLayout.LINE_AXIS);
+		gridBox.add(b6, constraints);
 
 		b6.add(makeToolBtn(MicropolisTool.AIRPORT));
 
 		// add glue to make all elements align toward top
-		c.gridy++;
-		c.weighty = 1.0;
-		gridBox.add(new JLabel(), c);
+		constraints.gridy++;
+		constraints.weighty = 1.0;
+		gridBox.add(new JLabel(), constraints);
 
 		return toolBar;
 	}
 
 	private void selectTool(MicropolisTool newTool)
 	{
-		toolBtns.get(newTool).setSelected(true);
+		toolButtons.get(newTool).setSelected(true);
 		if (newTool == currentTool) {
 			return;
 		}
 
 		if (currentTool != null) {
-			toolBtns.get(currentTool).setSelected(false);
+			toolButtons.get(currentTool).setSelected(false);
 		}
 
 		currentTool = newTool;
@@ -946,7 +928,7 @@ public class MainWindow extends JFrame
 						currentTool.name()
 		);
 
-		int cost = currentTool.getToolCost();
+		int cost = currentTool.getCost();
 		currentToolCostLbl.setText(cost != 0 ? formatFunds(cost) : " ");
 	}
 
@@ -971,18 +953,10 @@ public class MainWindow extends JFrame
 		}
 	}
 
-	void doQueryTool(int xpos, int ypos)
-	{
-		if (!engine.testBounds(xpos, ypos))
-			return;
-
-		ZoneStatus z = engine.queryZoneStatus(xpos, ypos);
-		notificationPane.showZoneStatus(engine, xpos, ypos, z);
-	}
 
 	private void doZoom(int dir, Point mousePt)
 	{
-		int oldZoom = drawingArea.getTileSize();
+		int oldZoom = drawingArea.getTileWidth();
 		int newZoom = dir < 0 ? oldZoom / 2 : oldZoom * 2;
 		if (newZoom < 8) {
 			newZoom = 8;
@@ -993,10 +967,10 @@ public class MainWindow extends JFrame
 
 		if (oldZoom != newZoom) {
 			// preserve effective mouse position in viewport when changing zoom level
-			double f = (double) newZoom / (double) oldZoom;
+			double zoomFactor = (double) newZoom / oldZoom;
 			Point pos = drawingAreaScroll.getViewport().getViewPosition();
-			int newX = (int) Math.round(mousePt.x * f - (mousePt.x - pos.x));
-			int newY = (int) Math.round(mousePt.y * f - (mousePt.y - pos.y));
+			int newX = (int) Math.round(mousePt.x * zoomFactor - (mousePt.x - pos.x));
+			int newY = (int) Math.round(mousePt.y * zoomFactor - (mousePt.y - pos.y));
 			drawingArea.selectTileSize(newZoom);
 			drawingAreaScroll.validate();
 			drawingAreaScroll.getViewport().setViewPosition(new Point(newX, newY));
@@ -1013,214 +987,22 @@ public class MainWindow extends JFrame
 		);
 	}
 
-	private void onMouseWheelMoved(MouseWheelEvent evt)
-	{
-		if (evt.getWheelRotation() < 0) {
-			doZoom(1, evt.getPoint());
-		} else {
-			doZoom(-1, evt.getPoint());
-		}
-	}
-
-	// used when a tool is being pressed
-	ToolStroke toolStroke;
-
-	// where the tool was last applied during the current drag
-	int lastX;
-	int lastY;
-
-	private void onToolDown(MouseEvent ev)
-	{
-		if (ev.getButton() == MouseEvent.BUTTON3) {
-			CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
-			doQueryTool(loc.x, loc.y);
-			return;
-		}
-
-		if (ev.getButton() != MouseEvent.BUTTON1)
-			return;
-
-		if (currentTool == null)
-			return;
-
-		CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
-		int x = loc.x;
-		int y = loc.y;
-
-		if (currentTool == MicropolisTool.QUERY) {
-			doQueryTool(x, y);
-			this.toolStroke = null;
-		} else {
-			this.toolStroke = currentTool.beginStroke(engine, x, y);
-			previewTool();
-		}
-
-		this.lastX = x;
-		this.lastY = y;
-	}
-
-	private void onEscapePressed()
-	{
-		// if currently dragging a tool...
-		if (toolStroke != null) {
-			// cancel the current mouse operation
-			toolStroke = null;
-			drawingArea.setToolPreview(null);
-			drawingArea.setToolCursor(null);
-		} else {
-			// dismiss any alerts currently visible
-			notificationPane.setVisible(false);
-		}
-	}
-
-	private void onToolUp(MouseEvent ev)
-	{
-		if (toolStroke != null) {
-			drawingArea.setToolPreview(null);
-
-			CityLocation loc = toolStroke.getLocation();
-			ToolResult tr = toolStroke.apply();
-			showToolResult(loc, tr);
-			toolStroke = null;
-		}
-
-		onToolHover(ev);
-
-		if (autoBudgetPending) {
-			autoBudgetPending = false;
-			showBudgetWindow();
-		}
-	}
-
-	void previewTool()
-	{
-		assert this.toolStroke != null;
-		assert this.currentTool != null;
-
-		drawingArea.setToolCursor(
-				toolStroke.getBounds(),
-				currentTool
-		);
-		drawingArea.setToolPreview(
-				toolStroke.getPreview()
-		);
-	}
-
-	private void onToolDrag(MouseEvent ev)
-	{
-		if (currentTool == null)
-			return;
-		if ((ev.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) == 0)
-			return;
-
-		CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
-		int x = loc.x;
-		int y = loc.y;
-		if (x == lastX && y == lastY)
-			return;
-
-		if (toolStroke != null) {
-			toolStroke.dragTo(x, y);
-			previewTool();
-		} else if (currentTool == MicropolisTool.QUERY) {
-			doQueryTool(x, y);
-		}
-
-		lastX = x;
-		lastY = y;
-	}
-
-	private void onToolHover(MouseEvent ev)
-	{
-		if (currentTool == null || currentTool == MicropolisTool.QUERY) {
-			drawingArea.setToolCursor(null);
-			return;
-		}
-
-		CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
-		int x = loc.x;
-		int y = loc.y;
-		int w = currentTool.getWidth();
-		int h = currentTool.getHeight();
-
-		if (w >= 3)
-			x--;
-		if (h >= 3)
-			y--;
-
-		drawingArea.setToolCursor(new CityRect(x, y, w, h), currentTool);
-	}
-
-	private void onToolExited()
-	{
-		drawingArea.setToolCursor(null);
-	}
-
-	private void showToolResult(CityLocation loc, ToolResult result)
-	{
-		switch (result) {
-			case SUCCESS:
-				citySound(currentTool == MicropolisTool.BULLDOZER ? Sound.BULLDOZE : Sound.BUILD, loc);
-				dirty1 = true;
-				break;
-
-			case NONE:
-				break;
-			case UH_OH:
-				messagesPane.appendCityMessage(MicropolisMessage.BULLDOZE_FIRST);
-				citySound(Sound.UHUH, loc);
-				break;
-
-			case INSUFFICIENT_FUNDS:
-				messagesPane.appendCityMessage(MicropolisMessage.INSUFFICIENT_FUNDS);
-				citySound(Sound.SORRY, loc);
-				break;
-
-			default:
-				assert false;
-		}
-	}
-
-	public static String formatFunds(int funds)
-	{
-		return MessageFormat.format(
-				strings.getString("funds"), funds
-		);
-	}
-
-	public static String formatGameDate(int cityTime)
-	{
-		Calendar c = Calendar.getInstance();
-		c.set(1900 + cityTime / 48,
-				cityTime % 48 / 4,
-				cityTime % 4 * 7 + 1
-		);
-
-		return MessageFormat.format(
-				strings.getString("citytime"),
-				c.getTime()
-		);
-	}
-
 	private void updateDateLabel()
 	{
-		dateLbl.setText(formatGameDate(engine.cityTime));
+		dateLbl.setText(formatGameDate(engine.getCityTime()));
 
 		NumberFormat nf = NumberFormat.getInstance();
-		popLbl.setText(nf.format(getEngine().getCityPopulation()));
+		popLbl.setText(nf.format(engine.getCityPopulation()));
 	}
-
-	Timer simTimer;
-	Timer shakeTimer;
 
 	private void startTimer()
 	{
-		final Micropolis engine = getEngine();
-		final int count = engine.simSpeed.simStepsPerUpdate;
+		Micropolis engine = this.engine;
+		int count = engine.getSimSpeed().simStepsPerUpdate;
 
 		assert !isTimerActive();
 
-		if (engine.simSpeed == Speed.PAUSED)
+		if (engine.getSimSpeed() == Speed.PAUSED)
 			return;
 
 		if (currentEarthquake != null) {
@@ -1240,7 +1022,7 @@ public class MainWindow extends JFrame
 		ActionListener taskPerformer = evt -> {
 			for (int i = 0; i < count; i++) {
 				engine.animate();
-				if (!engine.autoBudget && engine.isBudgetTime()) {
+				if (!engine.isAutoBudget() && engine.isBudgetTime()) {
 					showAutoBudget();
 					return;
 				}
@@ -1250,16 +1032,15 @@ public class MainWindow extends JFrame
 		};
 		taskPerformer = wrapActionListener(taskPerformer);
 
-		assert simTimer == null;
-		simTimer = new Timer(engine.simSpeed.animationDelay, taskPerformer);
+		simTimer = new Timer(engine.getSimSpeed().animationDelay, taskPerformer);
 		simTimer.start();
 	}
 
-	ActionListener wrapActionListener(final ActionListener l)
+	private ActionListener wrapActionListener(ActionListener actionListener)
 	{
 		return evt -> {
 			try {
-				l.actionPerformed(evt);
+				actionListener.actionPerformed(evt);
 			} catch (Throwable e) {
 				showErrorMessage(e);
 			}
@@ -1275,8 +1056,8 @@ public class MainWindow extends JFrame
 		stackTracePane.setEditable(false);
 		stackTracePane.setText(w.toString());
 
-		final JScrollPane detailsPane = new JScrollPane(stackTracePane);
-		detailsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		JScrollPane detailsPane = new JScrollPane(stackTracePane);
+		detailsPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		detailsPane.setPreferredSize(new Dimension(480, 240));
 		detailsPane.setMinimumSize(new Dimension(0, 0));
 
@@ -1310,19 +1091,6 @@ public class MainWindow extends JFrame
 		}
 	}
 
-	class EarthquakeStepper
-	{
-		int count = 0;
-
-		void oneStep()
-		{
-			count = (count + 1) % MicropolisDrawingArea.SHAKE_STEPS;
-			drawingArea.shake(count);
-		}
-	}
-
-	EarthquakeStepper currentEarthquake;
-
 	@Override
 	public void earthquakeStarted()
 	{
@@ -1335,7 +1103,7 @@ public class MainWindow extends JFrame
 		startTimer();
 	}
 
-	void stopEarthquake()
+	private void stopEarthquake()
 	{
 		drawingArea.shake(0);
 		currentEarthquake = null;
@@ -1355,21 +1123,16 @@ public class MainWindow extends JFrame
 		}
 	}
 
-	boolean isTimerActive()
+	private boolean isTimerActive()
 	{
 		return simTimer != null || shakeTimer != null;
 	}
 
-	private void onWindowClosed()
-	{
-		if (isTimerActive()) {
-			stopTimer();
-		}
-	}
+
 
 	private void onDifficultyClicked(int newDifficulty)
 	{
-		getEngine().setGameLevel(newDifficulty);
+		engine.setGameLevel(newDifficulty);
 	}
 
 	private void onPriorityClicked(Speed newSpeed)
@@ -1378,7 +1141,7 @@ public class MainWindow extends JFrame
 			stopTimer();
 		}
 
-		getEngine().setSpeed(newSpeed);
+		engine.setSpeed(newSpeed);
 		startTimer();
 	}
 
@@ -1387,24 +1150,24 @@ public class MainWindow extends JFrame
 		dirty1 = true;
 		switch (disaster) {
 			case FIRE:
-				getEngine().makeFire();
+				engine.makeFire();
 				break;
 			case FLOOD:
-				getEngine().makeFlood();
+				engine.makeFlood();
 				break;
 			case MONSTER:
-				getEngine().makeMonster();
+				engine.makeMonster();
 				break;
 			case MELTDOWN:
-				if (!getEngine().makeMeltdown()) {
+				if (!engine.makeMeltdown()) {
 					messagesPane.appendCityMessage(MicropolisMessage.NO_NUCLEAR_PLANTS);
 				}
 				break;
 			case TORNADO:
-				getEngine().makeTornado();
+				engine.makeTornado();
 				break;
 			case EARTHQUAKE:
-				getEngine().makeEarthquake();
+				engine.makeEarthquake();
 				break;
 			default:
 				assert false; //unknown disaster
@@ -1413,16 +1176,16 @@ public class MainWindow extends JFrame
 
 	private void reloadFunds()
 	{
-		fundsLbl.setText(formatFunds(getEngine().budget.totalFunds));
+		fundsLbl.setText(formatFunds(engine.getBudget().getTotalFunds()));
 	}
 
 	@Override
-	public void cityMessage(MicropolisMessage m, CityLocation p)
+	public void cityMessage(MicropolisMessage message, CityLocation loc)
 	{
-		messagesPane.appendCityMessage(m);
+		messagesPane.appendCityMessage(message);
 
-		if (m.useNotificationPane && p != null) {
-			notificationPane.showMessage(engine, m, p.x, p.y);
+		if (message.isUseNotificationPane() && loc != null) {
+			notificationPane.showMessage(engine, message, loc.getX(), loc.getY());
 		}
 	}
 
@@ -1440,15 +1203,15 @@ public class MainWindow extends JFrame
 
 	private void reloadOptions()
 	{
-		autoBudgetMenuItem.setSelected(getEngine().autoBudget);
-		autoBulldozeMenuItem.setSelected(getEngine().autoBulldoze);
-		disastersMenuItem.setSelected(!getEngine().noDisasters);
+		autoBudgetMenuItem.setSelected(engine.isAutoBudget());
+		autoBulldozeMenuItem.setSelected(engine.isAutoBulldoze());
+		disastersMenuItem.setSelected(!engine.isNoDisasters());
 		soundsMenuItem.setSelected(doSounds);
-		for (Speed spd : priorityMenuItems.keySet()) {
-			priorityMenuItems.get(spd).setSelected(getEngine().simSpeed == spd);
+		for (Map.Entry<Speed, JMenuItem> entry : priorityMenuItems.entrySet()) {
+			entry.getValue().setSelected(engine.getSimSpeed() == entry.getKey());
 		}
 		for (int i = GameLevel.MIN_LEVEL; i <= GameLevel.MAX_LEVEL; i++) {
-			difficultyMenuItems.get(i).setSelected(getEngine().gameLevel == i);
+			difficultyMenuItems.get(i).setSelected(engine.getGameLevel() == i);
 		}
 	}
 
@@ -1462,48 +1225,38 @@ public class MainWindow extends JFrame
 		if (audioFile == null)
 			return;
 
-		boolean isOnScreen = drawingAreaScroll.getViewport().getViewRect().contains(
-				drawingArea.getTileBounds(loc.x, loc.y)
+		boolean offScreen = !drawingAreaScroll.getViewport().getViewRect().contains(
+				drawingArea.getTileBounds(loc.getX(), loc.getY())
 		);
-		if (sound == Sound.HONKHONK_LOW && !isOnScreen)
+		if (sound == Sound.HONKHONK_LOW && offScreen)
 			return;
 
 		try {
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(audioFile));
 			clip.start();
+			clip.addLineListener(event -> {
+				if (event.getType().equals(LineEvent.Type.STOP)){
+					event.getLine().close();
+				}
+			});
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
 	}
 
-	@Override
-	public void censusChanged()
-	{
-	}
-
-	@Override
-	public void demandChanged()
-	{
-	}
-
-	@Override
-	public void evaluationChanged()
-	{
-	}
-
-	void onViewBudgetClicked()
+	private void onViewBudgetClicked()
 	{
 		dirty1 = true;
 		showBudgetWindow();
 	}
 
-	void onViewEvaluationClicked()
+	private void onViewEvaluationClicked()
 	{
 		evaluationPane.setVisible(true);
 	}
 
-	void onViewGraphClicked()
+	private void onViewGraphClicked()
 	{
 		graphsPane.setVisible(true);
 	}
@@ -1524,7 +1277,7 @@ public class MainWindow extends JFrame
 			stopTimer();
 		}
 
-		BudgetDialog dlg = new BudgetDialog(this, getEngine());
+		BudgetDialog dlg = new BudgetDialog(this, engine);
 		dlg.setModal(true);
 		dlg.setVisible(true);
 
@@ -1533,7 +1286,7 @@ public class MainWindow extends JFrame
 		}
 	}
 
-	private JMenuItem makeMapStateMenuItem(String stringPrefix, final MapState state)
+	private JMenuItem makeMapStateMenuItem(String stringPrefix, MapState state)
 	{
 		String caption = strings.getString(stringPrefix);
 		JMenuItem menuItem = new JRadioButtonMenuItem(caption);
@@ -1553,10 +1306,10 @@ public class MainWindow extends JFrame
 
 	private void setMapLegend(MapState state)
 	{
-		String k = "legend_image." + state.name();
+		String key = "legend_image." + state.name();
 		java.net.URL iconUrl = null;
-		if (strings.containsKey(k)) {
-			String iconName = strings.getString(k);
+		if (strings.containsKey(key)) {
+			String iconName = strings.getString(key);
 			iconUrl = MainWindow.class.getResource(iconName);
 		}
 		if (iconUrl != null) {
@@ -1575,11 +1328,313 @@ public class MainWindow extends JFrame
 
 		JLabel appNameLbl = new JLabel(versionStr);
 		JLabel appDetailsLbl = new JLabel(strings.getString("main.about_text"));
-		JComponent[] inputs = new JComponent[]{appNameLbl, appDetailsLbl};
+		JComponent[] inputs = {appNameLbl, appDetailsLbl};
 		JOptionPane.showMessageDialog(this,
 				inputs,
 				strings.getString("main.about_caption"),
 				JOptionPane.PLAIN_MESSAGE,
 				appIcon);
+	}
+
+	public void setCurrentFile(File currentFile)
+	{
+		this.currentFile = currentFile;
+	}
+
+	private class EarthquakeStepper
+	{
+		private int count;
+
+		private void oneStep()
+		{
+			count = (count + 1) % MicropolisDrawingArea.SHAKE_STEPS;
+			drawingArea.shake(count);
+		}
+
+	}
+
+	private class ZoomInAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			doZoom(1);
+		}
+	}
+
+	private class ZoomOutAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			doZoom(-1);
+		}
+	}
+
+	private class EscapeAction extends AbstractAction
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			onEscapePressed();
+		}
+
+		private void onEscapePressed()
+		{
+			// if currently dragging a tool...
+			if (toolStroke != null) {
+				// cancel the current mouse operation
+				toolStroke = null;
+				drawingArea.setToolPreview(null);
+				drawingArea.setToolCursor(null);
+			} else {
+				// dismiss any alerts currently visible
+				notificationPane.setVisible(false);
+			}
+		}
+
+	}
+
+	private class DrawingAreaMouseAdapter extends MouseAdapter
+	{
+		@Override
+		public void mousePressed(MouseEvent ev)
+		{
+			try {
+				onToolDown(ev);
+			} catch (Throwable e) {
+				showErrorMessage(e);
+			}
+		}
+
+		private void doQueryTool(int xpos, int ypos)
+		{
+			if (!engine.testBounds(xpos, ypos))
+				return;
+
+			ZoneStatus z = engine.queryZoneStatus(xpos, ypos);
+			notificationPane.showZoneStatus(engine, xpos, ypos, z);
+		}
+
+		private void previewTool()
+		{
+			assert toolStroke != null;
+			assert currentTool != null;
+
+			drawingArea.setToolCursor(
+					toolStroke.getBounds(),
+					currentTool
+			);
+			drawingArea.setToolPreview(
+					toolStroke.getPreview()
+			);
+		}
+
+		private void onToolDown(MouseEvent ev)
+		{
+			if (ev.getButton() == MouseEvent.BUTTON3) {
+				CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
+				doQueryTool(loc.getX(), loc.getY());
+				return;
+			}
+
+			if (ev.getButton() != MouseEvent.BUTTON1)
+				return;
+
+			if (currentTool == null)
+				return;
+
+			CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
+			int x = loc.getX();
+			int y = loc.getY();
+
+			if (currentTool == MicropolisTool.QUERY) {
+				doQueryTool(x, y);
+				toolStroke = null;
+			} else {
+				toolStroke = currentTool.beginStroke(engine, x, y);
+				previewTool();
+			}
+
+			lastX = x;
+			lastY = y;
+		}
+
+
+		private void onToolDrag(MouseEvent ev)
+		{
+			if (currentTool == null)
+				return;
+			if ((ev.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) == 0)
+				return;
+
+			CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
+			int x = loc.getX();
+			int y = loc.getY();
+			if (x == lastX && y == lastY)
+				return;
+
+			if (toolStroke != null) {
+				toolStroke.dragTo(x, y);
+				previewTool();
+			} else if (currentTool == MicropolisTool.QUERY) {
+				doQueryTool(x, y);
+			}
+
+			lastX = x;
+			lastY = y;
+		}
+
+		private void onToolHover(MouseEvent ev)
+		{
+			if (currentTool == null || currentTool == MicropolisTool.QUERY) {
+				drawingArea.setToolCursor(null);
+				return;
+			}
+
+			CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
+			int x = loc.getX();
+			int y = loc.getY();
+			int w = currentTool.getSize();
+			int h = currentTool.getSize();
+
+			if (w >= 3)
+				x--;
+			if (h >= 3)
+				y--;
+
+			drawingArea.setToolCursor(new CityRect(x, y, w, h), currentTool);
+		}
+
+		private void onToolExited()
+		{
+			drawingArea.setToolCursor(null);
+		}
+
+		private void showToolResult(CityLocation loc, ToolResult result)
+		{
+			switch (result) {
+				case SUCCESS:
+					citySound(currentTool == MicropolisTool.BULLDOZER ? Sound.BULLDOZE : Sound.BUILD, loc);
+					dirty1 = true;
+					break;
+
+				case NONE:
+					break;
+				case UH_OH:
+					messagesPane.appendCityMessage(MicropolisMessage.BULLDOZE_FIRST);
+					citySound(Sound.UHUH, loc);
+					break;
+
+				case INSUFFICIENT_FUNDS:
+					messagesPane.appendCityMessage(MicropolisMessage.INSUFFICIENT_FUNDS);
+					citySound(Sound.SORRY, loc);
+					break;
+
+				default:
+					assert false;
+			}
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent ev)
+		{
+			try {
+				onToolUp(ev);
+			} catch (Throwable e) {
+				showErrorMessage(e);
+			}
+		}
+
+		private void onToolUp(MouseEvent ev)
+		{
+			if (toolStroke != null) {
+				drawingArea.setToolPreview(null);
+
+				CityLocation loc = toolStroke.getLocation();
+				ToolResult tr = toolStroke.apply();
+				showToolResult(loc, tr);
+				toolStroke = null;
+			}
+
+			onToolHover(ev);
+
+			if (autoBudgetPending) {
+				autoBudgetPending = false;
+				showBudgetWindow();
+			}
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent ev)
+		{
+			try {
+				onToolDrag(ev);
+			} catch (Throwable e) {
+				showErrorMessage(e);
+			}
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent ev)
+		{
+			try {
+				onToolHover(ev);
+			} catch (Throwable e) {
+				showErrorMessage(e);
+			}
+		}
+
+		@Override
+		public void mouseExited(MouseEvent ev)
+		{
+			try {
+				onToolExited();
+			} catch (Throwable e) {
+				showErrorMessage(e);
+			}
+		}
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent evt)
+		{
+			try {
+				onMouseWheelMoved(evt);
+			} catch (Throwable e) {
+				showErrorMessage(e);
+			}
+		}
+
+		private void onMouseWheelMoved(MouseWheelEvent evt)
+		{
+			if (evt.getWheelRotation() < 0) {
+				doZoom(1, evt.getPoint());
+			} else {
+				doZoom(-1, evt.getPoint());
+			}
+		}
+
+	}
+
+	private class MainWindowAdapter extends WindowAdapter
+	{
+		@Override
+		public void windowClosing(WindowEvent e)
+		{
+			closeWindow();
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e)
+		{
+			onWindowClosed();
+		}
+
+		private void onWindowClosed()
+		{
+			if (isTimerActive()) {
+				stopTimer();
+			}
+		}
 	}
 }

@@ -8,53 +8,109 @@
 
 package micropolisj.engine;
 
-import static micropolisj.engine.TileConstants.*;
+import static micropolisj.engine.TileConstants.RIVER;
+import static micropolisj.engine.TileConstants.RZB;
+import static micropolisj.engine.TileConstants.TINYEXP;
+import static micropolisj.engine.TileConstants.TREEBASE;
+import static micropolisj.engine.TileConstants.checkWet;
+import static micropolisj.engine.TileConstants.isBridge;
+import static micropolisj.engine.TileConstants.isCombustible;
+import static micropolisj.engine.TileConstants.isZoneCenter;
 
 /**
  * Represents a mobile entity on the city map, such as a tornado
  * or a train. There can be any number present in a city, and each one
  * gets a chance to act on every tick of the simulation.
- *
- * @see Micropolis#moveObjects
  */
 public abstract class Sprite
 {
-	Micropolis city;
+	private final SpriteKind kind;
 
 	//TODO- enforce read-only nature of the following properties
 	// (i.e. do not let them be modified directly by other classes)
+	private final Micropolis city;
+	private int offx;
+	private int offy;
+	private int width = 32;
+	private int height = 32;
 
-	public SpriteKind kind;
+	private int frame;
+	private int x;
+	private int y;
 
-	public int offx;
-	public int offy;
-	public int width = 32;
-	public int height = 32;
+	private int lastX;
+	private int lastY;
 
-	public int frame;
-	public int x;
-	public int y;
+	private int dir;
 
-	public int lastX;
-	public int lastY;
-
-	int dir;
-
-	protected Sprite(Micropolis engine, SpriteKind kind)
+	Sprite(Micropolis engine, SpriteKind kind)
 	{
-		this.city = engine;
+		city = engine;
 		this.kind = kind;
 	}
 
-	protected final int getChar(int x, int y)
+	/**
+	 * Computes direction from one point to another.
+	 *
+	 * @return integer between 1 and 8, with
+	 * 1 == north,
+	 * 3 == east,
+	 * 5 == south,
+	 * 7 == west.
+	 */
+	static int getDir(int orgX, int orgY, int desX, int desY)
+	{
+		int[] gdtab = {0, 3, 2, 1, 3, 4, 5, 7, 6, 5, 7, 8, 1};
+		int dispX = desX - orgX;
+		int dispY = desY - orgY;
+
+		int z = dispX < 0 ? dispY < 0 ? 11 : 8 : dispY < 0 ? 2 : 5;
+
+		dispX = Math.abs(dispX);
+		dispY = Math.abs(dispY);
+
+		if (dispX * 2 < dispY) z++;
+		else if (dispY * 2 < dispX) z--;
+
+		return gdtab[z];
+	}
+
+	/**
+	 * Computes manhatten distance between two points.
+	 */
+	static int getDis(int x0, int y0, int x1, int y1)
+	{
+		return Math.abs(x0 - x1) + Math.abs(y0 - y1);
+	}
+
+	/**
+	 * Helper function for rotating a sprite.
+	 *
+	 * @param p the sprite's current attitude (1-8)
+	 * @param d the desired attitude (1-8)
+	 * @return the new attitude
+	 */
+	static int turnTo(int p, int d)
+	{
+		if (p == d)
+			return p;
+		if (p < d) {
+			if (d - p < 4) p++;
+			else p--;
+		} else {
+			if (p - d < 4) p--;
+			else p++;
+		}
+		if (p > 8) return 1;
+		if (p < 1) return 8;
+		return p;
+	}
+
+	int getChar(int x, int y)
 	{
 		int xpos = x / 16;
 		int ypos = y / 16;
-		if (city.testBounds(xpos, ypos)) {
-			return city.getTile(xpos, ypos);
-		} else {
-			return -1;
-		}
+		return city.testBounds(xpos, ypos) ? city.getTile(xpos, ypos) : -1;
 	}
 
 	/**
@@ -67,7 +123,7 @@ public abstract class Sprite
 	/**
 	 * Perform this agent's movement and animation.
 	 */
-	public final void move()
+	public void move()
 	{
 		lastX = x;
 		lastY = y;
@@ -78,56 +134,17 @@ public abstract class Sprite
 	/**
 	 * Tells whether this sprite is visible.
 	 */
-	public final boolean isVisible()
+	public boolean isVisible()
 	{
-		return this.frame != 0;
-	}
-
-	/**
-	 * Computes direction from one point to another.
-	 *
-	 * @return integer between 1 and 8, with
-	 * 1 == north,
-	 * 3 == east,
-	 * 5 == south,
-	 * 7 == west.
-	 */
-	static final int getDir(int orgX, int orgY, int desX, int desY)
-	{
-		final int Gdtab[] = {0, 3, 2, 1, 3, 4, 5, 7, 6, 5, 7, 8, 1};
-		int dispX = desX - orgX;
-		int dispY = desY - orgY;
-
-		int z = dispX < 0 ? dispY < 0 ? 11 : 8 : dispY < 0 ? 2 : 5;
-
-		dispX = Math.abs(dispX);
-		dispY = Math.abs(dispY);
-
-		if (dispX * 2 < dispY) z++;
-		else if (dispY * 2 < dispX) z--;
-
-		if (z >= 1 && z <= 12) {
-			return Gdtab[z];
-		} else {
-			assert false;
-			return 0;
-		}
-	}
-
-	/**
-	 * Computes manhatten distance between two points.
-	 */
-	static final int getDis(int x0, int y0, int x1, int y1)
-	{
-		return Math.abs(x0 - x1) + Math.abs(y0 - y1);
+		return frame != 0;
 	}
 
 	/**
 	 * Replaces this sprite with an exploding sprite.
 	 */
-	final void explodeSprite()
+	void explodeSprite()
 	{
-		this.frame = 0;
+		frame = 0;
 
 		city.makeExplosionAt(x, y);
 		int xpos = x / 16;
@@ -157,19 +174,19 @@ public abstract class Sprite
 	 *
 	 * @return true iff the sprite is in collision range
 	 */
-	final boolean checkSpriteCollision(Sprite otherSprite)
+	boolean checkSpriteCollision(Sprite otherSprite)
 	{
 		if (!isVisible()) return false;
 		if (!otherSprite.isVisible()) return false;
 
-		return getDis(this.x, this.y, otherSprite.x, otherSprite.y) < 30;
+		return getDis(x, y, otherSprite.x, otherSprite.y) < 30;
 	}
 
 	/**
 	 * Destroys whatever is at the specified location,
 	 * replacing it with fire, rubble, or water as appropriate.
 	 */
-	final void destroyTile(int xpos, int ypos)
+	void destroyTile(int xpos, int ypos)
 	{
 		if (!city.testBounds(xpos, ypos))
 			return;
@@ -198,27 +215,103 @@ public abstract class Sprite
 		}
 	}
 
-	/**
-	 * Helper function for rotating a sprite.
-	 *
-	 * @param p the sprite's current attitude (1-8)
-	 * @param d the desired attitude (1-8)
-	 * @return the new attitude
-	 */
-	static final int turnTo(int p, int d)
+	public SpriteKind getKind()
 	{
-		if (p == d)
-			return p;
-		if (p < d) {
-			if (d - p < 4) p++;
-			else p--;
-		} else {
-			if (p - d < 4) p--;
-			else p++;
-		}
-		if (p > 8) return 1;
-		if (p < 1) return 8;
-		return p;
+		return kind;
 	}
 
+	public Micropolis getCity()
+	{
+		return city;
+	}
+
+	public int getOffx()
+	{
+		return offx;
+	}
+
+	public void setOffx(int offx)
+	{
+		this.offx = offx;
+	}
+
+	public int getOffy()
+	{
+		return offy;
+	}
+
+	public void setOffy(int offy)
+	{
+		this.offy = offy;
+	}
+
+	public int getWidth()
+	{
+		return width;
+	}
+
+	public void setWidth(int width)
+	{
+		this.width = width;
+	}
+
+	public int getHeight()
+	{
+		return height;
+	}
+
+	public void setHeight(int height)
+	{
+		this.height = height;
+	}
+
+	public int getFrame()
+	{
+		return frame;
+	}
+
+	public void setFrame(int frame)
+	{
+		this.frame = frame;
+	}
+
+	public int getX()
+	{
+		return x;
+	}
+
+	public void setX(int x)
+	{
+		this.x = x;
+	}
+
+	public int getY()
+	{
+		return y;
+	}
+
+	public void setY(int y)
+	{
+		this.y = y;
+	}
+
+	public int getLastX()
+	{
+		return lastX;
+	}
+
+	public int getLastY()
+	{
+		return lastY;
+	}
+
+	public int getDir()
+	{
+		return dir;
+	}
+
+	public void setDir(int dir)
+	{
+		this.dir = dir;
+	}
 }

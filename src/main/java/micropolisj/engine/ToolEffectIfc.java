@@ -8,7 +8,7 @@
 
 package micropolisj.engine;
 
-public interface ToolEffectIfc
+interface ToolEffectIfc
 {
 	/**
 	 * Gets the tile at a relative location.

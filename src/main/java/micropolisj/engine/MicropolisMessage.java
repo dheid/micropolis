@@ -14,79 +14,66 @@ package micropolisj.engine;
 public enum MicropolisMessage
 {
 	//orig_num        generated       last tested/verified
-	NEED_RES,              //   1            doMessages           1/19
-	NEED_COM,              //   2            doMessages           1/19
-	NEED_IND,              //   3            doMessages           1/19
-	NEED_ROADS,            //   4            doMessages           1/19
-	NEED_RAILS,            //   5            doMessages           1/20
-	NEED_POWER,            //   6            doMessages           1/19
-	NEED_STADIUM,          //   7            doMessages           1/20
-	NEED_SEAPORT,          //   8            doMessages           1/20
-	NEED_AIRPORT,          //   9            doMessages
-	HIGH_POLLUTION,        //  10            doMessages           1/20
-	HIGH_CRIME,            //  11            doMessages           1/19
-	HIGH_TRAFFIC,          //  12            doMessages           1/20
-	NEED_FIRESTATION,      //  13            doMessages           1/19
-	NEED_POLICE,           //  14            doMessages           1/19
-	BLACKOUTS,             //  15            doMessages           1/19
-	HIGH_TAXES,            //  16            doMessages           1/19
-	ROADS_NEED_FUNDING,    //  17            doMessages
-	FIRE_NEED_FUNDING,     //  18            doMessages
-	POLICE_NEED_FUNDING,   //  19            doMessages
-	FIRE_REPORT,           //  20
-	MONSTER_REPORT,
-	TORNADO_REPORT,
-	EARTHQUAKE_REPORT,     //  23            makeEarthquake
-	PLANECRASH_REPORT,
-	SHIPWRECK_REPORT,
-	TRAIN_CRASH_REPORT,
-	COPTER_CRASH_REPORT,
-	HIGH_UNEMPLOYMENT,
-	OUT_OF_FUNDS_REPORT,
-	FIREBOMBING_REPORT,  //30
-	NEED_PARKS,
-	EXPLOSION_REPORT,
-	INSUFFICIENT_FUNDS,    //  33            MainWindow.applyCurrentTool
-	BULLDOZE_FIRST,        //  34            MainWindow.applyCurrentTool
-	POP_2K_REACHED,        //  35            checkGrowth          1/19
-	POP_10K_REACHED,       //  36            checkGrowth
-	POP_50K_REACHED,       //  37            checkGrowth
-	POP_100K_REACHED,      //  38            checkGrowth
-	POP_500K_REACHED,      //  39            checkGrowth
-	BROWNOUTS_REPORT,      //  40                                 1/20
-	HEAVY_TRAFFIC_REPORT,  //  41           HelicopterSprite
-	FLOOD_REPORT,
-	MELTDOWN_REPORT,        // 43            doMeltdown
-	RIOTING_REPORT,
+	NEED_RES(false),              //   1            doMessages           1/19
+	NEED_COM(false),              //   2            doMessages           1/19
+	NEED_IND(false),              //   3            doMessages           1/19
+	NEED_ROADS(false),            //   4            doMessages           1/19
+	NEED_RAILS(false),            //   5            doMessages           1/20
+	NEED_POWER(false),            //   6            doMessages           1/19
+	NEED_STADIUM(false),          //   7            doMessages           1/20
+	NEED_SEAPORT(false),          //   8            doMessages           1/20
+	NEED_AIRPORT(false),          //   9            doMessages
+	HIGH_POLLUTION(true),        //  10            doMessages           1/20
+	HIGH_CRIME(true),            //  11            doMessages           1/19
+	HIGH_TRAFFIC(false),          //  12            doMessages           1/20
+	NEED_FIRESTATION(false),      //  13            doMessages           1/19
+	NEED_POLICE(false),           //  14            doMessages           1/19
+	BLACKOUTS(false),             //  15            doMessages           1/19
+	HIGH_TAXES(false),            //  16            doMessages           1/19
+	ROADS_NEED_FUNDING(false),    //  17            doMessages
+	FIRE_NEED_FUNDING(false),     //  18            doMessages
+	POLICE_NEED_FUNDING(false),   //  19            doMessages
+	FIRE_REPORT(true),           //  20
+	MONSTER_REPORT(true),
+	TORNADO_REPORT(true),
+	EARTHQUAKE_REPORT(false),     //  23            makeEarthquake
+	PLANECRASH_REPORT(true),
+	SHIPWRECK_REPORT(true),
+	TRAIN_CRASH_REPORT(true),
+	COPTER_CRASH_REPORT(true),
+	HIGH_UNEMPLOYMENT(false),
+	OUT_OF_FUNDS_REPORT(false),
+	FIREBOMBING_REPORT(false),  //30
+	NEED_PARKS(false),
+	EXPLOSION_REPORT(false),
+	INSUFFICIENT_FUNDS(false),    //  33            MainWindow.applyCurrentTool
+	BULLDOZE_FIRST(false),        //  34            MainWindow.applyCurrentTool
+	POP_2K_REACHED(true),        //  35            checkGrowth          1/19
+	POP_10K_REACHED(true),       //  36            checkGrowth
+	POP_50K_REACHED(true),       //  37            checkGrowth
+	POP_100K_REACHED(true),      //  38            checkGrowth
+	POP_500K_REACHED(true),      //  39            checkGrowth
+	BROWNOUTS_REPORT(false),      //  40                                 1/20
+	HEAVY_TRAFFIC_REPORT(false),  //  41           HelicopterSprite
+	FLOOD_REPORT(true),
+	MELTDOWN_REPORT(true),        // 43            doMeltdown
+	RIOTING_REPORT(false),
 
 	// added by Jason
-	NO_NUCLEAR_PLANTS;
+	NO_NUCLEAR_PLANTS(false);
 
 	/**
 	 * Whether the message should be displayed in the notification pane.
 	 */
-	public boolean useNotificationPane = false;
+	private final boolean useNotificationPane;
 
-	static {
-		// not location-specific
-		POP_2K_REACHED.useNotificationPane = true;
-		POP_10K_REACHED.useNotificationPane = true;
-		POP_50K_REACHED.useNotificationPane = true;
-		POP_100K_REACHED.useNotificationPane = true;
-		POP_500K_REACHED.useNotificationPane = true;
-		HIGH_CRIME.useNotificationPane = true;
-		HIGH_POLLUTION.useNotificationPane = true;
+	MicropolisMessage(boolean useNotificationPane)
+	{
+		this.useNotificationPane = useNotificationPane;
+	}
 
-		// location-specific
-		FLOOD_REPORT.useNotificationPane = true;
-		FIRE_REPORT.useNotificationPane = true;
-		MONSTER_REPORT.useNotificationPane = true;
-		TORNADO_REPORT.useNotificationPane = true;
-		MELTDOWN_REPORT.useNotificationPane = true;
-		EARTHQUAKE_REPORT.useNotificationPane = true;
-		TRAIN_CRASH_REPORT.useNotificationPane = true;
-		SHIPWRECK_REPORT.useNotificationPane = true;
-		COPTER_CRASH_REPORT.useNotificationPane = true;
-		PLANECRASH_REPORT.useNotificationPane = true;
+	public boolean isUseNotificationPane()
+	{
+		return useNotificationPane;
 	}
 }

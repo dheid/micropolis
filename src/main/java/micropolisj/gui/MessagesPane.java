@@ -10,14 +10,14 @@ package micropolisj.gui;
 
 import micropolisj.engine.MicropolisMessage;
 
-import javax.swing.*;
+import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import java.util.ResourceBundle;
 
 public class MessagesPane extends JTextPane
 {
-	static ResourceBundle cityMessageStrings = ResourceBundle.getBundle("strings.CityMessages");
+	private static final ResourceBundle cityMessageStrings = ResourceBundle.getBundle("strings.CityMessages");
 
 	public MessagesPane()
 	{
@@ -29,7 +29,7 @@ public class MessagesPane extends JTextPane
 		appendMessageText(cityMessageStrings.getString(message.name()));
 	}
 
-	void appendMessageText(String messageText)
+	private void appendMessageText(String messageText)
 	{
 		try {
 			StyledDocument doc = getStyledDocument();
@@ -38,7 +38,7 @@ public class MessagesPane extends JTextPane
 			}
 			doc.insertString(doc.getLength(), messageText, null);
 		} catch (BadLocationException e) {
-			throw new Error("unexpected", e);
+			throw new RuntimeException("unexpected", e);
 		}
 	}
 }

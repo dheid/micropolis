@@ -13,76 +13,77 @@ package micropolisj.engine;
  */
 public class TornadoSprite extends Sprite
 {
-	static int[] CDx = {2, 3, 2, 0, -2, -3};
-	static int[] CDy = {-2, 0, 2, 3, 2, 0};
-
-	boolean flag;
-	int count;
+	private static final int[] CDx = {2, 3, 2, 0, -2, -3};
+	private static final int[] CDy = {-2, 0, 2, 3, 2, 0};
+	private int count;
+	private boolean flag;
 
 	public TornadoSprite(Micropolis engine, int xpos, int ypos)
 	{
 		super(engine, SpriteKind.TOR);
-		this.x = xpos * 16 + 8;
-		this.y = ypos * 16 + 8;
-		this.width = 48;
-		this.height = 48;
-		this.offx = -24;
-		this.offy = -40;
+		setX(xpos * 16 + 8);
+		setY(ypos * 16 + 8);
+		setWidth(48);
+		setHeight(48);
+		setOffx(-24);
+		setOffy(-40);
 
-		this.frame = 1;
-		this.count = 200;
+		setFrame(1);
+		count = 200;
 	}
 
 	@Override
 	public void moveImpl()
 	{
-		int z = this.frame;
+		int z = getFrame();
 
 		if (z == 2) {
 			//cycle animation
 
-			if (this.flag)
-				z = 3;
-			else
-				z = 1;
+			z = flag ? 3 : 1;
 		} else {
-			this.flag = z == 1;
+			flag = z == 1;
 			z = 2;
 		}
 
-		if (this.count > 0) {
-			this.count--;
+		if (count > 0) {
+			count--;
 		}
 
-		this.frame = z;
+		setFrame(z);
 
-		for (Sprite s : city.allSprites()) {
+		for (Sprite s : getCity().allSprites()) {
 			if (checkSpriteCollision(s) &&
-					(s.kind == SpriteKind.AIR ||
-							s.kind == SpriteKind.COP ||
-							s.kind == SpriteKind.SHI ||
-							s.kind == SpriteKind.TRA)
+					(s.getKind() == SpriteKind.AIR ||
+							s.getKind() == SpriteKind.COP ||
+							s.getKind() == SpriteKind.SHI ||
+							s.getKind() == SpriteKind.TRA)
 			) {
 				s.explodeSprite();
 			}
 		}
 
-		int zz = city.PRNG.nextInt(CDx.length);
-		x += CDx[zz];
-		y += CDy[zz];
+		int zz = getCity().getRandom().nextInt(CDx.length);
+		setX(getX() + CDx[zz]);
+		setY(getY() + CDy[zz]);
 
-		if (!city.testBounds(x / 16, y / 16)) {
+		if (!getCity().testBounds(getX() / 16, getY() / 16)) {
 			// out of bounds
-			this.frame = 0;
+			setFrame(0);
 			return;
 		}
 
-		if (this.count == 0 && city.PRNG.nextInt(501) == 0) {
+		if (count == 0 && getCity().getRandom().nextInt(501) == 0) {
 			// early termination
-			this.frame = 0;
+			setFrame(0);
 			return;
 		}
 
-		destroyTile(x / 16, y / 16);
+		destroyTile(getX() / 16, getY() / 16);
+	}
+
+	public void setCount(int count)
+	{
+		this.count = count;
 	}
 }

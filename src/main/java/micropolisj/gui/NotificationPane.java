@@ -12,27 +12,37 @@ import micropolisj.engine.Micropolis;
 import micropolisj.engine.MicropolisMessage;
 import micropolisj.engine.ZoneStatus;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JViewport;
+import javax.swing.SwingConstants;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ResourceBundle;
 
 import static micropolisj.gui.ColorParser.parseColor;
 
 public class NotificationPane extends JPanel
 {
-	JLabel headerLbl;
-	JViewport mapViewport;
-	MicropolisDrawingArea mapView;
-	JPanel mainPane;
-	JComponent infoPane;
-
-	static final Dimension VIEWPORT_SIZE = new Dimension(160, 160);
-	static final Color QUERY_COLOR = new Color(255, 165, 0);
-	static final ResourceBundle strings = MainWindow.strings;
-	static final ResourceBundle mstrings = ResourceBundle.getBundle("strings.CityMessages");
-	static final ResourceBundle s_strings = ResourceBundle.getBundle("strings.StatusMessages");
+	private static final Dimension VIEWPORT_SIZE = new Dimension(160, 160);
+	private static final Color QUERY_COLOR = new Color(255, 165, 0);
+	private static final ResourceBundle strings = MainWindow.strings;
+	private static final ResourceBundle mstrings = ResourceBundle.getBundle("strings.CityMessages");
+	private static final ResourceBundle s_strings = ResourceBundle.getBundle("strings.StatusMessages");
+	private final JLabel headerLbl;
+	private final JViewport mapViewport;
+	private final MicropolisDrawingArea mapView;
+	private final JPanel mainPane;
+	private JComponent infoPane;
 
 	public NotificationPane(Micropolis engine)
 	{
@@ -43,11 +53,11 @@ public class NotificationPane extends JPanel
 		headerLbl.setOpaque(true);
 		headerLbl.setHorizontalAlignment(SwingConstants.CENTER);
 		headerLbl.setBorder(BorderFactory.createRaisedBevelBorder());
-		add(headerLbl, BorderLayout.NORTH);
+		add(headerLbl, BorderLayout.PAGE_START);
 
 		JButton dismissBtn = new JButton(strings.getString("notification.dismiss"));
 		dismissBtn.addActionListener(evt -> onDismissClicked());
-		add(dismissBtn, BorderLayout.SOUTH);
+		add(dismissBtn, BorderLayout.PAGE_END);
 
 		mainPane = new JPanel(new BorderLayout());
 		add(mainPane, BorderLayout.CENTER);
@@ -58,7 +68,7 @@ public class NotificationPane extends JPanel
 						BorderFactory.createEmptyBorder(8, 4, 8, 4),
 						BorderFactory.createLineBorder(Color.BLACK)
 				));
-		mainPane.add(viewportContainer, BorderLayout.WEST);
+		mainPane.add(viewportContainer, BorderLayout.LINE_START);
 
 		mapViewport = new JViewport();
 		mapViewport.setPreferredSize(VIEWPORT_SIZE);
@@ -75,7 +85,7 @@ public class NotificationPane extends JPanel
 		setVisible(false);
 	}
 
-	void setPicture(Micropolis engine, int xpos, int ypos)
+	private void setPicture(Micropolis engine, int xpos, int ypos)
 	{
 		Dimension sz = VIEWPORT_SIZE;
 
@@ -115,12 +125,12 @@ public class NotificationPane extends JPanel
 		headerLbl.setText(strings.getString("notification.query_hdr"));
 		headerLbl.setBackground(QUERY_COLOR);
 
-		String buildingStr = zone.building != -1 ? s_strings.getString("zone." + zone.building) : "";
-		String popDensityStr = s_strings.getString("status." + zone.popDensity);
-		String landValueStr = s_strings.getString("status." + zone.landValue);
-		String crimeLevelStr = s_strings.getString("status." + zone.crimeLevel);
-		String pollutionStr = s_strings.getString("status." + zone.pollution);
-		String growthRateStr = s_strings.getString("status." + zone.growthRate);
+		String buildingStr = zone.getBuilding() == -1 ? "" : s_strings.getString("zone." + zone.getBuilding());
+		String popDensityStr = s_strings.getString("status." + zone.getPopDensity());
+		String landValueStr = s_strings.getString("status." + zone.getLandValue());
+		String crimeLevelStr = s_strings.getString("status." + zone.getCrimeLevel());
+		String pollutionStr = s_strings.getString("status." + zone.getPollution());
+		String growthRateStr = s_strings.getString("status." + zone.getGrowthRate());
 
 		setPicture(engine, xpos, ypos);
 
@@ -139,8 +149,8 @@ public class NotificationPane extends JPanel
 		c1.gridx = 0;
 		c2.gridx = 1;
 		c1.gridy = c2.gridy = 0;
-		c1.anchor = GridBagConstraints.WEST;
-		c2.anchor = GridBagConstraints.WEST;
+		c1.anchor = GridBagConstraints.LINE_START;
+		c2.anchor = GridBagConstraints.LINE_START;
 		c1.insets = new Insets(0, 0, 0, 8);
 		c2.weightx = 1.0;
 

@@ -8,92 +8,74 @@
 
 package micropolisj.engine;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Contains the code for performing a city evaluation.
  */
 public class CityEval
 {
+	private static final CityProblem[] NO_CITY_PROBLEMS = new CityProblem[0];
+
 	private final Micropolis engine;
-	private final Random PRNG;
 
-	public CityEval(Micropolis engine)
-	{
-		this.engine = engine;
-		this.PRNG = engine.PRNG;
-
-		assert PRNG != null;
-	}
-
-	/**
-	 * Percentage of population "approving" the mayor. Derived from cityScore.
-	 */
-	public int cityYes;
-
-	/**
-	 * Percentage of population "disapproving" the mayor. Derived from cityScore.
-	 */
-	public int cityNo;
-
-	/**
-	 * City assessment value.
-	 */
-	public int cityAssValue;
-
-	/**
-	 * Player's score, 0-1000.
-	 */
-	public int cityScore;
-
-	/**
-	 * Change in cityScore since last evaluation.
-	 */
-	public int deltaCityScore;
-
-	/**
-	 * City population as of current evaluation.
-	 */
-	public int cityPop;
-
-	/**
-	 * Change in cityPopulation since last evaluation.
-	 */
-	public int deltaCityPop;
-
-	/**
-	 * Classification of city size. 0==village, 1==town, etc.
-	 */
-	public int cityClass; // 0..5
-
-	/**
-	 * City's top 4 (or fewer) problems as reported by citizens.
-	 */
-	public CityProblem[] problemOrder = new CityProblem[0];
-
-	/**
-	 * Number of votes given for the various problems identified by problemOrder[].
-	 */
-	public EnumMap<CityProblem, Integer> problemVotes = new EnumMap<>(CityProblem.class);
+	private final Random random;
 
 	/**
 	 * Score for various problems.
 	 */
-	public EnumMap<CityProblem, Integer> problemTable = new EnumMap<>(CityProblem.class);
+	private final Map<CityProblem, Integer> problemTable = new EnumMap<>(CityProblem.class);
+
+	private int cityYes;
+
+	private int cityNo;
+
+	private int cityAssValue;
+
+	private int cityScore;
+
+	private int deltaCityScore;
+
+	private int cityPop;
+
+	private int deltaCityPop;
+
+	private int cityClass; // 0..5
+
+	private CityProblem[] problemOrder = NO_CITY_PROBLEMS;
+
+	private EnumMap<CityProblem, Integer> problemVotes = new EnumMap<>(CityProblem.class);
+
+	public CityEval(Micropolis engine)
+	{
+		this.engine = engine;
+		random = engine.getRandom();
+
+		assert random != null;
+	}
+
+	private static double clamp(double x)
+	{
+		return Math.max(0, Math.min(1000, x));
+	}
 
 	/**
 	 * Perform an evaluation.
 	 */
 	void cityEvaluation()
 	{
-		if (engine.totalPop != 0) {
+		if (engine.getTotalPop() == 0) {
+			evalInit();
+		} else {
 			calculateAssValue();
 			doPopNum();
 			doProblems();
 			calculateScore();
 			doVotes();
-		} else {
-			evalInit();
 		}
 		engine.fireEvaluationChanged();
 	}
@@ -101,7 +83,7 @@ public class CityEval
 	/**
 	 * Evaluate an empty city.
 	 */
-	void evalInit()
+	private void evalInit()
 	{
 		cityYes = 0;
 		cityNo = 0;
@@ -110,26 +92,26 @@ public class CityEval
 		cityScore = 500;
 		deltaCityScore = 0;
 		problemVotes.clear();
-		problemOrder = new CityProblem[0];
+		problemOrder = NO_CITY_PROBLEMS;
 	}
 
-	void calculateAssValue()
+	private void calculateAssValue()
 	{
 		int z = 0;
-		z += engine.roadTotal * 5;
-		z += engine.railTotal * 10;
-		z += engine.policeCount * 1000;
-		z += engine.fireStationCount * 1000;
-		z += engine.hospitalCount * 400;
-		z += engine.stadiumCount * 3000;
-		z += engine.seaportCount * 5000;
-		z += engine.airportCount * 10000;
-		z += engine.coalCount * 3000;
-		z += engine.nuclearCount * 6000;
+		z += engine.getRoadTotal() * 5;
+		z += engine.getRailTotal() * 10;
+		z += engine.getPoliceCount() * 1000;
+		z += engine.getFireStationCount() * 1000;
+		z += engine.getHospitalCount() * 400;
+		z += engine.getStadiumCount() * 3000;
+		z += engine.getSeaportCount() * 5000;
+		z += engine.getAirportCount() * 10000;
+		z += engine.getCoalCount() * 3000;
+		z += engine.getNuclearCount() * 6000;
 		cityAssValue = z * 1000;
 	}
 
-	void doPopNum()
+	private void doPopNum()
 	{
 		int oldCityPop = cityPop;
 		cityPop = engine.getCityPopulation();
@@ -144,13 +126,13 @@ public class CityEval
 														0;                  //village
 	}
 
-	void doProblems()
+	private void doProblems()
 	{
 		problemTable.clear();
-		problemTable.put(CityProblem.CRIME, engine.crimeAverage);
-		problemTable.put(CityProblem.POLLUTION, engine.pollutionAverage);
-		problemTable.put(CityProblem.HOUSING, (int) Math.round(engine.landValueAverage * 0.7));
-		problemTable.put(CityProblem.TAXES, engine.cityTax * 10);
+		problemTable.put(CityProblem.CRIME, engine.getCrimeAverage());
+		problemTable.put(CityProblem.POLLUTION, engine.getPollutionAverage());
+		problemTable.put(CityProblem.HOUSING, (int) Math.round(engine.getLandValueAverage() * 0.7));
+		problemTable.put(CityProblem.TAXES, engine.getCityTax() * 10);
 		problemTable.put(CityProblem.TRAFFIC, averageTrf());
 		problemTable.put(CityProblem.UNEMPLOYMENT, getUnemployment());
 		problemTable.put(CityProblem.FIRE, getFire());
@@ -162,24 +144,22 @@ public class CityEval
 
 		int c = 0;
 		while (c < probOrder.length &&
-				problemVotes.get(probOrder[c]).intValue() != 0 &&
+				problemVotes.get(probOrder[c]) != 0 &&
 				c < 4)
 			c++;
 
 		problemOrder = new CityProblem[c];
-		for (int i = 0; i < c; i++) {
-			problemOrder[i] = probOrder[i];
-		}
+		System.arraycopy(probOrder, 0, problemOrder, 0, c);
 	}
 
-	EnumMap<CityProblem, Integer> voteProblems(Map<CityProblem, Integer> probTab)
+	private EnumMap<CityProblem, Integer> voteProblems(Map<CityProblem, Integer> probTab)
 	{
 		CityProblem[] pp = CityProblem.values();
 		int[] votes = new int[pp.length];
 
 		int countVotes = 0;
 		for (int i = 0; i < 600; i++) {
-			if (PRNG.nextInt(301) < probTab.get(pp[i % pp.length])) {
+			if (random.nextInt(301) < probTab.get(pp[i % pp.length])) {
 				votes[i % pp.length]++;
 				countVotes++;
 				if (countVotes >= 100)
@@ -194,7 +174,7 @@ public class CityEval
 		return rv;
 	}
 
-	int averageTrf()
+	private int averageTrf()
 	{
 		int count = 1;
 		int total = 0;
@@ -209,17 +189,17 @@ public class CityEval
 			}
 		}
 
-		engine.trafficAverage = (int) Math.round((double) total / (double) count * 2.4);
-		return engine.trafficAverage;
+		engine.setTrafficAverage((int) Math.round((double) total / count * 2.4));
+		return engine.getTrafficAverage();
 	}
 
-	int getUnemployment()
+	private int getUnemployment()
 	{
-		int b = (engine.comPop + engine.indPop) * 8;
+		int b = (engine.getComPop() + engine.getIndPop()) * 8;
 		if (b == 0)
 			return 0;
 
-		double r = (double) engine.resPop / (double) b;
+		double r = (double) engine.getResPop() / b;
 		b = (int) Math.floor((r - 1.0) * 255);
 		if (b > 255) {
 			b = 255;
@@ -227,93 +207,178 @@ public class CityEval
 		return b;
 	}
 
-	int getFire()
+	private int getFire()
 	{
-		int z = engine.firePop * 5;
+		int z = engine.getFirePop() * 5;
 		return Math.min(255, z);
 	}
 
-	static double clamp(double x, double min, double max)
-	{
-		return Math.max(min, Math.min(max, x));
-	}
-
-	void calculateScore()
+	private void calculateScore()
 	{
 		int oldCityScore = cityScore;
 
 		int x = 0;
 		for (Integer z : problemTable.values()) {
-			x += z.intValue();
+			x += z;
 		}
 
 		x /= 3;
 		x = Math.min(256, x);
 
-		double z = clamp((256 - x) * 4, 0, 1000);
+		double z = clamp((256 - x) * 4);
 
-		if (engine.resCap) {
+		if (engine.isResCap()) {
 			z = 0.85 * z;
 		}
-		if (engine.comCap) {
+		if (engine.isComCap()) {
 			z = 0.85 * z;
 		}
-		if (engine.indCap) {
+		if (engine.isIndCap()) {
 			z = 0.85 * z;
 		}
-		if (engine.roadEffect < 32) {
-			z -= 32 - engine.roadEffect;
+		if (engine.getRoadEffect() < 32) {
+			z -= 32 - engine.getRoadEffect();
 		}
-		if (engine.policeEffect < 1000) {
-			z *= 0.9 + engine.policeEffect / 10000.1;
+		if (engine.getPoliceEffect() < 1000) {
+			z *= 0.9 + engine.getPoliceEffect() / 10000.1;
 		}
-		if (engine.fireEffect < 1000) {
-			z *= 0.9 + engine.fireEffect / 10000.1;
+		if (engine.getFireEffect() < 1000) {
+			z *= 0.9 + engine.getFireEffect() / 10000.1;
 		}
-		if (engine.resValve < -1000) {
+		if (engine.getResValve() < -1000) {
 			z *= 0.85;
 		}
-		if (engine.comValve < -1000) {
+		if (engine.getComValve() < -1000) {
 			z *= 0.85;
 		}
-		if (engine.indValve < -1000) {
+		if (engine.getIndValve() < -1000) {
 			z *= 0.85;
 		}
 
-		double SM = 1.0;
-		if (cityPop == 0 && deltaCityPop == 0) {
-			SM = 1.0;
-		} else if (deltaCityPop == cityPop) {
-			SM = 1.0;
-		} else if (deltaCityPop > 0) {
-			SM = (double) deltaCityPop / (double) cityPop + 1.0;
-		} else if (deltaCityPop < 0) {
-			SM = 0.95 + (double) deltaCityPop / (double) (cityPop - deltaCityPop);
+		double sm = 1.0;
+		if (cityPop != 0 || deltaCityPop != 0) {
+			if (deltaCityPop != cityPop) {
+				if (deltaCityPop > 0) {
+					sm = (double) deltaCityPop / cityPop + 1.0;
+				} else if (deltaCityPop < 0) {
+					sm = 0.95 + (double) deltaCityPop / (cityPop - deltaCityPop);
+				}
+			}
 		}
-		z *= SM;
+		z *= sm;
 		z -= getFire();
-		z -= engine.cityTax;
+		z -= engine.getCityTax();
 
-		int TM = engine.unpoweredZoneCount + engine.poweredZoneCount;
-		SM = TM != 0 ? (double) engine.poweredZoneCount / (double) TM : 1.0;
-		z *= SM;
+		int tm = engine.getUnpoweredZoneCount() + engine.getPoweredZoneCount();
+		sm = tm != 0 ? (double) engine.getPoweredZoneCount() / tm : 1.0;
+		z *= sm;
 
-		z = clamp(z, 0, 1000);
+		z = clamp(z);
 
 		cityScore = (int) Math.round((cityScore + z) / 2.0);
 		deltaCityScore = cityScore - oldCityScore;
 	}
 
-	void doVotes()
+	private void doVotes()
 	{
 		cityYes = cityNo = 0;
 		for (int i = 0; i < 100; i++) {
-			if (PRNG.nextInt(1001) < cityScore) {
+			if (random.nextInt(1001) < cityScore) {
 				cityYes++;
 			} else {
 				cityNo++;
 			}
 		}
+	}
+
+	/**
+	 * Percentage of population "approving" the mayor. Derived from cityScore.
+	 */
+	public int getCityYes()
+	{
+		return cityYes;
+	}
+
+	/**
+	 * Percentage of population "disapproving" the mayor. Derived from cityScore.
+	 */
+	public int getCityNo()
+	{
+		return cityNo;
+	}
+
+	/**
+	 * City assessment value.
+	 */
+	public int getCityAssValue()
+	{
+		return cityAssValue;
+	}
+
+	/**
+	 * Player's score, 0-1000.
+	 */
+	public int getCityScore()
+	{
+		return cityScore;
+	}
+
+	public void setCityScore(int cityScore)
+	{
+		this.cityScore = cityScore;
+	}
+
+	/**
+	 * Change in cityScore since last evaluation.
+	 */
+	public int getDeltaCityScore()
+	{
+		return deltaCityScore;
+	}
+
+	/**
+	 * City population as of current evaluation.
+	 */
+	public int getCityPop()
+	{
+		return cityPop;
+	}
+
+	/**
+	 * Change in cityPopulation since last evaluation.
+	 */
+	public int getDeltaCityPop()
+	{
+		return deltaCityPop;
+	}
+
+	/**
+	 * Classification of city size. 0==village, 1==town, etc.
+	 */
+	public int getCityClass()
+	{
+		return cityClass;
+	}
+
+	public void setCityClass(int cityClass)
+	{
+		this.cityClass = cityClass;
+	}
+
+	/**
+	 * City's top 4 (or fewer) problems as reported by citizens.
+	 */
+	public CityProblem[] getProblemOrder()
+	{
+		return problemOrder;
+	}
+
+	/**
+	 * Number of votes given for the various problems identified by problemOrder[].
+	 */
+	public EnumMap<CityProblem, Integer> getProblemVotes()
+	{
+		return problemVotes;
 	}
 
 }

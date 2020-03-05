@@ -8,7 +8,14 @@
 
 package micropolisj.engine;
 
-import static micropolisj.engine.TileConstants.*;
+import static micropolisj.engine.TileConstants.CLEAR;
+import static micropolisj.engine.TileConstants.DIRT;
+import static micropolisj.engine.TileConstants.RADTILE;
+import static micropolisj.engine.TileConstants.RIVER;
+import static micropolisj.engine.TileConstants.TINYEXP;
+import static micropolisj.engine.TileConstants.getZoneSizeFor;
+import static micropolisj.engine.TileConstants.isOverWater;
+import static micropolisj.engine.TileConstants.isZoneCenter;
 
 class Bulldozer extends ToolStroke
 {
@@ -23,11 +30,11 @@ class Bulldozer extends ToolStroke
 		CityRect b = getBounds();
 
 		// scan selection area for rubble, forest, etc...
-		for (int y = 0; y < b.height; y++) {
-			for (int x = 0; x < b.width; x++) {
+		for (int y = 0; y < b.getHeight(); y++) {
+			for (int x = 0; x < b.getWidth(); x++) {
 
-				ToolEffectIfc subEff = new TranslatedToolEffect(eff, b.x + x, b.y + y);
-				if (city.isTileDozeable(subEff)) {
+				ToolEffectIfc subEff = new TranslatedToolEffect(eff, b.getX() + x, b.getY() + y);
+				if (Micropolis.isTileDozeable(subEff)) {
 
 					dozeField(subEff);
 				}
@@ -36,17 +43,17 @@ class Bulldozer extends ToolStroke
 		}
 
 		// scan selection area for zones...
-		for (int y = 0; y < b.height; y++) {
-			for (int x = 0; x < b.width; x++) {
+		for (int y = 0; y < b.getHeight(); y++) {
+			for (int x = 0; x < b.getWidth(); x++) {
 
-				if (isZoneCenter(eff.getTile(b.x + x, b.y + y))) {
-					dozeZone(new TranslatedToolEffect(eff, b.x + x, b.y + y));
+				if (isZoneCenter(eff.getTile(b.getX() + x, b.getY() + y))) {
+					dozeZone(new TranslatedToolEffect(eff, b.getX() + x, b.getY() + y));
 				}
 			}
 		}
 	}
 
-	void dozeZone(ToolEffectIfc eff)
+	private void dozeZone(ToolEffectIfc eff)
 	{
 		int currTile = eff.getTile(0, 0);
 
@@ -72,10 +79,9 @@ class Bulldozer extends ToolStroke
 		}
 
 		putRubble(new TranslatedToolEffect(eff, -1, -1), dim.width, dim.height);
-		return;
 	}
 
-	void dozeField(ToolEffectIfc eff)
+	private static void dozeField(ToolEffectIfc eff)
 	{
 		int tile = eff.getTile(0, 0);
 
@@ -89,10 +95,9 @@ class Bulldozer extends ToolStroke
 
 		fixZone(eff);
 		eff.spend(1);
-		return;
 	}
 
-	void putRubble(ToolEffectIfc eff, int w, int h)
+	private void putRubble(ToolEffectIfc eff, int w, int h)
 	{
 		for (int yy = 0; yy < h; yy++) {
 			for (int xx = 0; xx < w; xx++) {
@@ -101,7 +106,7 @@ class Bulldozer extends ToolStroke
 					continue;
 
 				if (tile != RADTILE && tile != DIRT) {
-					int z = inPreview ? 0 : city.PRNG.nextInt(3);
+					int z = isInPreview() ? 0 : getCity().getRandom().nextInt(3);
 					int nTile = TINYEXP + z;
 					eff.setTile(xx, yy, nTile);
 				}

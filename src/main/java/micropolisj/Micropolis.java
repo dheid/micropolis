@@ -10,11 +10,11 @@ package micropolisj;
 
 import micropolisj.gui.MainWindow;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 
-public class Micropolis
+class Micropolis
 {
-	static void createAndShowGUI()
+	private static void createAndShowGUI()
 	{
 		MainWindow win = new MainWindow();
 		win.setVisible(true);

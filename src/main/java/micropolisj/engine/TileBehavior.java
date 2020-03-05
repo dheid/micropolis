@@ -10,30 +10,64 @@ package micropolisj.engine;
 
 import java.util.Random;
 
-public abstract class TileBehavior
+abstract class TileBehavior
 {
-	protected final Micropolis city;
-	protected final Random PRNG;
-	int xpos;
-	int ypos;
-	int tile;
+	private final Micropolis city;
 
-	protected TileBehavior(Micropolis city)
+	private final Random random;
+
+	private int xpos;
+
+	private int ypos;
+
+	private int tile;
+
+	TileBehavior(Micropolis city)
 	{
 		this.city = city;
-		this.PRNG = city.PRNG;
+		random = city.getRandom();
 	}
 
-	public final void processTile(int xpos, int ypos)
+	public void processTile(int xpos, int ypos)
 	{
 		this.xpos = xpos;
 		this.ypos = ypos;
-		this.tile = city.getTile(xpos, ypos);
+		tile = city.getTile(xpos, ypos);
 		apply();
 	}
 
 	/**
 	 * Activate the tile identified by xpos and ypos properties.
 	 */
-	public abstract void apply();
+	protected abstract void apply();
+
+	public Micropolis getCity()
+	{
+		return city;
+	}
+
+	public Random getRandom()
+	{
+		return random;
+	}
+
+	public int getXpos()
+	{
+		return xpos;
+	}
+
+	public int getYpos()
+	{
+		return ypos;
+	}
+
+	public int getTile()
+	{
+		return tile;
+	}
+
+	public void setTile(int tile)
+	{
+		this.tile = tile;
+	}
 }

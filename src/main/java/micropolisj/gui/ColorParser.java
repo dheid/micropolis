@@ -8,9 +8,9 @@
 
 package micropolisj.gui;
 
-import java.awt.*;
+import java.awt.Color;
 
-public class ColorParser
+class ColorParser
 {
 	private ColorParser()
 	{
@@ -18,9 +18,9 @@ public class ColorParser
 
 	static Color parseColor(String str)
 	{
-		if (str.startsWith("#") && str.length() == 7) {
+		if (!str.isEmpty() && str.charAt(0) == '#' && str.length() == 7) {
 			return new Color(Integer.parseInt(str.substring(1), 16));
-		} else if (str.startsWith("rgba(") && str.endsWith(")")) {
+		} else if (str.startsWith("rgba(") && !str.isEmpty() && str.charAt(str.length() - 1) == ')') {
 			String[] parts = str.substring(5, str.length() - 1).split(",");
 			int r = Integer.parseInt(parts[0]);
 			int g = Integer.parseInt(parts[1]);
@@ -29,7 +29,7 @@ public class ColorParser
 			int a = Math.min(255, (int) Math.floor(aa * 256.0));
 			return new Color(r, g, b, a);
 		} else {
-			throw new Error("invalid color format: " + str);
+			throw new RuntimeException("invalid color format: " + str);
 		}
 	}
 }

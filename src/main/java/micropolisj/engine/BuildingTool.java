@@ -8,9 +8,15 @@
 
 package micropolisj.engine;
 
-import static micropolisj.engine.TileConstants.*;
+import static micropolisj.engine.TileConstants.AIRPORT;
+import static micropolisj.engine.TileConstants.FIRESTATION;
+import static micropolisj.engine.TileConstants.NUCLEAR;
+import static micropolisj.engine.TileConstants.POLICESTATION;
+import static micropolisj.engine.TileConstants.PORT;
+import static micropolisj.engine.TileConstants.POWERPLANT;
+import static micropolisj.engine.TileConstants.STADIUM;
 
-class BuildingTool extends ToolStroke
+public class BuildingTool extends ToolStroke
 {
 	public BuildingTool(Micropolis engine, MicropolisTool tool, int xpos, int ypos)
 	{
@@ -20,40 +26,47 @@ class BuildingTool extends ToolStroke
 	@Override
 	public void dragTo(int xdest, int ydest)
 	{
-		this.xpos = xdest;
-		this.ypos = ydest;
-		this.xdest = xdest;
-		this.ydest = ydest;
+		setXpos(xdest);
+		setYpos(ydest);
+		this.setXdest(xdest);
+		this.setYdest(ydest);
 	}
 
 	@Override
-	boolean apply1(ToolEffectIfc eff)
+	void apply1(ToolEffectIfc eff)
 	{
-		switch (tool) {
+		switch (getTool()) {
 			case FIRE:
-				return applyZone(eff, FIRESTATION);
+				applyZone(eff, FIRESTATION);
+				return;
 
 			case POLICE:
-				return applyZone(eff, POLICESTATION);
+				applyZone(eff, POLICESTATION);
+				return;
 
 			case POWERPLANT:
-				return applyZone(eff, POWERPLANT);
+				applyZone(eff, POWERPLANT);
+				return;
 
 			case STADIUM:
-				return applyZone(eff, STADIUM);
+				applyZone(eff, STADIUM);
+				return;
 
 			case SEAPORT:
-				return applyZone(eff, PORT);
+				applyZone(eff, PORT);
+				return;
 
 			case NUCLEAR:
-				return applyZone(eff, NUCLEAR);
+				applyZone(eff, NUCLEAR);
+				return;
 
 			case AIRPORT:
-				return applyZone(eff, AIRPORT);
+				applyZone(eff, AIRPORT);
+				return;
 
 			default:
 				// not expected
-				throw new Error("unexpected tool: " + tool);
+				throw new RuntimeException("unexpected tool: " + getTool());
 		}
 	}
 }

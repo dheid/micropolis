@@ -15,28 +15,93 @@ package micropolisj.engine;
  */
 public class ZoneStatus
 {
+	private int building;
+
+	private int popDensity;
+
+	private int landValue;
+
+	private int crimeLevel;
+
+	private int pollution;
+
+	private int growthRate;
+
 	/**
 	 * Number from 0 to 27, identifying the type of building.
 	 */
-	public int building;
+	public int getBuilding()
+	{
+		return building;
+	}
+
+	public void setBuilding(int building)
+	{
+		this.building = building;
+	}
+
 	/**
 	 * Number from 1 to 4, 1=Low, 2=Medium, 3=High, 4=Very High.
 	 */
-	public int popDensity;
+	public int getPopDensity()
+	{
+		return popDensity;
+	}
+
+	public void setPopDensity(int popDensity)
+	{
+		this.popDensity = popDensity;
+	}
+
 	/**
 	 * Number from 5 to 8, 5=Slum, 6=Lower Class, etc.
 	 */
-	public int landValue;
+	public int getLandValue()
+	{
+		return landValue;
+	}
+
+	public void setLandValue(int landValue)
+	{
+		this.landValue = landValue;
+	}
+
 	/**
 	 * Number from 9 to 12, 9=Safe, 10=Light, 11=Moderate, etc.
 	 */
-	public int crimeLevel;
+	public int getCrimeLevel()
+	{
+		return crimeLevel;
+	}
+
+	public void setCrimeLevel(int crimeLevel)
+	{
+		this.crimeLevel = crimeLevel;
+	}
+
 	/**
 	 * Number from 13 to 16, 13=None, 14=Moderate, 15=Heavy, etc.
 	 */
-	public int pollution;
+	public int getPollution()
+	{
+		return pollution;
+	}
+
+	public void setPollution(int pollution)
+	{
+		this.pollution = pollution;
+	}
+
 	/**
 	 * Number from 17 to 20, 17=Declining, 18=Stable, etc.
 	 */
-	public int growthRate;
+	public int getGrowthRate()
+	{
+		return growthRate;
+	}
+
+	public void setGrowthRate(int growthRate)
+	{
+		this.growthRate = growthRate;
+	}
 }

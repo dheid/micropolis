@@ -33,9 +33,9 @@ public enum Speed
 	 */
 	public final int simStepsPerUpdate;
 
-	private Speed(int delay, int simSteps)
+	Speed(int delay, int simSteps)
 	{
-		this.animationDelay = delay;
-		this.simStepsPerUpdate = simSteps;
+		animationDelay = delay;
+		simStepsPerUpdate = simSteps;
 	}
 }
