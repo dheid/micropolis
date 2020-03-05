@@ -464,61 +464,31 @@ public class MainWindow extends JFrame
 		menuItem = new JMenuItem(strings.getString("menu.game.new"));
 		setupKeys(menuItem, "menu.game.new");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onNewCityClicked();
-					}
-				}));
+				ev -> onNewCityClicked()));
 		gameMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.game.load"));
 		setupKeys(menuItem, "menu.game.load");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onLoadGameClicked();
-					}
-				}));
+				ev -> onLoadGameClicked()));
 		gameMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.game.save"));
 		setupKeys(menuItem, "menu.game.save");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onSaveCityClicked();
-					}
-				}));
+				ev -> onSaveCityClicked()));
 		gameMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.game.save_as"));
 		setupKeys(menuItem, "menu.game.save_as");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onSaveCityAsClicked();
-					}
-				}));
+				ev -> onSaveCityAsClicked()));
 		gameMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.game.exit"));
 		setupKeys(menuItem, "menu.game.exit");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						closeWindow();
-					}
-				}));
+				ev -> closeWindow()));
 		gameMenu.add(menuItem);
 
 		JMenu optionsMenu = new JMenu(strings.getString("menu.options"));
@@ -535,13 +505,7 @@ public class MainWindow extends JFrame
 			menuItem = new JRadioButtonMenuItem(strings.getString("menu.difficulty." + level));
 			setupKeys(menuItem, "menu.difficulty." + level);
 			menuItem.addActionListener(wrapActionListener(
-					new ActionListener()
-					{
-						public void actionPerformed(ActionEvent evt)
-						{
-							onDifficultyClicked(level);
-						}
-					}));
+					evt -> onDifficultyClicked(level)));
 			levelMenu.add(menuItem);
 			difficultyMenuItems.put(level, menuItem);
 		}
@@ -549,73 +513,37 @@ public class MainWindow extends JFrame
 		autoBudgetMenuItem = new JCheckBoxMenuItem(strings.getString("menu.options.auto_budget"));
 		setupKeys(autoBudgetMenuItem, "menu.options.auto_budget");
 		autoBudgetMenuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onAutoBudgetClicked();
-					}
-				}));
+				ev -> onAutoBudgetClicked()));
 		optionsMenu.add(autoBudgetMenuItem);
 
 		autoBulldozeMenuItem = new JCheckBoxMenuItem(strings.getString("menu.options.auto_bulldoze"));
 		setupKeys(autoBulldozeMenuItem, "menu.options.auto_bulldoze");
 		autoBulldozeMenuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onAutoBulldozeClicked();
-					}
-				}));
+				ev -> onAutoBulldozeClicked()));
 		optionsMenu.add(autoBulldozeMenuItem);
 
 		disastersMenuItem = new JCheckBoxMenuItem(strings.getString("menu.options.disasters"));
 		setupKeys(disastersMenuItem, "menu.options.disasters");
 		disastersMenuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onDisastersClicked();
-					}
-				}));
+				ev -> onDisastersClicked()));
 		optionsMenu.add(disastersMenuItem);
 
 		soundsMenuItem = new JCheckBoxMenuItem(strings.getString("menu.options.sound"));
 		setupKeys(soundsMenuItem, "menu.options.sound");
 		soundsMenuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onSoundClicked();
-					}
-				}));
+				ev -> onSoundClicked()));
 		optionsMenu.add(soundsMenuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.options.zoom_in"));
 		setupKeys(menuItem, "menu.options.zoom_in");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						doZoom(1);
-					}
-				}));
+				ev -> doZoom(1)));
 		optionsMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.options.zoom_out"));
 		setupKeys(menuItem, "menu.options.zoom_out");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						doZoom(-1);
-					}
-				}));
+				ev -> doZoom(-1)));
 		optionsMenu.add(menuItem);
 
 		JMenu disastersMenu = new JMenu(strings.getString("menu.disasters"));
@@ -625,73 +553,37 @@ public class MainWindow extends JFrame
 		menuItem = new JMenuItem(strings.getString("menu.disasters.MONSTER"));
 		setupKeys(menuItem, "menu.disasters.MONSTER");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onInvokeDisasterClicked(Disaster.MONSTER);
-					}
-				}));
+				ev -> onInvokeDisasterClicked(Disaster.MONSTER)));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.FIRE"));
 		setupKeys(menuItem, "menu.disasters.FIRE");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onInvokeDisasterClicked(Disaster.FIRE);
-					}
-				}));
+				ev -> onInvokeDisasterClicked(Disaster.FIRE)));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.FLOOD"));
 		setupKeys(menuItem, "menu.disasters.FLOOD");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onInvokeDisasterClicked(Disaster.FLOOD);
-					}
-				}));
+				ev -> onInvokeDisasterClicked(Disaster.FLOOD)));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.MELTDOWN"));
 		setupKeys(menuItem, "menu.disasters.MELTDOWN");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onInvokeDisasterClicked(Disaster.MELTDOWN);
-					}
-				}));
+				ev -> onInvokeDisasterClicked(Disaster.MELTDOWN)));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.TORNADO"));
 		setupKeys(menuItem, "menu.disasters.TORNADO");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onInvokeDisasterClicked(Disaster.TORNADO);
-					}
-				}));
+				ev -> onInvokeDisasterClicked(Disaster.TORNADO)));
 		disastersMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.EARTHQUAKE"));
 		setupKeys(menuItem, "menu.disasters.EARTHQUAKE");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onInvokeDisasterClicked(Disaster.EARTHQUAKE);
-					}
-				}));
+				ev -> onInvokeDisasterClicked(Disaster.EARTHQUAKE)));
 		disastersMenu.add(menuItem);
 
 		JMenu priorityMenu = new JMenu(strings.getString("menu.speed"));
@@ -702,65 +594,35 @@ public class MainWindow extends JFrame
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.SUPER_FAST"));
 		setupKeys(menuItem, "menu.speed.SUPER_FAST");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onPriorityClicked(Speed.SUPER_FAST);
-					}
-				}));
+				ev -> onPriorityClicked(Speed.SUPER_FAST)));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.SUPER_FAST, menuItem);
 
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.FAST"));
 		setupKeys(menuItem, "menu.speed.FAST");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onPriorityClicked(Speed.FAST);
-					}
-				}));
+				ev -> onPriorityClicked(Speed.FAST)));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.FAST, menuItem);
 
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.NORMAL"));
 		setupKeys(menuItem, "menu.speed.NORMAL");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onPriorityClicked(Speed.NORMAL);
-					}
-				}));
+				ev -> onPriorityClicked(Speed.NORMAL)));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.NORMAL, menuItem);
 
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.SLOW"));
 		setupKeys(menuItem, "menu.speed.SLOW");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onPriorityClicked(Speed.SLOW);
-					}
-				}));
+				ev -> onPriorityClicked(Speed.SLOW)));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.SLOW, menuItem);
 
 		menuItem = new JRadioButtonMenuItem(strings.getString("menu.speed.PAUSED"));
 		setupKeys(menuItem, "menu.speed.PAUSED");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onPriorityClicked(Speed.PAUSED);
-					}
-				}));
+				ev -> onPriorityClicked(Speed.PAUSED)));
 		priorityMenu.add(menuItem);
 		priorityMenuItems.put(Speed.PAUSED, menuItem);
 
@@ -771,37 +633,19 @@ public class MainWindow extends JFrame
 		menuItem = new JMenuItem(strings.getString("menu.windows.budget"));
 		setupKeys(menuItem, "menu.windows.budget");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onViewBudgetClicked();
-					}
-				}));
+				ev -> onViewBudgetClicked()));
 		windowsMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.windows.evaluation"));
 		setupKeys(menuItem, "menu.windows.evaluation");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onViewEvaluationClicked();
-					}
-				}));
+				ev -> onViewEvaluationClicked()));
 		windowsMenu.add(menuItem);
 
 		menuItem = new JMenuItem(strings.getString("menu.windows.graph"));
 		setupKeys(menuItem, "menu.windows.graph");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onViewGraphClicked();
-					}
-				}));
+				ev -> onViewGraphClicked()));
 		windowsMenu.add(menuItem);
 
 		JMenu helpMenu = new JMenu(strings.getString("menu.help"));
@@ -811,13 +655,7 @@ public class MainWindow extends JFrame
 		menuItem = new JMenuItem(strings.getString("menu.help.about"));
 		setupKeys(menuItem, "menu.help.about");
 		menuItem.addActionListener(wrapActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent ev)
-					{
-						onAboutClicked();
-					}
-				}));
+				ev -> onAboutClicked()));
 		helpMenu.add(menuItem);
 
 		setJMenuBar(menuBar);
@@ -988,13 +826,7 @@ public class MainWindow extends JFrame
 		btn.setToolTipText(tipText);
 		btn.setMargin(new Insets(0, 0, 0, 0));
 		btn.setBorderPainted(false);
-		btn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent ev)
-			{
-				selectTool(tool);
-			}
-		});
+		btn.addActionListener(ev -> selectTool(tool));
 		toolBtns.put(tool, btn);
 		return btn;
 	}
@@ -1382,36 +1214,28 @@ public class MainWindow extends JFrame
 
 		if (currentEarthquake != null) {
 			int interval = 3000 / MicropolisDrawingArea.SHAKE_STEPS;
-			shakeTimer = new Timer(interval, new ActionListener()
-			{
-				public void actionPerformed(ActionEvent evt)
-				{
-					currentEarthquake.oneStep();
-					if (currentEarthquake.count == 0) {
-						stopTimer();
-						currentEarthquake = null;
-						startTimer();
-					}
+			shakeTimer = new Timer(interval, evt -> {
+				currentEarthquake.oneStep();
+				if (currentEarthquake.count == 0) {
+					stopTimer();
+					currentEarthquake = null;
+					startTimer();
 				}
 			});
 			shakeTimer.start();
 			return;
 		}
 
-		ActionListener taskPerformer = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				for (int i = 0; i < count; i++) {
-					engine.animate();
-					if (!engine.autoBudget && engine.isBudgetTime()) {
-						showAutoBudget();
-						return;
-					}
+		ActionListener taskPerformer = evt -> {
+			for (int i = 0; i < count; i++) {
+				engine.animate();
+				if (!engine.autoBudget && engine.isBudgetTime()) {
+					showAutoBudget();
+					return;
 				}
-				updateDateLabel();
-				dirty2 = true;
 			}
+			updateDateLabel();
+			dirty2 = true;
 		};
 		taskPerformer = wrapActionListener(taskPerformer);
 
@@ -1422,15 +1246,11 @@ public class MainWindow extends JFrame
 
 	ActionListener wrapActionListener(final ActionListener l)
 	{
-		return new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				try {
-					l.actionPerformed(evt);
-				} catch (Throwable e) {
-					showErrorMessage(e);
-				}
+		return evt -> {
+			try {
+				l.actionPerformed(evt);
+			} catch (Throwable e) {
+				showErrorMessage(e);
 			}
 		};
 	}
@@ -1705,13 +1525,7 @@ public class MainWindow extends JFrame
 		String caption = strings.getString(stringPrefix);
 		JMenuItem menuItem = new JRadioButtonMenuItem(caption);
 		setupKeys(menuItem, stringPrefix);
-		menuItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				setMapState(state);
-			}
-		});
+		menuItem.addActionListener(evt -> setMapState(state));
 		mapStateMenuItems.put(state, menuItem);
 		return menuItem;
 	}

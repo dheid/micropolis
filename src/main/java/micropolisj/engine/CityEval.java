@@ -158,13 +158,7 @@ public class CityEval
 		problemVotes = voteProblems(problemTable);
 
 		CityProblem[] probOrder = CityProblem.values();
-		Arrays.sort(probOrder, new Comparator<CityProblem>()
-		{
-			public int compare(CityProblem a, CityProblem b)
-			{
-				return -(problemVotes.get(a).compareTo(problemVotes.get(b)));
-			}
-		});
+		Arrays.sort(probOrder, (a, b) -> -(problemVotes.get(a).compareTo(problemVotes.get(b))));
 
 		int c = 0;
 		while (c < probOrder.length &&

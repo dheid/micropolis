@@ -44,13 +44,7 @@ public class EvaluationPane extends JPanel
 		super(new BorderLayout());
 
 		JButton dismissBtn = new JButton(gstrings.getString("dismiss-evaluation"));
-		dismissBtn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				onDismissClicked();
-			}
-		});
+		dismissBtn.addActionListener(evt -> onDismissClicked());
 		add(dismissBtn, BorderLayout.SOUTH);
 
 		Box b1 = new Box(BoxLayout.X_AXIS);

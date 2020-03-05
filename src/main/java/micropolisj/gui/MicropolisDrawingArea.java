@@ -443,13 +443,7 @@ public class MicropolisDrawingArea extends JComponent
 	{
 		assert blinkTimer == null;
 
-		ActionListener callback = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				doBlink();
-			}
-		};
+		ActionListener callback = evt -> doBlink();
 
 		blinkTimer = new Timer(500, callback);
 		blinkTimer.start();

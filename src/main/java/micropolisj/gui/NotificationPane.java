@@ -46,13 +46,7 @@ public class NotificationPane extends JPanel
 		add(headerLbl, BorderLayout.NORTH);
 
 		JButton dismissBtn = new JButton(strings.getString("notification.dismiss"));
-		dismissBtn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				onDismissClicked();
-			}
-		});
+		dismissBtn.addActionListener(evt -> onDismissClicked());
 		add(dismissBtn, BorderLayout.SOUTH);
 
 		mainPane = new JPanel(new BorderLayout());

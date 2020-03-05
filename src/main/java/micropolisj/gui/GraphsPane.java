@@ -65,13 +65,7 @@ public class GraphsPane extends JPanel
 		engine.addListener(this);
 
 		JButton dismissBtn = new JButton(strings.getString("dismiss_graph"));
-		dismissBtn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				onDismissClicked();
-			}
-		});
+		dismissBtn.addActionListener(evt -> onDismissClicked());
 		add(dismissBtn, BorderLayout.SOUTH);
 
 		JPanel b1 = new JPanel(new BorderLayout());
@@ -87,25 +81,13 @@ public class GraphsPane extends JPanel
 		c.insets = new Insets(1, 1, 1, 1);
 		tenYearsBtn = new JToggleButton(strings.getString("ten_years"));
 		tenYearsBtn.setMargin(new Insets(0, 0, 0, 0));
-		tenYearsBtn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				setTimePeriod(TimePeriod.TEN_YEARS);
-			}
-		});
+		tenYearsBtn.addActionListener(evt -> setTimePeriod(TimePeriod.TEN_YEARS));
 		toolsPane.add(tenYearsBtn, c);
 
 		c.gridy++;
 		onetwentyYearsBtn = new JToggleButton(strings.getString("onetwenty_years"));
 		onetwentyYearsBtn.setMargin(new Insets(0, 0, 0, 0));
-		onetwentyYearsBtn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				setTimePeriod(TimePeriod.ONETWENTY_YEARS);
-			}
-		});
+		onetwentyYearsBtn.addActionListener(evt -> setTimePeriod(TimePeriod.ONETWENTY_YEARS));
 		toolsPane.add(onetwentyYearsBtn, c);
 
 		c.gridx = 0;
@@ -204,13 +186,7 @@ public class GraphsPane extends JPanel
 		btn.setContentAreaFilled(false);
 		btn.setMargin(new Insets(0, 0, 0, 0));
 
-		btn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				graphArea.repaint();
-			}
-		});
+		btn.addActionListener(evt -> graphArea.repaint());
 
 		dataBtns.put(graph, btn);
 		return btn;
@@ -335,14 +311,10 @@ public class GraphsPane extends JPanel
 			}
 
 			GraphData[] myGraphs = paths.keySet().toArray(new GraphData[0]);
-			Arrays.sort(myGraphs, new Comparator<GraphData>()
-			{
-				public int compare(GraphData a, GraphData b)
-				{
-					double y0 = paths.get(a).getCurrentPoint().getY();
-					double y1 = paths.get(b).getCurrentPoint().getY();
-					return -Double.compare(y0, y1);
-				}
+			Arrays.sort(myGraphs, (a, b) -> {
+				double y0 = paths.get(a).getCurrentPoint().getY();
+				double y1 = paths.get(b).getCurrentPoint().getY();
+				return -Double.compare(y0, y1);
 			});
 
 			int lbottom = bottomEdge;

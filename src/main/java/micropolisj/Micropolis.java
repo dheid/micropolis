@@ -23,12 +23,6 @@ public class Micropolis
 
 	public static void main(String[] args)
 	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				createAndShowGUI();
-			}
-		});
+		SwingUtilities.invokeLater(Micropolis::createAndShowGUI);
 	}
 }

@@ -67,13 +67,7 @@ public class NewCityDialog extends JDialog
 		for (int lev = GameLevel.MIN_LEVEL; lev <= GameLevel.MAX_LEVEL; lev++) {
 			final int x = lev;
 			radioBtn = new JRadioButton(strings.getString("menu.difficulty." + lev));
-			radioBtn.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent evt)
-				{
-					setGameLevel(x);
-				}
-			});
+			radioBtn.addActionListener(evt -> setGameLevel(x));
 			levelBox.add(radioBtn);
 			levelBtns.put(lev, radioBtn);
 		}
@@ -85,80 +79,38 @@ public class NewCityDialog extends JDialog
 
 		JButton btn;
 		btn = new JButton(strings.getString("welcome.previous_map"));
-		btn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				onPreviousMapClicked();
-			}
-		});
+		btn.addActionListener(evt -> onPreviousMapClicked());
 		btn.setEnabled(false);
 		buttonPane.add(btn);
 		previousMapBtn = btn;
 
 		btn = new JButton(strings.getString("welcome.play_this_map"));
-		btn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				onPlayClicked();
-			}
-		});
+		btn.addActionListener(evt -> onPlayClicked());
 		buttonPane.add(btn);
 		getRootPane().setDefaultButton(btn);
 
 		btn = new JButton(strings.getString("welcome.next_map"));
-		btn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				onNextMapClicked();
-			}
-		});
+		btn.addActionListener(evt -> onNextMapClicked());
 		buttonPane.add(btn);
 
 		btn = new JButton(strings.getString("welcome.load_city"));
-		btn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent evt)
-			{
-				onLoadCityClicked();
-			}
-		});
+		btn.addActionListener(evt -> onLoadCityClicked());
 		buttonPane.add(btn);
 
 		if (showCancelOption) {
 			btn = new JButton(strings.getString("welcome.cancel"));
-			btn.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent evt)
-				{
-					onCancelClicked();
-				}
-			});
+			btn.addActionListener(evt -> onCancelClicked());
 			buttonPane.add(btn);
 		} else {
 			btn = new JButton(strings.getString("welcome.quit"));
-			btn.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent evt)
-				{
-					onQuitClicked();
-				}
-			});
+			btn.addActionListener(evt -> onQuitClicked());
 			buttonPane.add(btn);
 		}
 
 		pack();
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(owner);
-		getRootPane().registerKeyboardAction(new ActionListener()
-											 {
-												 public void actionPerformed(ActionEvent evt)
-												 {
-													 dispose();
-												 }
-											 },
+		getRootPane().registerKeyboardAction(evt -> dispose(),
 				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
 				JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}

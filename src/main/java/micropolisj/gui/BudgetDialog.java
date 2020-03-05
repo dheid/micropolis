@@ -120,13 +120,7 @@ public class BudgetDialog extends JDialog
 		policeFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
 		adjustSliderSize(policeFundEntry);
 
-		ChangeListener change = new ChangeListener()
-		{
-			public void stateChanged(ChangeEvent ev)
-			{
-				applyChange();
-			}
-		};
+		ChangeListener change = ev -> applyChange();
 		taxRateEntry.addChangeListener(change);
 		roadFundEntry.addChangeListener(change);
 		fireFundEntry.addChangeListener(change);
@@ -157,23 +151,11 @@ public class BudgetDialog extends JDialog
 		add(buttonPane, BorderLayout.SOUTH);
 
 		JButton continueBtn = new JButton(strings.getString("budgetdlg.continue"));
-		continueBtn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent ev)
-			{
-				onContinueClicked();
-			}
-		});
+		continueBtn.addActionListener(ev -> onContinueClicked());
 		buttonPane.add(continueBtn);
 
 		JButton resetBtn = new JButton(strings.getString("budgetdlg.reset"));
-		resetBtn.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent ev)
-			{
-				onResetClicked();
-			}
-		});
+		resetBtn.addActionListener(ev -> onResetClicked());
 		buttonPane.add(resetBtn);
 
 		loadBudgetNumbers(true);
@@ -181,13 +163,7 @@ public class BudgetDialog extends JDialog
 		pack();
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(owner);
-		getRootPane().registerKeyboardAction(new ActionListener()
-											 {
-												 public void actionPerformed(ActionEvent evt)
-												 {
-													 dispose();
-												 }
-											 },
+		getRootPane().registerKeyboardAction(evt -> dispose(),
 				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
 				JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
