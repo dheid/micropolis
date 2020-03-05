@@ -1,10 +1,12 @@
 # Micropolis
 
-Micropolis is the Open Source Release of the original SimCity source code. This is a Java version
-originally written by Jason Long.
+Micropolis is the Open Source Release of the original SimCity source code. This is a Java rewrite
+fork based on [MicropolisJ by Jason Long](https://github.com/SimHacker/micropolis/tree/master/micropolis-java), which was first released in Feburary 2013. MicropolisJ was
+functionality-wise almost equivalent to the TCL/Tk edition
 
-The original game, SimCity, was developed by Will Wright. Don Hopkins released a GPL open source
-version named Micropolis as a part of the One Laptop Per Child (OLPC) program.
+The original game, SimCity, was developed by Will Wright. Don Hopkins released [a GPL open source
+version named Micropolis](https://github.com/SimHacker/micropolis) as a part of the One Laptop Per
+Child (OLPC) program.
 
 The forked version is Copyright (C) 2013 Jason Long (jason@long.name).
 Portions Copyright (C) 1989-2007 Electronic Arts Inc.
@@ -36,6 +38,12 @@ x.x.x is the version number
 (2) Double-click on `micropolis.bat` within the directory `bin`
 
 # Development
+
+The `micropolisj.engine` package contains the guts of the city simulation. It has no dependencies
+on the front-end or any particular graphical system.
+
+The `micropolisj.gui packag`e provides the user interface for the game. It renders the city, controls
+the speed of the simulation, and responds to event messages from the engine.
 
 ## Building
 
