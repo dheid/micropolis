@@ -40,7 +40,7 @@ public class ToolPreview implements ToolEffectIfc
 	ToolPreview()
 	{
 		this.tiles = new short[0][0];
-		this.sounds = new ArrayList<SoundInfo>();
+		this.sounds = new ArrayList<>();
 		this.toolResult = ToolResult.NONE;
 	}
 

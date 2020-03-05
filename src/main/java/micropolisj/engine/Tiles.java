@@ -23,7 +23,7 @@ public class Tiles
 {
 	static final Charset UTF8 = Charset.forName("UTF-8");
 	static TileSpec[] tiles;
-	static Map<String, TileSpec> tilesByName = new HashMap<String, TileSpec>();
+	static Map<String, TileSpec> tilesByName = new HashMap<>();
 
 	static {
 		try {
@@ -37,7 +37,7 @@ public class Tiles
 	static void readTiles()
 			throws IOException
 	{
-		ArrayList<TileSpec> tilesList = new ArrayList<TileSpec>();
+		ArrayList<TileSpec> tilesList = new ArrayList<>();
 
 		Properties tilesRc = new Properties();
 		tilesRc.load(

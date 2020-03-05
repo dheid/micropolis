@@ -34,8 +34,8 @@ public class TileSpec
 	{
 		this.tileNumber = tileNumber;
 		this.name = tileName;
-		this.attributes = new HashMap<String, String>();
-		this.images = new ArrayList<String>();
+		this.attributes = new HashMap<>();
+		this.images = new ArrayList<>();
 	}
 
 	public static TileSpec parse(int tileNumber, String tileName, String inStr, Properties tilesRc)
