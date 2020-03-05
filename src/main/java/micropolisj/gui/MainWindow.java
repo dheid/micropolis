@@ -49,7 +49,7 @@ public class MainWindow extends JFrame
 	EnumMap<MapState, JMenuItem> mapStateMenuItems = new EnumMap<>(MapState.class);
 	MicropolisTool currentTool;
 	File currentFile;
-	boolean doSounds = true;
+	boolean doSounds;
 	boolean dirty1 = false;  //indicates if a tool was successfully applied since last save
 	boolean dirty2 = false;  //indicates if simulator took a step since last save
 	long lastSavedTime = 0;  //real-time clock of when file was last saved

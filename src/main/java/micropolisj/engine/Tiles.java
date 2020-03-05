@@ -28,7 +28,6 @@ public class Tiles
 	static {
 		try {
 			readTiles();
-			checkTiles();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -97,10 +96,4 @@ public class Tiles
 		}
 	}
 
-	static void checkTiles()
-	{
-		for (int i = 0; i < tiles.length; i++) {
-			// do something here
-		}
-	}
 }

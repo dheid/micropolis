@@ -1727,14 +1727,11 @@ public class Micropolis
 			yumDuckets -= b.roadFunded;
 			if (yumDuckets >= b.fireFunded) {
 				yumDuckets -= b.fireFunded;
-				if (yumDuckets >= b.policeFunded) {
-					yumDuckets -= b.policeFunded;
-				} else {
+				if (yumDuckets < b.policeFunded) {
 					assert b.policeRequest != 0;
 
 					b.policeFunded = yumDuckets;
 					b.policePercent = (double) b.policeFunded / (double) b.policeRequest;
-					yumDuckets = 0;
 				}
 			} else {
 				assert b.fireRequest != 0;
@@ -1743,7 +1740,6 @@ public class Micropolis
 				b.firePercent = (double) b.fireFunded / (double) b.fireRequest;
 				b.policeFunded = 0;
 				b.policePercent = 0.0;
-				yumDuckets = 0;
 			}
 		} else {
 			assert b.roadRequest != 0;
