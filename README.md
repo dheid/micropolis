@@ -1,6 +1,7 @@
 # Micropolis
 
 ![Java CI with Gradle](https://github.com/dheid/micropolis/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=master)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W3EER56)
 
 Micropolis is the Open Source Release of the original SimCity source code. This is a Java rewrite
 fork based on [MicropolisJ by Jason Long](https://github.com/SimHacker/micropolis/tree/master/micropolis-java), which was first released in Feburary 2013. MicropolisJ was
