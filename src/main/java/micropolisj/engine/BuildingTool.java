@@ -16,57 +16,53 @@ import static micropolisj.engine.TileConstants.PORT;
 import static micropolisj.engine.TileConstants.POWERPLANT;
 import static micropolisj.engine.TileConstants.STADIUM;
 
-public class BuildingTool extends ToolStroke
-{
-	public BuildingTool(Micropolis engine, MicropolisTool tool, int xpos, int ypos)
-	{
-		super(engine, tool, xpos, ypos);
-	}
+public class BuildingTool extends ToolStroke {
+  public BuildingTool(Micropolis engine, MicropolisTool tool, int xpos, int ypos) {
+    super(engine, tool, xpos, ypos);
+  }
 
-	@Override
-	public void dragTo(int xdest, int ydest)
-	{
-		setXpos(xdest);
-		setYpos(ydest);
-		this.setXdest(xdest);
-		this.setYdest(ydest);
-	}
+  @Override
+  public void dragTo(int xdest, int ydest) {
+    setXpos(xdest);
+    setYpos(ydest);
+    this.setXdest(xdest);
+    this.setYdest(ydest);
+  }
 
-	@Override
-	void apply1(ToolEffectIfc eff)
-	{
-		switch (getTool()) {
-			case FIRE:
-				applyZone(eff, FIRESTATION);
-				return;
+  @Override
+  void apply1(ToolEffectIfc eff) {
+    switch (getTool()) {
+      case FIRE:
+        applyZone(eff, FIRESTATION);
+        return;
 
-			case POLICE:
-				applyZone(eff, POLICESTATION);
-				return;
+      case POLICE:
+        applyZone(eff, POLICESTATION);
+        return;
 
-			case POWERPLANT:
-				applyZone(eff, POWERPLANT);
-				return;
+      case POWERPLANT:
+        applyZone(eff, POWERPLANT);
+        return;
 
-			case STADIUM:
-				applyZone(eff, STADIUM);
-				return;
+      case STADIUM:
+        applyZone(eff, STADIUM);
+        return;
 
-			case SEAPORT:
-				applyZone(eff, PORT);
-				return;
+      case SEAPORT:
+        applyZone(eff, PORT);
+        return;
 
-			case NUCLEAR:
-				applyZone(eff, NUCLEAR);
-				return;
+      case NUCLEAR:
+        applyZone(eff, NUCLEAR);
+        return;
 
-			case AIRPORT:
-				applyZone(eff, AIRPORT);
-				return;
+      case AIRPORT:
+        applyZone(eff, AIRPORT);
+        return;
 
-			default:
-				// not expected
-				throw new RuntimeException("unexpected tool: " + getTool());
-		}
-	}
+      default:
+        // not expected
+        throw new RuntimeException("unexpected tool: " + getTool());
+    }
+  }
 }

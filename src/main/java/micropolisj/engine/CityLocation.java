@@ -8,74 +8,59 @@
 
 package micropolisj.engine;
 
-/**
- * Coordinates of a location (x,y) in the city.
- */
-public class CityLocation
-{
-	private int x;
+/** Coordinates of a location (x,y) in the city. */
+public class CityLocation {
+  private int x;
 
-	private int y;
+  private int y;
 
-	/**
-	 * Constructs and initializes city coordinates.
-	 */
-	public CityLocation(int x, int y)
-	{
-		this.x = x;
-		this.y = y;
-	}
+  /** Constructs and initializes city coordinates. */
+  public CityLocation(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
 
-	@Override
-	public int hashCode()
-	{
-		return x * 33 + y;
-	}
+  @Override
+  public int hashCode() {
+    return x * 33 + y;
+  }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (obj instanceof CityLocation) {
-			CityLocation rhs = (CityLocation) obj;
-			return x == rhs.x && y == rhs.y;
-		} else {
-			return false;
-		}
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof CityLocation) {
+      CityLocation rhs = (CityLocation) obj;
+      return x == rhs.x && y == rhs.y;
+    } else {
+      return false;
+    }
+  }
 
-	@Override
-	public String toString()
-	{
-		return "(" + x + "," + y + ")";
-	}
+  @Override
+  public String toString() {
+    return "(" + x + "," + y + ")";
+  }
 
-	/**
-	 * The X coordinate of this location.
-	 * Increasing X coordinates correspond to East,
-	 * and decreasing X coordinates correspond to West.
-	 */
-	public int getX()
-	{
-		return x;
-	}
+  /**
+   * The X coordinate of this location. Increasing X coordinates correspond to East, and decreasing
+   * X coordinates correspond to West.
+   */
+  public int getX() {
+    return x;
+  }
 
-	public void setX(int x)
-	{
-		this.x = x;
-	}
+  public void setX(int x) {
+    this.x = x;
+  }
 
-	/**
-	 * The Y coordinate of this location.
-	 * Increasing Y coordinates correspond to South,
-	 * and decreasing Y coordinates correspond to North.
-	 */
-	public int getY()
-	{
-		return y;
-	}
+  /**
+   * The Y coordinate of this location. Increasing Y coordinates correspond to South, and decreasing
+   * Y coordinates correspond to North.
+   */
+  public int getY() {
+    return y;
+  }
 
-	public void setY(int y)
-	{
-		this.y = y;
-	}
+  public void setY(int y) {
+    this.y = y;
+  }
 }

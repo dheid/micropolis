@@ -1,52 +1,43 @@
 package micropolisj.engine;
 
-public class FinancialHistory
-{
-	private int cityTime;
+public class FinancialHistory {
+  private int cityTime;
 
-	private int totalFunds;
+  private int totalFunds;
 
-	private int taxIncome;
+  private int taxIncome;
 
-	private int operatingExpenses;
+  private int operatingExpenses;
 
-	public int getCityTime()
-	{
-		return cityTime;
-	}
+  public int getCityTime() {
+    return cityTime;
+  }
 
-	public void setCityTime(int cityTime)
-	{
-		this.cityTime = cityTime;
-	}
+  public void setCityTime(int cityTime) {
+    this.cityTime = cityTime;
+  }
 
-	public int getTotalFunds()
-	{
-		return totalFunds;
-	}
+  public int getTotalFunds() {
+    return totalFunds;
+  }
 
-	public void setTotalFunds(int totalFunds)
-	{
-		this.totalFunds = totalFunds;
-	}
+  public void setTotalFunds(int totalFunds) {
+    this.totalFunds = totalFunds;
+  }
 
-	public int getTaxIncome()
-	{
-		return taxIncome;
-	}
+  public int getTaxIncome() {
+    return taxIncome;
+  }
 
-	public void setTaxIncome(int taxIncome)
-	{
-		this.taxIncome = taxIncome;
-	}
+  public void setTaxIncome(int taxIncome) {
+    this.taxIncome = taxIncome;
+  }
 
-	public int getOperatingExpenses()
-	{
-		return operatingExpenses;
-	}
+  public int getOperatingExpenses() {
+    return operatingExpenses;
+  }
 
-	public void setOperatingExpenses(int operatingExpenses)
-	{
-		this.operatingExpenses = operatingExpenses;
-	}
+  public void setOperatingExpenses(int operatingExpenses) {
+    this.operatingExpenses = operatingExpenses;
+  }
 }

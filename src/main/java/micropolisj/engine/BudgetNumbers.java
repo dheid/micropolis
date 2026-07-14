@@ -13,137 +13,114 @@ package micropolisj.engine;
  *
  * @see micropolisj.engine.Micropolis#generateBudget
  */
-public class BudgetNumbers
-{
-	private int taxRate;
+public class BudgetNumbers {
+  private int taxRate;
 
-	private int taxIncome;
+  private int taxIncome;
 
-	private int roadRequest;
+  private int roadRequest;
 
-	private int roadFunded;
+  private int roadFunded;
 
-	private double roadPercent;
+  private double roadPercent;
 
-	private int fireRequest;
+  private int fireRequest;
 
-	private int fireFunded;
+  private int fireFunded;
 
-	private double firePercent;
+  private double firePercent;
 
-	private int policeRequest;
+  private int policeRequest;
 
-	private int policeFunded;
+  private int policeFunded;
 
-	private double policePercent;
+  private double policePercent;
 
-	public int getTaxRate()
-	{
-		return taxRate;
-	}
+  public int getTaxRate() {
+    return taxRate;
+  }
 
-	public void setTaxRate(int taxRate)
-	{
-		this.taxRate = taxRate;
-	}
+  public void setTaxRate(int taxRate) {
+    this.taxRate = taxRate;
+  }
 
-	public int getTaxIncome()
-	{
-		return taxIncome;
-	}
+  public int getTaxIncome() {
+    return taxIncome;
+  }
 
-	public void setTaxIncome(int taxIncome)
-	{
-		this.taxIncome = taxIncome;
-	}
+  public void setTaxIncome(int taxIncome) {
+    this.taxIncome = taxIncome;
+  }
 
-	public int getRoadRequest()
-	{
-		return roadRequest;
-	}
+  public int getRoadRequest() {
+    return roadRequest;
+  }
 
-	public void setRoadRequest(int roadRequest)
-	{
-		this.roadRequest = roadRequest;
-	}
+  public void setRoadRequest(int roadRequest) {
+    this.roadRequest = roadRequest;
+  }
 
-	public int getRoadFunded()
-	{
-		return roadFunded;
-	}
+  public int getRoadFunded() {
+    return roadFunded;
+  }
 
-	public void setRoadFunded(int roadFunded)
-	{
-		this.roadFunded = roadFunded;
-	}
+  public void setRoadFunded(int roadFunded) {
+    this.roadFunded = roadFunded;
+  }
 
-	public double getRoadPercent()
-	{
-		return roadPercent;
-	}
+  public double getRoadPercent() {
+    return roadPercent;
+  }
 
-	public void setRoadPercent(double roadPercent)
-	{
-		this.roadPercent = roadPercent;
-	}
+  public void setRoadPercent(double roadPercent) {
+    this.roadPercent = roadPercent;
+  }
 
-	public int getFireRequest()
-	{
-		return fireRequest;
-	}
+  public int getFireRequest() {
+    return fireRequest;
+  }
 
-	public void setFireRequest(int fireRequest)
-	{
-		this.fireRequest = fireRequest;
-	}
+  public void setFireRequest(int fireRequest) {
+    this.fireRequest = fireRequest;
+  }
 
-	public int getFireFunded()
-	{
-		return fireFunded;
-	}
+  public int getFireFunded() {
+    return fireFunded;
+  }
 
-	public void setFireFunded(int fireFunded)
-	{
-		this.fireFunded = fireFunded;
-	}
+  public void setFireFunded(int fireFunded) {
+    this.fireFunded = fireFunded;
+  }
 
-	public double getFirePercent()
-	{
-		return firePercent;
-	}
+  public double getFirePercent() {
+    return firePercent;
+  }
 
-	public void setFirePercent(double firePercent)
-	{
-		this.firePercent = firePercent;
-	}
+  public void setFirePercent(double firePercent) {
+    this.firePercent = firePercent;
+  }
 
-	public int getPoliceRequest()
-	{
-		return policeRequest;
-	}
+  public int getPoliceRequest() {
+    return policeRequest;
+  }
 
-	public void setPoliceRequest(int policeRequest)
-	{
-		this.policeRequest = policeRequest;
-	}
+  public void setPoliceRequest(int policeRequest) {
+    this.policeRequest = policeRequest;
+  }
 
-	public int getPoliceFunded()
-	{
-		return policeFunded;
-	}
+  public int getPoliceFunded() {
+    return policeFunded;
+  }
 
-	public void setPoliceFunded(int policeFunded)
-	{
-		this.policeFunded = policeFunded;
-	}
+  public void setPoliceFunded(int policeFunded) {
+    this.policeFunded = policeFunded;
+  }
 
-	public double getPolicePercent()
-	{
-		return policePercent;
-	}
+  public double getPolicePercent() {
+    return policePercent;
+  }
 
-	public void setPolicePercent(double policePercent)
-	{
-		this.policePercent = policePercent;
-	}
+  public void setPolicePercent(double policePercent) {
+    this.policePercent = policePercent;
+  }
 }

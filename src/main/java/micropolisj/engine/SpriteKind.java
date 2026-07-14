@@ -8,26 +8,22 @@
 
 package micropolisj.engine;
 
-/**
- * Enumeration of the various kinds of sprites that may appear in the city.
- */
-public enum SpriteKind
-{
-	TRA(1, 5),
-	COP(2, 8),
-	AIR(3, 11),
-	SHI(4, 8),
-	GOD(5, 16),
-	TOR(6, 3),
-	EXP(7, 6),
-	BUS(8, 4);
+/** Enumeration of the various kinds of sprites that may appear in the city. */
+public enum SpriteKind {
+  TRA(1, 5),
+  COP(2, 8),
+  AIR(3, 11),
+  SHI(4, 8),
+  GOD(5, 16),
+  TOR(6, 3),
+  EXP(7, 6),
+  BUS(8, 4);
 
-	public final int objectId;
-	public final int numFrames;
+  public final int objectId;
+  public final int numFrames;
 
-	SpriteKind(int objectId, int numFrames)
-	{
-		this.objectId = objectId;
-		this.numFrames = numFrames;
-	}
+  SpriteKind(int objectId, int numFrames) {
+    this.objectId = objectId;
+    this.numFrames = numFrames;
+  }
 }

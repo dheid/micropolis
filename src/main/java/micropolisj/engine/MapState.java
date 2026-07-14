@@ -8,23 +8,20 @@
 
 package micropolisj.engine;
 
-/**
- * Lists the various map overlay options that are available.
- */
-public enum MapState
-{
-	ALL,                //ALMAP
-	RESIDENTIAL,        //REMAP
-	COMMERCIAL,         //COMAP
-	INDUSTRIAL,         //INMAP
-	TRANSPORT,          //RDMAP
-	POPDEN_OVERLAY,     //PDMAP
-	GROWTHRATE_OVERLAY, //RGMAP
-	LANDVALUE_OVERLAY,  //LVMAP
-	CRIME_OVERLAY,      //CRMAP
-	POLLUTE_OVERLAY,    //PLMAP
-	TRAFFIC_OVERLAY,    //TDMAP
-	POWER_OVERLAY,      //PRMAP
-	FIRE_OVERLAY,       //FIMAP
-	POLICE_OVERLAY     //POMAP
+/** Lists the various map overlay options that are available. */
+public enum MapState {
+  ALL, // ALMAP
+  RESIDENTIAL, // REMAP
+  COMMERCIAL, // COMAP
+  INDUSTRIAL, // INMAP
+  TRANSPORT, // RDMAP
+  POPDEN_OVERLAY, // PDMAP
+  GROWTHRATE_OVERLAY, // RGMAP
+  LANDVALUE_OVERLAY, // LVMAP
+  CRIME_OVERLAY, // CRMAP
+  POLLUTE_OVERLAY, // PLMAP
+  TRAFFIC_OVERLAY, // TDMAP
+  POWER_OVERLAY, // PRMAP
+  FIRE_OVERLAY, // FIMAP
+  POLICE_OVERLAY // POMAP
 }

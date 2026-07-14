@@ -8,9 +8,6 @@
 
 package micropolisj.engine;
 
-import java.util.Arrays;
-import java.util.Random;
-
 import static micropolisj.engine.TileConstants.CHANNEL;
 import static micropolisj.engine.TileConstants.DIRT;
 import static micropolisj.engine.TileConstants.LOMASK;
@@ -22,418 +19,392 @@ import static micropolisj.engine.TileConstants.WOODS_HIGH;
 import static micropolisj.engine.TileConstants.WOODS_LOW;
 import static micropolisj.engine.TileConstants.isTree;
 
-/**
- * Contains the code for generating a random map terrain.
- */
-public class MapGenerator
-{
-	private static final char[][] BRMatrix = {
-			{0, 0, 0, 3, 3, 3, 0, 0, 0},
-			{0, 0, 3, 2, 2, 2, 3, 0, 0},
-			{0, 3, 2, 2, 2, 2, 2, 3, 0},
-			{3, 2, 2, 2, 2, 2, 2, 2, 3},
-			{3, 2, 2, 2, 4, 2, 2, 2, 3},
-			{3, 2, 2, 2, 2, 2, 2, 2, 3},
-			{0, 3, 2, 2, 2, 2, 2, 3, 0},
-			{0, 0, 3, 2, 2, 2, 3, 0, 0},
-			{0, 0, 0, 3, 3, 3, 0, 0, 0}
-	};
-	private static final char[][] SRMatrix = {
-			{0, 0, 3, 3, 0, 0},
-			{0, 3, 2, 2, 3, 0},
-			{3, 2, 2, 2, 2, 3},
-			{3, 2, 2, 2, 2, 3},
-			{0, 3, 2, 2, 3, 0},
-			{0, 0, 3, 3, 0, 0}
-	};
-	private static final char[] REdTab = {
-			RIVEDGE + 8, RIVEDGE + 8, RIVEDGE + 12, RIVEDGE + 10,
-			RIVEDGE, RIVER, RIVEDGE + 14, RIVEDGE + 12,
-			RIVEDGE + 4, RIVEDGE + 6, RIVER, RIVEDGE + 8,
-			RIVEDGE + 2, RIVEDGE + 4, RIVEDGE, RIVER
-	};
-	private static final int[] DIRECTION_TABX = {0, 1, 1, 1, 0, -1, -1, -1};
-	private static final int[] DIRECTION_TABY = {-1, -1, 0, 1, 1, 1, 0, -1};
-	private static final int[] DX = {-1, 0, 1, 0};
-	private static final int[] DY = {0, 1, 0, -1};
-	private static final char[] TEdTab = {
-			0, 0, 0, 34,
-			0, 0, 36, 35,
-			0, 32, 0, 33,
-			30, 31, 29, 37
-	};
-	private final Micropolis engine;
-	private final char[][] map;
-	private final CreateIsland createIsland = CreateIsland.SELDOM;
-	private Random random;
-	private int xStart;
-	private int yStart;
-	private int mapX;
-	private int mapY;
-	private int dir;
-	private int lastDir;
-	public MapGenerator(Micropolis engine)
-	{
-		assert engine != null;
-		this.engine = engine;
-		map = engine.getMap();
-	}
+import java.util.Arrays;
+import java.util.Random;
 
-	private int getWidth()
-	{
-		return map[0].length;
-	}
+/** Contains the code for generating a random map terrain. */
+public class MapGenerator {
+  private static final char[][] BRMatrix = {
+    {0, 0, 0, 3, 3, 3, 0, 0, 0},
+    {0, 0, 3, 2, 2, 2, 3, 0, 0},
+    {0, 3, 2, 2, 2, 2, 2, 3, 0},
+    {3, 2, 2, 2, 2, 2, 2, 2, 3},
+    {3, 2, 2, 2, 4, 2, 2, 2, 3},
+    {3, 2, 2, 2, 2, 2, 2, 2, 3},
+    {0, 3, 2, 2, 2, 2, 2, 3, 0},
+    {0, 0, 3, 2, 2, 2, 3, 0, 0},
+    {0, 0, 0, 3, 3, 3, 0, 0, 0}
+  };
+  private static final char[][] SRMatrix = {
+    {0, 0, 3, 3, 0, 0},
+    {0, 3, 2, 2, 3, 0},
+    {3, 2, 2, 2, 2, 3},
+    {3, 2, 2, 2, 2, 3},
+    {0, 3, 2, 2, 3, 0},
+    {0, 0, 3, 3, 0, 0}
+  };
+  private static final char[] REdTab = {
+    RIVEDGE + 8,
+    RIVEDGE + 8,
+    RIVEDGE + 12,
+    RIVEDGE + 10,
+    RIVEDGE,
+    RIVER,
+    RIVEDGE + 14,
+    RIVEDGE + 12,
+    RIVEDGE + 4,
+    RIVEDGE + 6,
+    RIVER,
+    RIVEDGE + 8,
+    RIVEDGE + 2,
+    RIVEDGE + 4,
+    RIVEDGE,
+    RIVER
+  };
+  private static final int[] DIRECTION_TABX = {0, 1, 1, 1, 0, -1, -1, -1};
+  private static final int[] DIRECTION_TABY = {-1, -1, 0, 1, 1, 1, 0, -1};
+  private static final int[] DX = {-1, 0, 1, 0};
+  private static final int[] DY = {0, 1, 0, -1};
+  private static final char[] TEdTab = {
+    0, 0, 0, 34,
+    0, 0, 36, 35,
+    0, 32, 0, 33,
+    30, 31, 29, 37
+  };
+  private final Micropolis engine;
+  private final char[][] map;
+  private final CreateIsland createIsland = CreateIsland.SELDOM;
+  private Random random;
+  private int xStart;
+  private int yStart;
+  private int mapX;
+  private int mapY;
+  private int dir;
+  private int lastDir;
 
-	private int getHeight()
-	{
-		return map.length;
-	}
+  public MapGenerator(Micropolis engine) {
+    assert engine != null;
+    this.engine = engine;
+    map = engine.getMap();
+  }
 
-	/**
-	 * Generate a random map terrain.
-	 */
-	public void generateNewCity()
-	{
-		long r = Micropolis.DEFAULT_PRNG.nextLong();
-		generateSomeCity(r);
-	}
+  private int getWidth() {
+    return map[0].length;
+  }
 
-	private void generateSomeCity(long r)
-	{
-		generateMap(r);
-		engine.fireWholeMapChanged();
-	}
+  private int getHeight() {
+    return map.length;
+  }
 
-	private void generateMap(long r)
-	{
-		random = new Random(r);
+  /** Generate a random map terrain. */
+  public void generateNewCity() {
+    long r = Micropolis.DEFAULT_PRNG.nextLong();
+    generateSomeCity(r);
+  }
 
-		if (createIsland == CreateIsland.SELDOM) {
-			if (random.nextInt(100) < 10) //chance that island is generated
-			{
-				makeIsland();
-				return;
-			}
-		}
+  private void generateSomeCity(long r) {
+    generateMap(r);
+    engine.fireWholeMapChanged();
+  }
 
-		if (createIsland == CreateIsland.ALWAYS) {
-			makeNakedIsland();
-		} else {
-			clearMap();
-		}
+  private void generateMap(long r) {
+    random = new Random(r);
 
-		getRandStart();
+    if (createIsland == CreateIsland.SELDOM) {
+      if (random.nextInt(100) < 10) // chance that island is generated
+      {
+        makeIsland();
+        return;
+      }
+    }
 
-		doRivers();
+    if (createIsland == CreateIsland.ALWAYS) {
+      makeNakedIsland();
+    } else {
+      clearMap();
+    }
 
-		makeLakes();
+    getRandStart();
 
-		smoothRiver();
+    doRivers();
 
-		doTrees();
-	}
+    makeLakes();
 
-	private void makeIsland()
-	{
-		makeNakedIsland();
-		smoothRiver();
-		doTrees();
-	}
+    smoothRiver();
 
-	private int erand()
-	{
-		return Math.min(
-				random.nextInt(19),
-				random.nextInt(19)
-		);
-	}
+    doTrees();
+  }
 
-	private void makeNakedIsland()
-	{
-		int worldX = getWidth();
-		int worldY = getHeight();
+  private void makeIsland() {
+    makeNakedIsland();
+    smoothRiver();
+    doTrees();
+  }
 
-		for (int y = 0; y < worldY; y++) {
-			for (int x = 0; x < worldX; x++) {
-				map[y][x] = RIVER;
-			}
-		}
+  private int erand() {
+    return Math.min(random.nextInt(19), random.nextInt(19));
+  }
 
-		for (int y = 5; y < worldY - 5; y++) {
-			for (int x = 5; x < worldX - 5; x++) {
-				map[y][x] = DIRT;
-			}
-		}
+  private void makeNakedIsland() {
+    int worldX = getWidth();
+    int worldY = getHeight();
 
-		for (int x = 0; x < worldX - 5; x += 2) {
-			mapX = x;
-			mapY = erand();
-			BRivPlop();
-			mapY = worldY - 10 - erand();
-			BRivPlop();
-			mapY = 0;
-			SRivPlop();
-			mapY = worldY - 6;
-			SRivPlop();
-		}
+    for (int y = 0; y < worldY; y++) {
+      for (int x = 0; x < worldX; x++) {
+        map[y][x] = RIVER;
+      }
+    }
 
-		for (int y = 0; y < worldY - 5; y += 2) {
-			mapY = y;
-			mapX = erand();
-			BRivPlop();
-			mapX = worldX - 10 - erand();
-			BRivPlop();
-			mapX = 0;
-			SRivPlop();
-			mapX = worldX - 6;
-			SRivPlop();
-		}
-	}
+    for (int y = 5; y < worldY - 5; y++) {
+      for (int x = 5; x < worldX - 5; x++) {
+        map[y][x] = DIRT;
+      }
+    }
 
-	private void clearMap()
-	{
-		for (char[] chars : map) {
-			Arrays.fill(chars, DIRT);
-		}
-	}
+    for (int x = 0; x < worldX - 5; x += 2) {
+      mapX = x;
+      mapY = erand();
+      BRivPlop();
+      mapY = worldY - 10 - erand();
+      BRivPlop();
+      mapY = 0;
+      SRivPlop();
+      mapY = worldY - 6;
+      SRivPlop();
+    }
 
-	private void getRandStart()
-	{
-		xStart = 40 + random.nextInt(getWidth() - 79);
-		yStart = 33 + random.nextInt(getHeight() - 66);
+    for (int y = 0; y < worldY - 5; y += 2) {
+      mapY = y;
+      mapX = erand();
+      BRivPlop();
+      mapX = worldX - 10 - erand();
+      BRivPlop();
+      mapX = 0;
+      SRivPlop();
+      mapX = worldX - 6;
+      SRivPlop();
+    }
+  }
 
-		mapX = xStart;
-		mapY = yStart;
-	}
+  private void clearMap() {
+    for (char[] chars : map) {
+      Arrays.fill(chars, DIRT);
+    }
+  }
 
-	private void makeLakes()
-	{
-		int lim1;
-		lim1 = random.nextInt(11);
+  private void getRandStart() {
+    xStart = 40 + random.nextInt(getWidth() - 79);
+    yStart = 33 + random.nextInt(getHeight() - 66);
 
-		for (int t = 0; t < lim1; t++) {
-			int x = random.nextInt(getWidth() - 20) + 10;
-			int y = random.nextInt(getHeight() - 19) + 10;
-			int lim2 = random.nextInt(13) + 2;
+    mapX = xStart;
+    mapY = yStart;
+  }
 
-			for (int z = 0; z < lim2; z++) {
-				mapX = x - 6 + random.nextInt(13);
-				mapY = y - 6 + random.nextInt(13);
+  private void makeLakes() {
+    int lim1;
+    lim1 = random.nextInt(11);
 
-				if (random.nextInt(5) == 0) BRivPlop();
-				else SRivPlop();
-			}
-		}
-	}
+    for (int t = 0; t < lim1; t++) {
+      int x = random.nextInt(getWidth() - 20) + 10;
+      int y = random.nextInt(getHeight() - 19) + 10;
+      int lim2 = random.nextInt(13) + 2;
 
-	private void doRivers()
-	{
-		dir = lastDir = random.nextInt(4);
-		doBRiv();
+      for (int z = 0; z < lim2; z++) {
+        mapX = x - 6 + random.nextInt(13);
+        mapY = y - 6 + random.nextInt(13);
 
-		mapX = xStart;
-		mapY = yStart;
-		dir = lastDir ^= 4;
-		doBRiv();
+        if (random.nextInt(5) == 0) BRivPlop();
+        else SRivPlop();
+      }
+    }
+  }
 
-		mapX = xStart;
-		mapY = yStart;
-		lastDir = random.nextInt(4);
-		doSRiv();
-	}
+  private void doRivers() {
+    dir = lastDir = random.nextInt(4);
+    doBRiv();
 
-	private void doBRiv()
-	{
-		int r1, r2;
-		r1 = 100;
-		r2 = 200;
+    mapX = xStart;
+    mapY = yStart;
+    dir = lastDir ^= 4;
+    doBRiv();
 
-		while (engine.testBounds(mapX + 4, mapY + 4)) {
-			BRivPlop();
-			if (random.nextInt(r1 + 1) < 10) {
-				dir = lastDir;
-			} else {
-				if (random.nextInt(r2 + 1) > 90) {
-					dir++;
-				}
-				if (random.nextInt(r2 + 1) > 90) {
-					dir--;
-				}
-			}
-			moveMap(dir);
-		}
-	}
+    mapX = xStart;
+    mapY = yStart;
+    lastDir = random.nextInt(4);
+    doSRiv();
+  }
 
-	private void doSRiv()
-	{
-		int r1, r2;
-		r1 = 100;
-		r2 = 200;
+  private void doBRiv() {
+    int r1, r2;
+    r1 = 100;
+    r2 = 200;
 
-		while (engine.testBounds(mapX + 3, mapY + 3)) {
-			SRivPlop();
-			if (random.nextInt(r1 + 1) < 10) {
-				dir = lastDir;
-			} else {
-				if (random.nextInt(r2 + 1) > 90) {
-					dir++;
-				}
-				if (random.nextInt(r2 + 1) > 90) {
-					dir--;
-				}
-			}
-			moveMap(dir);
-		}
-	}
+    while (engine.testBounds(mapX + 4, mapY + 4)) {
+      BRivPlop();
+      if (random.nextInt(r1 + 1) < 10) {
+        dir = lastDir;
+      } else {
+        if (random.nextInt(r2 + 1) > 90) {
+          dir++;
+        }
+        if (random.nextInt(r2 + 1) > 90) {
+          dir--;
+        }
+      }
+      moveMap(dir);
+    }
+  }
 
-	private void BRivPlop()
-	{
-		for (int x = 0; x < 9; x++) {
-			for (int y = 0; y < 9; y++) {
-				putOnMap(BRMatrix[y][x], x, y);
-			}
-		}
-	}
+  private void doSRiv() {
+    int r1, r2;
+    r1 = 100;
+    r2 = 200;
 
-	private void SRivPlop()
-	{
-		for (int x = 0; x < 6; x++) {
-			for (int y = 0; y < 6; y++) {
-				putOnMap(SRMatrix[y][x], x, y);
-			}
-		}
-	}
+    while (engine.testBounds(mapX + 3, mapY + 3)) {
+      SRivPlop();
+      if (random.nextInt(r1 + 1) < 10) {
+        dir = lastDir;
+      } else {
+        if (random.nextInt(r2 + 1) > 90) {
+          dir++;
+        }
+        if (random.nextInt(r2 + 1) > 90) {
+          dir--;
+        }
+      }
+      moveMap(dir);
+    }
+  }
 
-	private void putOnMap(char mapChar, int xoff, int yoff)
-	{
-		if (mapChar == 0)
-			return;
+  private void BRivPlop() {
+    for (int x = 0; x < 9; x++) {
+      for (int y = 0; y < 9; y++) {
+        putOnMap(BRMatrix[y][x], x, y);
+      }
+    }
+  }
 
-		int xloc = mapX + xoff;
-		int yloc = mapY + yoff;
+  private void SRivPlop() {
+    for (int x = 0; x < 6; x++) {
+      for (int y = 0; y < 6; y++) {
+        putOnMap(SRMatrix[y][x], x, y);
+      }
+    }
+  }
 
-		if (!engine.testBounds(xloc, yloc))
-			return;
+  private void putOnMap(char mapChar, int xoff, int yoff) {
+    if (mapChar == 0) return;
 
-		char tmp = map[yloc][xloc];
-		if (tmp != DIRT) {
-			tmp &= LOMASK;
-			if (tmp == RIVER && mapChar != CHANNEL)
-				return;
-			if (tmp == CHANNEL)
-				return;
-		}
-		map[yloc][xloc] = mapChar;
-	}
+    int xloc = mapX + xoff;
+    int yloc = mapY + yoff;
 
-	private void smoothRiver()
-	{
-		for (int mapY = 0; mapY < map.length; mapY++) {
-			for (int mapX = 0; mapX < map[mapY].length; mapX++) {
-				if (map[mapY][mapX] == REDGE) {
-					int bitindex = 0;
+    if (!engine.testBounds(xloc, yloc)) return;
 
-					for (int z = 0; z < 4; z++) {
-						bitindex <<= 1;
-						int xtem = mapX + DX[z];
-						int ytem = mapY + DY[z];
-						if (engine.testBounds(xtem, ytem) &&
-								(map[ytem][xtem] & LOMASK) != DIRT &&
-								((map[ytem][xtem] & LOMASK) < WOODS_LOW ||
-										(map[ytem][xtem] & LOMASK) > WOODS_HIGH)) {
-							bitindex |= 1;
-						}
-					}
+    char tmp = map[yloc][xloc];
+    if (tmp != DIRT) {
+      tmp &= LOMASK;
+      if (tmp == RIVER && mapChar != CHANNEL) return;
+      if (tmp == CHANNEL) return;
+    }
+    map[yloc][xloc] = mapChar;
+  }
 
-					char temp = REdTab[bitindex & 15];
-					if (temp != RIVER && random.nextInt(2) != 0)
-						temp++;
-					map[mapY][mapX] = temp;
-				}
-			}
-		}
-	}
+  private void smoothRiver() {
+    for (int mapY = 0; mapY < map.length; mapY++) {
+      for (int mapX = 0; mapX < map[mapY].length; mapX++) {
+        if (map[mapY][mapX] == REDGE) {
+          int bitindex = 0;
 
-	private void doTrees()
-	{
-		int amount;
+          for (int z = 0; z < 4; z++) {
+            bitindex <<= 1;
+            int xtem = mapX + DX[z];
+            int ytem = mapY + DY[z];
+            if (engine.testBounds(xtem, ytem)
+                && (map[ytem][xtem] & LOMASK) != DIRT
+                && ((map[ytem][xtem] & LOMASK) < WOODS_LOW
+                    || (map[ytem][xtem] & LOMASK) > WOODS_HIGH)) {
+              bitindex |= 1;
+            }
+          }
 
-		amount = random.nextInt(101) + 50;
+          char temp = REdTab[bitindex & 15];
+          if (temp != RIVER && random.nextInt(2) != 0) temp++;
+          map[mapY][mapX] = temp;
+        }
+      }
+    }
+  }
 
-		for (int x = 0; x < amount; x++) {
-			int xloc = random.nextInt(getWidth());
-			int yloc = random.nextInt(getHeight());
-			treeSplash(xloc, yloc);
-		}
+  private void doTrees() {
+    int amount;
 
-		smoothTrees();
-		smoothTrees();
-	}
+    amount = random.nextInt(101) + 50;
 
-	private void treeSplash(int xloc, int yloc)
-	{
-		int dis;
-		dis = random.nextInt(151) + 50;
+    for (int x = 0; x < amount; x++) {
+      int xloc = random.nextInt(getWidth());
+      int yloc = random.nextInt(getHeight());
+      treeSplash(xloc, yloc);
+    }
 
-		mapX = xloc;
-		mapY = yloc;
+    smoothTrees();
+    smoothTrees();
+  }
 
-		for (int z = 0; z < dis; z++) {
-			int dir = random.nextInt(8);
-			moveMap(dir);
+  private void treeSplash(int xloc, int yloc) {
+    int dis;
+    dis = random.nextInt(151) + 50;
 
-			if (!engine.testBounds(mapX, mapY))
-				return;
+    mapX = xloc;
+    mapY = yloc;
 
-			if ((map[mapY][mapX] & LOMASK) == DIRT) {
-				map[mapY][mapX] = WOODS;
-			}
-		}
-	}
+    for (int z = 0; z < dis; z++) {
+      int dir = random.nextInt(8);
+      moveMap(dir);
 
-	private void moveMap(int dir)
-	{
-		dir &= 7;
-		mapX += DIRECTION_TABX[dir];
-		mapY += DIRECTION_TABY[dir];
-	}
+      if (!engine.testBounds(mapX, mapY)) return;
 
-	private void smoothTrees()
-	{
-		for (int mapY = 0; mapY < map.length; mapY++) {
-			for (int mapX = 0; mapX < map[mapY].length; mapX++) {
-				if (isTree(map[mapY][mapX])) {
-					int bitindex = 0;
-					for (int z = 0; z < 4; z++) {
-						bitindex <<= 1;
-						int xtem = mapX + DX[z];
-						int ytem = mapY + DY[z];
-						if (engine.testBounds(xtem, ytem) &&
-								isTree(map[ytem][xtem])) {
-							bitindex |= 1;
-						}
-					}
-					char temp = TEdTab[bitindex & 15];
-					if (temp != 0) {
-						if (temp != WOODS) {
-							if ((mapX + mapY & 1) != 0) {
-								temp -= 8;
-							}
-						}
-					}
-					map[mapY][mapX] = temp;
-				}
-			}
-		}
-	}
+      if ((map[mapY][mapX] & LOMASK) == DIRT) {
+        map[mapY][mapX] = WOODS;
+      }
+    }
+  }
 
-	/**
-	 * Three settings on whether to generate a new map as an island.
-	 */
-	enum CreateIsland
-	{
-		ALWAYS,
-		SELDOM   // seldom == 10% of the time
-	}
+  private void moveMap(int dir) {
+    dir &= 7;
+    mapX += DIRECTION_TABX[dir];
+    mapY += DIRECTION_TABY[dir];
+  }
 
+  private void smoothTrees() {
+    for (int mapY = 0; mapY < map.length; mapY++) {
+      for (int mapX = 0; mapX < map[mapY].length; mapX++) {
+        if (isTree(map[mapY][mapX])) {
+          int bitindex = 0;
+          for (int z = 0; z < 4; z++) {
+            bitindex <<= 1;
+            int xtem = mapX + DX[z];
+            int ytem = mapY + DY[z];
+            if (engine.testBounds(xtem, ytem) && isTree(map[ytem][xtem])) {
+              bitindex |= 1;
+            }
+          }
+          char temp = TEdTab[bitindex & 15];
+          if (temp != 0) {
+            if (temp != WOODS) {
+              if ((mapX + mapY & 1) != 0) {
+                temp -= 8;
+              }
+            }
+          }
+          map[mapY][mapX] = temp;
+        }
+      }
+    }
+  }
+
+  /** Three settings on whether to generate a new map as an island. */
+  enum CreateIsland {
+    ALWAYS,
+    SELDOM // seldom == 10% of the time
+  }
 }

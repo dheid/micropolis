@@ -8,15 +8,12 @@
 
 package micropolisj.engine;
 
-/**
- * Lists the disasters that the user can invoke.
- */
-public enum Disaster
-{
-	MONSTER,
-	FIRE,
-	FLOOD,
-	MELTDOWN,
-	TORNADO,
-	EARTHQUAKE
+/** Lists the disasters that the user can invoke. */
+public enum Disaster {
+  MONSTER,
+  FIRE,
+  FLOOD,
+  MELTDOWN,
+  TORNADO,
+  EARTHQUAKE
 }

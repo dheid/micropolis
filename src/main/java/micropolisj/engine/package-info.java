@@ -1,4 +1,2 @@
-/**
- * <p>Contains the backend classes that implement the actual city simulation.</p>
- */
+/** Contains the backend classes that implement the actual city simulation. */
 package micropolisj.engine;

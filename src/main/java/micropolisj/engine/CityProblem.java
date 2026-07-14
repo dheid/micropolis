@@ -8,16 +8,13 @@
 
 package micropolisj.engine;
 
-/**
- * Enumeration of various city problems that the citizens complain about.
- */
-public enum CityProblem
-{
-	CRIME,
-	POLLUTION,
-	HOUSING,
-	TAXES,
-	TRAFFIC,
-	UNEMPLOYMENT,
-	FIRE
+/** Enumeration of various city problems that the citizens complain about. */
+public enum CityProblem {
+  CRIME,
+  POLLUTION,
+  HOUSING,
+  TAXES,
+  TRAFFIC,
+  UNEMPLOYMENT,
+  FIRE
 }

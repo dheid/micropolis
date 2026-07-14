@@ -9,101 +9,76 @@
 package micropolisj.engine;
 
 /**
- * Specifies a rectangular area in the city's coordinate space.
- * This class is functionally equivalent to Java AWT's Rectangle
- * class, but is portable to Java editions that do not contain AWT.
+ * Specifies a rectangular area in the city's coordinate space. This class is functionally
+ * equivalent to Java AWT's Rectangle class, but is portable to Java editions that do not contain
+ * AWT.
  */
-public class CityRect
-{
-	private int x;
+public class CityRect {
+  private int x;
 
-	private int y;
+  private int y;
 
-	private int width;
+  private int width;
 
-	private int height;
+  private int height;
 
-	public CityRect()
-	{
-	}
+  public CityRect() {}
 
-	public CityRect(int x, int y, int width, int height)
-	{
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-	}
+  public CityRect(int x, int y, int width, int height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+  }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (obj instanceof CityRect) {
-			CityRect rhs = (CityRect) obj;
-			return x == rhs.x &&
-					y == rhs.y &&
-					width == rhs.width &&
-					height == rhs.height;
-		} else {
-			return false;
-		}
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof CityRect) {
+      CityRect rhs = (CityRect) obj;
+      return x == rhs.x && y == rhs.y && width == rhs.width && height == rhs.height;
+    } else {
+      return false;
+    }
+  }
 
-	@Override
-	public String toString()
-	{
-		return "[" + x + "," + y + "," + width + "x" + height + "]";
-	}
+  @Override
+  public String toString() {
+    return "[" + x + "," + y + "," + width + "x" + height + "]";
+  }
 
-	/**
-	 * The X coordinate of the upper-left corner of the rectangle.
-	 */
-	public int getX()
-	{
-		return x;
-	}
+  /** The X coordinate of the upper-left corner of the rectangle. */
+  public int getX() {
+    return x;
+  }
 
-	public void setX(int x)
-	{
-		this.x = x;
-	}
+  public void setX(int x) {
+    this.x = x;
+  }
 
-	/**
-	 * The Y coordinate of the upper-left corner of the rectangle.
-	 */
-	public int getY()
-	{
-		return y;
-	}
+  /** The Y coordinate of the upper-left corner of the rectangle. */
+  public int getY() {
+    return y;
+  }
 
-	public void setY(int y)
-	{
-		this.y = y;
-	}
+  public void setY(int y) {
+    this.y = y;
+  }
 
-	/**
-	 * The width of the rectangle.
-	 */
-	public int getWidth()
-	{
-		return width;
-	}
+  /** The width of the rectangle. */
+  public int getWidth() {
+    return width;
+  }
 
-	public void setWidth(int width)
-	{
-		this.width = width;
-	}
+  public void setWidth(int width) {
+    this.width = width;
+  }
 
-	/**
-	 * The height of the rectangle.
-	 */
-	public int getHeight()
-	{
-		return height;
-	}
+  /** The height of the rectangle. */
+  public int getHeight() {
+    return height;
+  }
 
-	public void setHeight(int height)
-	{
-		this.height = height;
-	}
+  public void setHeight(int height) {
+    this.height = height;
+  }
 }

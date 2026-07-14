@@ -8,32 +8,27 @@
 
 package micropolisj.engine;
 
-public class GameLevel
-{
-	public static final int MIN_LEVEL = 0;
-	public static final int MAX_LEVEL = 2;
+public class GameLevel {
+  public static final int MIN_LEVEL = 0;
+  public static final int MAX_LEVEL = 2;
 
-	//prevent this class from being instantiated
-	private GameLevel()
-	{
-	}
+  // prevent this class from being instantiated
+  private GameLevel() {}
 
-	public static boolean isValid(int lev)
-	{
-		return lev >= MIN_LEVEL && lev <= MAX_LEVEL;
-	}
+  public static boolean isValid(int lev) {
+    return lev >= MIN_LEVEL && lev <= MAX_LEVEL;
+  }
 
-	public static int getStartingFunds(int lev)
-	{
-		switch (lev) {
-			case 0:
-				return 20000;
-			case 1:
-				return 10000;
-			case 2:
-				return 5000;
-			default:
-				throw new RuntimeException("unexpected game level: " + lev);
-		}
-	}
+  public static int getStartingFunds(int lev) {
+    switch (lev) {
+      case 0:
+        return 20000;
+      case 1:
+        return 10000;
+      case 2:
+        return 5000;
+      default:
+        throw new RuntimeException("unexpected game level: " + lev);
+    }
+  }
 }

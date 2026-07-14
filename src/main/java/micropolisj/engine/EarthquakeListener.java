@@ -8,10 +8,7 @@
 
 package micropolisj.engine;
 
-/**
- * The listener interface for receiving earthquake notifications.
- */
-public interface EarthquakeListener
-{
-	void earthquakeStarted();
+/** The listener interface for receiving earthquake notifications. */
+public interface EarthquakeListener {
+  void earthquakeStarted();
 }

@@ -8,37 +8,33 @@
 
 package micropolisj.gui;
 
-import micropolisj.engine.MicropolisMessage;
-
+import java.util.ResourceBundle;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
-import java.util.ResourceBundle;
+import micropolisj.engine.MicropolisMessage;
 
-public class MessagesPane extends JTextPane
-{
-	private static final ResourceBundle cityMessageStrings = ResourceBundle.getBundle("strings.CityMessages");
+public class MessagesPane extends JTextPane {
+  private static final ResourceBundle cityMessageStrings =
+      ResourceBundle.getBundle("strings.CityMessages");
 
-	public MessagesPane()
-	{
-		setEditable(false);
-	}
+  public MessagesPane() {
+    setEditable(false);
+  }
 
-	public void appendCityMessage(MicropolisMessage message)
-	{
-		appendMessageText(cityMessageStrings.getString(message.name()));
-	}
+  public void appendCityMessage(MicropolisMessage message) {
+    appendMessageText(cityMessageStrings.getString(message.name()));
+  }
 
-	private void appendMessageText(String messageText)
-	{
-		try {
-			StyledDocument doc = getStyledDocument();
-			if (doc.getLength() != 0) {
-				doc.insertString(doc.getLength(), "\n", null);
-			}
-			doc.insertString(doc.getLength(), messageText, null);
-		} catch (BadLocationException e) {
-			throw new RuntimeException("unexpected", e);
-		}
-	}
+  private void appendMessageText(String messageText) {
+    try {
+      StyledDocument doc = getStyledDocument();
+      if (doc.getLength() != 0) {
+        doc.insertString(doc.getLength(), "\n", null);
+      }
+      doc.insertString(doc.getLength(), messageText, null);
+    } catch (BadLocationException e) {
+      throw new RuntimeException("unexpected", e);
+    }
+  }
 }

@@ -44,7 +44,7 @@ The release archive comes with start scripts that ease the process of running th
 Download the Tar archive of the [latest version of Micropolis](https://github.com/dheid/micropolis/releases/latest). x.x.x is the version number
 
 (1) Extract the tar archive: `tar xf /path/to/micropolis-x.x.x.tar`
-    
+
 (2) Run `./micropolis-x.x.x/bin/micropolis` to start the game
 
 ## Windows
@@ -76,13 +76,13 @@ be found here: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 1. Fork the repository on GitHub and clone it locally.
 
 2. Create a copy of each property file in `src/main/resources/strings` and rename the copy according
-to your language code. This little bash code will help you:
+   to your language code. This little bash code will help you:
 
 ```bash
-    export language_code=es # change this according to your language
-    find src/main/resources/strings -regex '.*/\([A-Za-z]*\)\.properties' -exec sh -c 'filename={}; cp $filename ${filename%.properties}_$language_code.properties' \;
-```   
- 
+export language_code=es # change this according to your language
+find src/main/resources/strings -regex '.*/\([A-Za-z]*\)\.properties' -exec sh -c 'filename={}; cp $filename ${filename%.properties}_$language_code.properties' \;
+```
+
 3. Translate the lines within the new resources bundles.
 
 4. Create a pull request.
@@ -91,8 +91,8 @@ to your language code. This little bash code will help you:
 
 Save files have the following format:
 
-| Offset | Content                                             |
-| ------ | --------------------------------------------------- |
+| Offset |                       Content                       |
+|--------|-----------------------------------------------------|
 | 0x0000 | History of residential levels (240 16-bit integers) |
 | 0x01E0 | History of commericial levels                       |
 | 0x03C0 | History of industrial levels                        |
@@ -101,3 +101,4 @@ Save files have the following format:
 | 0x0960 | History of cash flow                                |
 | 0x0B40 | Miscellaneous values                                |
 | 0x0C30 | Map data (by columns, west to east)                 |
+

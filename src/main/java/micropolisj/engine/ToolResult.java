@@ -8,13 +8,10 @@
 
 package micropolisj.engine;
 
-/**
- * Lists the various results that may occur when applying a tool.
- */
-public enum ToolResult
-{
-	SUCCESS, // 1
-	NONE,    // 0
-	UH_OH,   // -1; invalid position
-	INSUFFICIENT_FUNDS   // -2
+/** Lists the various results that may occur when applying a tool. */
+public enum ToolResult {
+  SUCCESS, // 1
+  NONE, // 0
+  UH_OH, // -1; invalid position
+  INSUFFICIENT_FUNDS // -2
 }

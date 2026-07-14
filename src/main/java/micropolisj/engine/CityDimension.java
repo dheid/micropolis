@@ -8,40 +8,33 @@
 
 package micropolisj.engine;
 
-/**
- * Encapsulates the width and height of a rectangular section of a Micropolis city.
- */
-public class CityDimension
-{
-	public final int width;
-	public final int height;
+/** Encapsulates the width and height of a rectangular section of a Micropolis city. */
+public class CityDimension {
+  public final int width;
+  public final int height;
 
-	public CityDimension(int width, int height)
-	{
-		this.width = width;
-		this.height = height;
-	}
+  public CityDimension(int width, int height) {
+    this.width = width;
+    this.height = height;
+  }
 
-	@Override
-	public int hashCode()
-	{
-		return width * 33 + height;
-	}
+  @Override
+  public int hashCode() {
+    return width * 33 + height;
+  }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (obj instanceof CityDimension) {
-			CityDimension rhs = (CityDimension) obj;
-			return width == rhs.width && height == rhs.height;
-		} else {
-			return false;
-		}
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof CityDimension) {
+      CityDimension rhs = (CityDimension) obj;
+      return width == rhs.width && height == rhs.height;
+    } else {
+      return false;
+    }
+  }
 
-	@Override
-	public String toString()
-	{
-		return width + "x" + height;
-	}
+  @Override
+  public String toString() {
+    return width + "x" + height;
+  }
 }
