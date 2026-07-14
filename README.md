@@ -21,6 +21,20 @@ https://www.java.com/
 For development, please install the Java Development Toolkit. I recommend OpenJDK. You'll find an
 installation instruction here: https://openjdk.java.net/install/
 
+# Building from Source
+
+To build the project from source, you need [Apache Maven](https://maven.apache.org/) installed.
+
+```bash
+mvn clean package
+```
+
+After a successful build, the executable JAR file will be created in the `target/` directory:
+
+```bash
+java -jar target/micropolis-1.0.0-SNAPSHOT.jar
+```
+
 # Running
 
 The release archive comes with start scripts that ease the process of running the game.
