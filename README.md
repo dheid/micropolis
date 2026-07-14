@@ -50,14 +50,6 @@ on the front-end or any particular graphical system.
 The `micropolisj.gui packag`e provides the user interface for the game. It renders the city, controls
 the speed of the simulation, and responds to event messages from the engine.
 
-## Building
-
-A Gradle wrapper is included, so please just run
-
-    ./gradlew build
-    
-to build the software and run the tests. 
-
 ## Localization
 
 Unless you are an English speaker, you may like to run Micropolis in your own language. Micropolis
@@ -96,22 +88,3 @@ Save files have the following format:
 | 0x0960 | History of cash flow                                |
 | 0x0B40 | Miscellaneous values                                |
 | 0x0C30 | Map data (by columns, west to east)                 |
-
-# Releasing
-
-To create a release, make sure that your GitHub API token with corresponding repository
-permissions exists in '~/.gradle/gradle.properties':
-
-    github.token=abcdef...
-    
-Update the version property in the `gradle.properties` of this repository.    
-    
-Ensure that you included all the changes into the `master` branch.
-
-    ./gradlew 
-
-Then execute
-
-    ./gradlew clean build githubRelease
-    
-to create a GitHub release from the current master.
