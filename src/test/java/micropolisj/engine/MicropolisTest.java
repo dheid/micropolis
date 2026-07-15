@@ -94,4 +94,90 @@ public class MicropolisTest {
   public void testAnimate() {
     assertThatNoException().isThrownBy(micropolis::animate);
   }
+
+  @Test
+  public void spendReducesTotalFundsByAmount() {
+    micropolis.setFunds(1000);
+
+    micropolis.spend(300);
+
+    assertThat(micropolis.getBudget().getTotalFunds()).isEqualTo(700);
+  }
+
+  @Test
+  public void spendWithZeroAmountLeavesFundsUnchanged() {
+    micropolis.setFunds(500);
+
+    micropolis.spend(0);
+
+    assertThat(micropolis.getBudget().getTotalFunds()).isEqualTo(500);
+  }
+
+  @Test
+  public void spendWithNegativeAmountIncreasesFunds() {
+    micropolis.setFunds(500);
+
+    micropolis.spend(-200);
+
+    assertThat(micropolis.getBudget().getTotalFunds()).isEqualTo(700);
+  }
+
+  @Test
+  public void spendMoreThanAvailableFundsResultsInNegativeBalance() {
+    micropolis.setFunds(100);
+
+    micropolis.spend(150);
+
+    assertThat(micropolis.getBudget().getTotalFunds()).isEqualTo(-50);
+  }
+
+  @Test
+  public void spendCalledMultipleTimesAccumulatesDeductions() {
+    micropolis.setFunds(1000);
+
+    micropolis.spend(100);
+    micropolis.spend(250);
+    micropolis.spend(50);
+
+    assertThat(micropolis.getBudget().getTotalFunds()).isEqualTo(600);
+  }
+
+  @Test
+  public void spendNotifiesFundsChangedListener() {
+    boolean[] notified = {false};
+    micropolis.addListener(fundsChangedListener(() -> notified[0] = true));
+
+    micropolis.spend(100);
+
+    assertThat(notified[0]).isTrue();
+  }
+
+  /**
+   * Builds a {@link CityListener} stub that runs the given callback on {@code fundsChanged()} and
+   * throws on any other invocation, since those are irrelevant to this test.
+   */
+  private static CityListener fundsChangedListener(Runnable onFundsChanged) {
+    return new CityListener() {
+      @Override
+      public void cityMessage(MicropolisMessage message, CityLocation loc) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public void citySound(Sound sound, CityLocation loc) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public void fundsChanged() {
+        onFundsChanged.run();
+      }
+
+      @Override
+      public void optionsChanged() {
+        throw new UnsupportedOperationException();
+      }
+    };
+  }
+
 }
